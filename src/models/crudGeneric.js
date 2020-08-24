@@ -1,21 +1,82 @@
-const connection = require("../database/connection");
+import knex from '../database/connection'
+import { first, split, map, pipe, head, last, find, isEmpty } from 'lodash/fp'
+import { fieldsNoTypeText } from '../constants/db'
+async function getAll(tableName, queryParams = {}) {
+  const { perPage, currentPage, sort } = queryParams
 
-async function getAll(tableName) {
-  return connection(tableName).select("*");
+  const sql = knex.select().from(tableName)
+  if (sort) sql.orderByRaw(parseOrderBy(sort))
+  if (perPage && currentPage) sql.paginate(perPage, currentPage)
+
+  return await sql
+}
+
+async function getOneRecord({ id, tableName, columnPrimary }) {
+  return knex
+    .select()
+    .from(tableName)
+    .where(columnPrimary, '=', id)
+    .first()
 }
 
 async function createRecord(data, tableName) {
-  return connection(tableName).returning("*").insert(data);
+  return first(
+    await knex(tableName)
+      .returning('*')
+      .insert(data)
+  )
 }
 
 async function updateRecord({ id, data, tableName, columnPrimary }) {
-  return connection(tableName)
-    .where(columnPrimary, id)
-    .update(data, Object.keys(data));
+  return first(
+    await knex(tableName)
+      .update(data, Object.keys(data))
+      .where(columnPrimary, id)
+  )
 }
 
-//Nao deleta se tiver linkado com outra tabela, NORMAL ?
+const prepareDataDeleted = (id, tableName, columnPrimary, totalDeleted) => ({
+  totalDeleted,
+  id,
+  tableName,
+  columnPrimary
+})
+
 async function deleteRecord({ id, tableName, columnPrimary }) {
-  return connection(tableName).where(columnPrimary, id).delete();
+  return prepareDataDeleted(
+    id,
+    tableName,
+    columnPrimary,
+    await knex(tableName)
+      .where(columnPrimary, id)
+      .delete()
+  )
 }
-module.exports = { getAll, createRecord, updateRecord, deleteRecord };
+
+const isColumnTypeText = column => isEmpty(find(column, fieldsNoTypeText))
+
+const parseOrderByForFieldText = column =>
+  isColumnTypeText(column) ? ` LOWER(${column})` : column
+
+const parseOrderBy = sort => {
+  return pipe(
+    split(','),
+    map(field => {
+      const arrayField = split(':', field)
+      const column = head(arrayField)
+      const order = last(arrayField)
+      return sort.length === 1
+        ? parseOrderByForFieldText(column)
+        : `${parseOrderByForFieldText(column)} ${order}`
+    })
+  )(sort)
+}
+
+export default {
+  getAll,
+  createRecord,
+  updateRecord,
+  deleteRecord,
+  getOneRecord,
+  parseOrderBy
+}

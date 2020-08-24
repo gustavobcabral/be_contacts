@@ -1,31 +1,22 @@
-/* eslint-disable @typescript-eslint/camelcase */
-/* eslint-disable fp/no-mutation */
 const {
-  getDetailsOneContact,
-  getDetailsAllContact,
-  creatRecord,
+  getAll,
+  createRecord,
   updateRecord,
   deleteRecord
-} = require('../models/detailsContactsModel')
+} = require('../models/languagesModel')
+import { responseSuccess, responseNext } from '../helpers/responseGeneric'
 
-async function get(request, response) {
-  const datailscontacts = await getDetailsAllContact()
-  return response.json(datailscontacts)
-}
-
-async function getOne(request, response) {
-  const datailscontacts = await getDetailsOneContact(request.params.id)
-  return response.json(datailscontacts)
+async function get(request, response, next) {
+  try {
+    response.json(responseSuccess(request, await getAll()))
+  } catch (error) {
+    next(responseNext(error, response))
+  }
 }
 
 async function create(request, response) {
-  const data = {
-    ...request.body,
-    phone_contact: request.params.id
-  }
-
   try {
-    const newData = await creatRecord(data)
+    const newData = await createRecord(request.body)
     response
       .status(200)
       .json({ status: true, message: 'CREATING_SUCCESSFUL', data: newData })
@@ -39,11 +30,8 @@ async function create(request, response) {
 }
 
 async function update(request, response) {
-  const { id } = request.params
-  const data = request.body
-
   try {
-    const recordsAffected = await updateRecord(data, id)
+    const recordsAffected = await updateRecord(request.params.id, request.body)
     let statusCode = 200
     let json = {
       status: true,
@@ -82,4 +70,5 @@ async function deleteOne(request, response) {
     })
   }
 }
-export default { get, getOne, create, update, deleteOne }
+
+export default { get, create, update, deleteOne }

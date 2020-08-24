@@ -1,93 +1,159 @@
-const {
-  getAll,
-  getOneRecord,
+import {
+  getOneWithDetails,
   createRecord,
   updateRecord,
   deleteRecord,
-} = require("../models/contactsModel");
-const { getDetailsOneContact } = require("../models/detailsContacsModel");
+  getAllWithDetails,
+  columnPrimary,
+  fields
+} from '../models/contactsModel'
+import { fields as fieldsDetailsContact } from '../models/detailsContactsModel'
+import asyncPipe from 'pipeawait'
+import {
+  first,
+  isEmpty,
+  reduce,
+  pipe,
+  pick,
+  isNull,
+  curry,
+  uniqBy,
+  map,
+  get as getLodash,
+  omit,
+  orderBy,
+  countBy
+} from 'lodash/fp'
+import { responseSuccess, responseNext } from '../helpers/responseGeneric'
+import {
+  getParamsForUpdate,
+  getParamsForGet,
+  getParamsForCreate,
+  getParamsForGetOne,
+  getParamsForDelete
+} from '../helpers/genericHelpers'
 
-async function get(request, response) {
-  const contacts = await getAll();
-  const newContacts = [];
-  for (const contact of contacts) {
-    const details = await getDetailsOneContact(contact.phone, 2);
-    const contactDetails = {
-      ...contact,
-      details,
-    };
-    newContacts.push(contactDetails);
-  }
-  return response.json(newContacts);
+const getDetailsProps = detailsContact => {
+  return omit(['phone_contact'], pick(fieldsDetailsContact, detailsContact))
 }
 
-async function getOne(request, response) {
-  const { id } = request.params;
-  const contact = await getOneRecord(id);
-  const details = await getDetailsOneContact(contact.phone);
-
-  const contactDetails = {
-    ...contact,
-    details,
-  };
-
-  return response.json(contactDetails);
-}
-async function create(request, response) {
-  try {
-    const newData = await createRecord(request.body);
-    response
-      .status(200)
-      .json({ status: true, message: "CREATING_SUCCESSFUL", data: newData });
-  } catch (error) {
-    response.status(500).json({
-      status: false,
-      message: "ERROR_WHILE_CREATING",
-      error,
-    });
-  }
+const getContactProps = contact => {
+  return pick(fields, contact)
 }
 
-async function update(request, response) {
-  try {
-    const recordsAffected = await updateRecord(request.body, request.params.id);
-    let statusCode = 200;
-    let json = {
-      status: true,
-      message: "UPDATE_SUCCESSFUL",
-      data: recordsAffected,
-    };
-    if (recordsAffected.length === 0) {
-      statusCode = 500;
-      json = { status: false, message: "UPDATE_FAIL" };
+const reduceToGetDetails = (phone, listAllDetails) => {
+  return pipe(
+    orderBy(['createdAt'], ['desc']),
+    reduce(
+      (acc, current) =>
+        phone === current.phone && !isNull(current.createdAt)
+          ? [...acc, getDetailsProps(current)]
+          : acc,
+      []
+    )
+  )(listAllDetails)
+}
+
+const mapToGetDetailsOneContact = (list, contactsUnique) => {
+  return map(
+    contact => ({
+      ...getContactProps(contact),
+      details: reduceToGetDetails(getLodash(columnPrimary, contact), list)
+    }),
+    contactsUnique
+  )
+}
+
+const mountDetailsDataForContacts = detailsContacts => {
+  if (!isEmpty(detailsContacts)) {
+    const { list } = detailsContacts
+    const uniqueContacts = uniqBy(columnPrimary, list)
+    const withoutDetails = getLodash(
+      'null',
+      countBy('phone_contact', uniqueContacts)
+    )
+    const withDetails = uniqueContacts.length - withoutDetails
+    const listOrganized = pipe(curry(mapToGetDetailsOneContact)(list))(
+      uniqueContacts
+    )
+    return {
+      ...detailsContacts,
+      withDetails,
+      withoutDetails,
+      list: listOrganized
     }
-    return response.status(statusCode).json(json);
-  } catch (error) {
-    response.status(500).json({
-      status: false,
-      message: "ERROR_WHILE_UPDATE",
-      error,
-    });
   }
+  return []
 }
 
-async function deleteOne(request, response) {
+const mountDetailsDataForOneContact = detailsContact => {
+  return pipe(mountDetailsDataForContacts, first)(detailsContact)
+}
+
+const get = async (request, response, next) => {
   try {
-    const recordsAffected = await deleteRecord(request.params.id);
-    let statusCode = 200;
-    let json = { status: true, message: "DELETED_SUCCESSFUL" };
-    if (recordsAffected === 0) {
-      statusCode = 500;
-      json = { status: false, message: "DELETED_FAIL" };
-    }
-    return response.status(statusCode).json(json);
+    response.json(
+      await asyncPipe(
+        getAllWithDetails,
+        mountDetailsDataForContacts,
+        curry(responseSuccess)(request)
+      )(getParamsForGet(request))
+    )
   } catch (error) {
-    response.status(500).json({
-      status: false,
-      message: "ERROR_WHILE_DELETING",
-      error,
-    });
+    next(responseNext(error, request))
   }
 }
 
-module.exports = { get, getOne, create, update, deleteOne };
+const getOne = async (request, response, next) => {
+  try {
+    response.json(
+      await asyncPipe(
+        getOneWithDetails,
+        mountDetailsDataForOneContact,
+        curry(responseSuccess)(request)
+      )(getParamsForGetOne(request))
+    )
+  } catch (error) {
+    next(responseNext(error, request))
+  }
+}
+const create = async (request, response, next) => {
+  try {
+    response.json(
+      await asyncPipe(
+        createRecord,
+        curry(responseSuccess)(request)
+      )(getParamsForCreate(request))
+    )
+  } catch (error) {
+    next(responseNext(error, request))
+  }
+}
+
+const update = async (request, response, next) => {
+  try {
+    response.json(
+      await asyncPipe(
+        updateRecord,
+        curry(responseSuccess)(request)
+      )(getParamsForUpdate(request))
+    )
+  } catch (error) {
+    next(responseNext(error, request))
+  }
+}
+
+const deleteOne = async (request, response, next) => {
+  try {
+    response.json(
+      await asyncPipe(
+        deleteRecord,
+        curry(responseSuccess)(request)
+      )(getParamsForDelete(request))
+    )
+  } catch (error) {
+    next(responseNext(error, request))
+  }
+}
+
+export default { get, getOne, create, update, deleteOne }

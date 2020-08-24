@@ -1,6 +1,6 @@
 import crud from './crudGeneric'
 
-const tableName = 'status'
+const tableName = 'languages'
 const columnPrimary = 'id'
 
 async function getAll() {
