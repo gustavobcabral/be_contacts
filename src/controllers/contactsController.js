@@ -5,10 +5,10 @@ import {
   deleteRecord,
   getAllWithDetails,
   columnPrimary,
-  fields
-} from '../models/contactsModel'
-import { fields as fieldsDetailsContact } from '../models/detailsContactsModel'
-import asyncPipe from 'pipeawait'
+  fields,
+} from "../models/contactsModel";
+import { fields as fieldsDetailsContact } from "../models/detailsContactsModel";
+import asyncPipe from "pipeawait";
 import {
   first,
   isEmpty,
@@ -22,28 +22,28 @@ import {
   get as getLodash,
   omit,
   orderBy,
-  countBy
-} from 'lodash/fp'
-import { responseSuccess, responseNext } from '../helpers/responseGeneric'
+  countBy,
+} from "lodash/fp";
+import { responseSuccess, responseNext } from "../helpers/responseGeneric";
 import {
   getParamsForUpdate,
   getParamsForGet,
   getParamsForCreate,
   getParamsForGetOne,
-  getParamsForDelete
-} from '../helpers/genericHelpers'
+  getParamsForDelete,
+} from "../helpers/genericHelpers";
 
-const getDetailsProps = detailsContact => {
-  return omit(['phone_contact'], pick(fieldsDetailsContact, detailsContact))
-}
+const getDetailsProps = (detailsContact) => {
+  return omit(["phone_contact"], pick(fieldsDetailsContact, detailsContact));
+};
 
-const getContactProps = contact => {
-  return pick(fields, contact)
-}
+const getContactProps = (contact) => {
+  return pick(fields, contact);
+};
 
 const reduceToGetDetails = (phone, listAllDetails) => {
   return pipe(
-    orderBy(['createdAt'], ['desc']),
+    orderBy(["createdAt"], ["desc"]),
     reduce(
       (acc, current) =>
         phone === current.phone && !isNull(current.createdAt)
@@ -51,44 +51,44 @@ const reduceToGetDetails = (phone, listAllDetails) => {
           : acc,
       []
     )
-  )(listAllDetails)
-}
+  )(listAllDetails);
+};
 
 const mapToGetDetailsOneContact = (list, contactsUnique) => {
   return map(
-    contact => ({
+    (contact) => ({
       ...getContactProps(contact),
-      details: reduceToGetDetails(getLodash(columnPrimary, contact), list)
+      details: reduceToGetDetails(getLodash(columnPrimary, contact), list),
     }),
     contactsUnique
-  )
-}
+  );
+};
 
-const mountDetailsDataForContacts = detailsContacts => {
+const mountDetailsDataForContacts = (detailsContacts) => {
   if (!isEmpty(detailsContacts)) {
-    const { list } = detailsContacts
-    const uniqueContacts = uniqBy(columnPrimary, list)
+    const { list } = detailsContacts;
+    const uniqueContacts = uniqBy(columnPrimary, list);
     const withoutDetails = getLodash(
-      'null',
-      countBy('phone_contact', uniqueContacts)
-    )
-    const withDetails = uniqueContacts.length - withoutDetails
+      "null",
+      countBy("phone_contact", uniqueContacts)
+    );
+    const withDetails = uniqueContacts.length - withoutDetails;
     const listOrganized = pipe(curry(mapToGetDetailsOneContact)(list))(
       uniqueContacts
-    )
+    );
     return {
       ...detailsContacts,
       withDetails,
       withoutDetails,
-      list: listOrganized
-    }
+      list: listOrganized,
+    };
   }
-  return []
-}
+  return [];
+};
 
-const mountDetailsDataForOneContact = detailsContact => {
-  return pipe(mountDetailsDataForContacts, first)(detailsContact)
-}
+const mountDetailsDataForOneContact = (detailsContact) => {
+  return pipe(mountDetailsDataForContacts, first)(detailsContact);
+};
 
 const get = async (request, response, next) => {
   try {
@@ -98,11 +98,11 @@ const get = async (request, response, next) => {
         mountDetailsDataForContacts,
         curry(responseSuccess)(request)
       )(getParamsForGet(request))
-    )
+    );
   } catch (error) {
-    next(responseNext(error, request))
+    next(responseNext(error, request));
   }
-}
+};
 
 const getOne = async (request, response, next) => {
   try {
@@ -112,11 +112,11 @@ const getOne = async (request, response, next) => {
         mountDetailsDataForOneContact,
         curry(responseSuccess)(request)
       )(getParamsForGetOne(request))
-    )
+    );
   } catch (error) {
-    next(responseNext(error, request))
+    next(responseNext(error, request));
   }
-}
+};
 const create = async (request, response, next) => {
   try {
     response.json(
@@ -124,11 +124,11 @@ const create = async (request, response, next) => {
         createRecord,
         curry(responseSuccess)(request)
       )(getParamsForCreate(request))
-    )
+    );
   } catch (error) {
-    next(responseNext(error, request))
+    next(responseNext(error, request));
   }
-}
+};
 
 const update = async (request, response, next) => {
   try {
@@ -137,11 +137,11 @@ const update = async (request, response, next) => {
         updateRecord,
         curry(responseSuccess)(request)
       )(getParamsForUpdate(request))
-    )
+    );
   } catch (error) {
-    next(responseNext(error, request))
+    next(responseNext(error, request));
   }
-}
+};
 
 const deleteOne = async (request, response, next) => {
   try {
@@ -150,10 +150,10 @@ const deleteOne = async (request, response, next) => {
         deleteRecord,
         curry(responseSuccess)(request)
       )(getParamsForDelete(request))
-    )
+    );
   } catch (error) {
-    next(responseNext(error, request))
+    next(responseNext(error, request));
   }
-}
+};
 
-export default { get, getOne, create, update, deleteOne }
+export default { get, getOne, create, update, deleteOne };

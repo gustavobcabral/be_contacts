@@ -56,6 +56,7 @@ async function update(request, response) {
     }
     return response.status(statusCode).json(json)
   } catch (error) {
+    console.log(error)
     response.status(500).json({
       status: false,
       message: 'ERROR_WHILE_UPDATE',
