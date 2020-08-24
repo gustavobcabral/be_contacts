@@ -1,5 +1,5 @@
 import knex from '../database/connection'
-import { first, split, map, pipe, head, last, find, isEmpty } from 'lodash/fp'
+import { split, map, pipe, head, last, find, isEmpty } from 'lodash/fp'
 import { fieldsNoTypeText } from '../constants/db'
 async function getAll(tableName, queryParams = {}) {
   const { perPage, currentPage, sort } = queryParams
@@ -20,11 +20,9 @@ async function getOneRecord({ id, tableName, columnPrimary }) {
 }
 
 async function createRecord(data, tableName) {
-  return first(
-    await knex(tableName)
-      .returning('*')
-      .insert(data)
-  )
+  return await knex(tableName)
+    .returning('*')
+    .insert(data)
 }
 
 const prepareDataUpdated = (id, data) => {
