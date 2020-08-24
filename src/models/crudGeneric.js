@@ -27,26 +27,27 @@ async function createRecord(data, tableName) {
   )
 }
 
+const prepareDataUpdated = (id, data) => {
+  return { totalAffected: data.length, id, data }
+}
+
 async function updateRecord({ id, data, tableName, columnPrimary }) {
-  return first(
+  return prepareDataUpdated(
+    id,
     await knex(tableName)
       .update(data, Object.keys(data))
       .where(columnPrimary, id)
   )
 }
 
-const prepareDataDeleted = (id, tableName, columnPrimary, totalDeleted) => ({
+const prepareDataDeleted = (id, totalDeleted) => ({
   totalDeleted,
-  id,
-  tableName,
-  columnPrimary
+  id
 })
 
 async function deleteRecord({ id, tableName, columnPrimary }) {
   return prepareDataDeleted(
     id,
-    tableName,
-    columnPrimary,
     await knex(tableName)
       .where(columnPrimary, id)
       .delete()
