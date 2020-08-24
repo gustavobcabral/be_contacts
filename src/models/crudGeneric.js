@@ -40,8 +40,8 @@ async function updateRecord({ id, data, tableName, columnPrimary }) {
   )
 }
 
-const prepareDataDeleted = (id, totalDeleted) => ({
-  totalDeleted,
+const prepareDataDeleted = (id, totalAffected) => ({
+  totalAffected,
   id
 })
 
