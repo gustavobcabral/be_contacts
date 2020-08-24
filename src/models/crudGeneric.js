@@ -1,6 +1,7 @@
 import knex from '../database/connection'
 import { split, map, pipe, head, last, find, isEmpty } from 'lodash/fp'
 import { fieldsNoTypeText } from '../constants/db'
+
 async function getAll(tableName, queryParams = {}) {
   const { perPage, currentPage, sort } = queryParams
 
