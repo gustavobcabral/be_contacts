@@ -1,6 +1,5 @@
 import knex from '../database/connection'
-import { split, map, pipe, head, last, find, isEmpty } from 'lodash/fp'
-import { fieldsNoTypeText } from '../constants/db'
+import { split, map, pipe, head, last } from 'lodash/fp'
 
 const getAll = async (tableName, queryParams = {}) => {
   const { perPage, currentPage, sort } = queryParams
@@ -51,11 +50,6 @@ const deleteRecord = async ({ id, tableName, columnPrimary }) => {
       .delete()
   )
 }
-
-const isColumnTypeText = column => isEmpty(find(column, fieldsNoTypeText))
-
-const parseOrderByForFieldText = column =>
-  isColumnTypeText(column) ? ` LOWER(${column})` : column
 
 const parseOrderBy = sort => {
   return pipe(
