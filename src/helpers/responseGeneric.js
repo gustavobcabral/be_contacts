@@ -17,21 +17,20 @@ const methods = [
   { method: 'DELETE', errorDesc: DEL_ERROR, successDesc: DEL_OK }
 ]
 
-const findCod = (request, type) => {
-  return pipe(find({ method: request.method }), get(type))(methods)
-}
+const findCod = (request, type) =>
+  pipe(find({ method: request.method }), get(type))(methods)
 
-const responseSuccess = (request, data) => {
-  return { status: true, cod: findCod(request, 'successDesc'), data }
-}
+const responseSuccess = (request, data) => ({
+  status: true,
+  cod: findCod(request, 'successDesc'),
+  data
+})
 
-const responseError = err => {
-  return {
-    status: false,
-    cod: err.cod,
-    error: err.message || err.response || err.error || err
-  }
-}
+const responseError = err => ({
+  status: false,
+  cod: err.cod,
+  error: err.message || err.response || err.error || err
+})
 
 const responseNext = (error, request) => ({
   error,
