@@ -2,17 +2,16 @@ import knex from '../database/connection'
 import { split, map, pipe, head, last, find, isEmpty } from 'lodash/fp'
 import { fieldsNoTypeText } from '../constants/db'
 
-async function getAll(tableName, queryParams = {}) {
+const getAll = async (tableName, queryParams = {}) => {
   const { perPage, currentPage, sort } = queryParams
-
   const sql = knex.select().from(tableName)
   if (sort) sql.orderByRaw(parseOrderBy(sort))
   if (perPage && currentPage) sql.paginate(perPage, currentPage)
 
-  return await sql
+  return sql
 }
 
-async function getOneRecord({ id, tableName, columnPrimary }) {
+const getOneRecord = async ({ id, tableName, columnPrimary }) => {
   return knex
     .select()
     .from(tableName)
@@ -20,7 +19,7 @@ async function getOneRecord({ id, tableName, columnPrimary }) {
     .first()
 }
 
-async function createRecord(data, tableName) {
+const createRecord = async (data, tableName) => {
   return await knex(tableName)
     .returning('*')
     .insert(data)
@@ -30,7 +29,7 @@ const prepareDataUpdated = (id, data) => {
   return { totalAffected: data.length, id, data }
 }
 
-async function updateRecord({ id, data, tableName, columnPrimary }) {
+const updateRecord = async ({ id, data, tableName, columnPrimary }) => {
   return prepareDataUpdated(
     id,
     await knex(tableName)
@@ -44,7 +43,7 @@ const prepareDataDeleted = (id, totalAffected) => ({
   id
 })
 
-async function deleteRecord({ id, tableName, columnPrimary }) {
+const deleteRecord = async ({ id, tableName, columnPrimary }) => {
   return prepareDataDeleted(
     id,
     await knex(tableName)
@@ -65,9 +64,7 @@ const parseOrderBy = sort => {
       const arrayField = split(':', field)
       const column = head(arrayField)
       const order = last(arrayField)
-      return sort.length === 1
-        ? parseOrderByForFieldText(column)
-        : `${parseOrderByForFieldText(column)} ${order}`
+      return sort.length === 1 ? column : `${column} ${order}`
     })
   )(sort)
 }
