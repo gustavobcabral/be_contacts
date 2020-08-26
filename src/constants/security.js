@@ -1,0 +1,5 @@
+const UNAUTHORIZED = 'UNAUTHORIZED'
+const NO_TOKEN = 'NO_TOKEN'
+const JWT_SECRET = 'JehovaIsOurGod'
+
+export { UNAUTHORIZED, NO_TOKEN, JWT_SECRET }
