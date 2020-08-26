@@ -3,23 +3,26 @@ import crud from './crudGeneric'
 const tableName = 'publishers'
 const columnPrimary = 'id'
 
-async function getAll() {
-  return crud.getAll(tableName)
+const getAll = async queryParams => {
+  return crud.getAll(tableName, queryParams)
 }
 
-async function getOneRecord(id) {
+// async function getOneRecord(id) {
+//   return crud.getOneRecord({ id, tableName, columnPrimary })
+// }
+const getOneRecord = async id => {
   return crud.getOneRecord({ id, tableName, columnPrimary })
 }
 
-async function createRecord(data) {
+const createRecord = async data => {
   return crud.createRecord(data, tableName)
 }
 
-async function updateRecord(id, data) {
+const updateRecord = async ({ id, data }) => {
   return crud.updateRecord({ id, data, tableName, columnPrimary })
 }
 
-async function deleteRecord(id) {
+const deleteRecord = async id => {
   return crud.deleteRecord({ id, tableName, columnPrimary })
 }
 export { getAll, getOneRecord, createRecord, updateRecord, deleteRecord }

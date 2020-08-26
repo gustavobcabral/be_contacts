@@ -1,86 +1,71 @@
-/* eslint-disable @typescript-eslint/camelcase */
-/* eslint-disable fp/no-mutation */
 const {
-  getDetailsOneContact,
   getDetailsAllContact,
-  creatRecord,
+  createRecord,
   updateRecord,
   deleteRecord
 } = require('../models/detailsContactsModel')
+import { responseSuccess, responseNext } from '../helpers/responseGeneric'
+import {
+  getParamsForUpdate,
+  getParamsForCreate,
+  getParamsForDelete,
+  defaultValueForQuery
+} from '../helpers/genericHelpers'
+import asyncPipe from 'pipeawait'
+import { curry } from 'lodash/fp'
 
-async function get(request, response) {
-  const datailscontacts = await getDetailsAllContact()
-  return response.json(datailscontacts)
-}
-
-async function getOne(request, response) {
-  const datailscontacts = await getDetailsOneContact(request.params.id)
-  return response.json(datailscontacts)
-}
-
-async function create(request, response) {
-  const data = {
-    ...request.body,
-    phone_contact: request.params.id
-  }
-
+const get = async (request, response, next) => {
   try {
-    const newData = await creatRecord(data)
-    response
-      .status(200)
-      .json({ status: true, message: 'CREATING_SUCCESSFUL', data: newData })
-  } catch (error) {
-    response.status(500).json({
-      status: false,
-      message: 'ERROR_WHILE_CREATING',
-      error
+    const paramsQuery = defaultValueForQuery(request, {
+      sort: 'description:asc'
     })
+    response.json(
+      await asyncPipe(
+        getDetailsAllContact,
+        curry(responseSuccess)(request)
+      )(paramsQuery)
+    )
+  } catch (error) {
+    next(responseNext(error, request))
   }
 }
 
-async function update(request, response) {
-  const { id } = request.params
-  const data = request.body
-
+const create = async (request, response, next) => {
   try {
-    const recordsAffected = await updateRecord(data, id)
-    let statusCode = 200
-    let json = {
-      status: true,
-      message: 'UPDATE_SUCCESSFUL',
-      data: recordsAffected
-    }
-    if (recordsAffected.length === 0) {
-      statusCode = 500
-      json = { status: false, message: 'UPDATE_FAIL' }
-    }
-    return response.status(statusCode).json(json)
+    response.json(
+      await asyncPipe(
+        createRecord,
+        curry(responseSuccess)(request)
+      )(getParamsForCreate(request))
+    )
   } catch (error) {
-    console.log(error)
-    response.status(500).json({
-      status: false,
-      message: 'ERROR_WHILE_UPDATE',
-      error
-    })
+    next(responseNext(error, request))
   }
 }
 
-async function deleteOne(request, response) {
+const update = async (request, response, next) => {
   try {
-    const recordsAffected = await deleteRecord(request.params.id)
-    let statusCode = 200
-    let json = { status: true, message: 'DELETED_SUCCESSFUL' }
-    if (recordsAffected === 0) {
-      statusCode = 500
-      json = { status: false, message: 'DELETED_FAIL' }
-    }
-    return response.status(statusCode).json(json)
+    response.json(
+      await asyncPipe(
+        updateRecord,
+        curry(responseSuccess)(request)
+      )(getParamsForUpdate(request))
+    )
   } catch (error) {
-    response.status(500).json({
-      status: false,
-      message: 'ERROR_WHILE_DELETING',
-      error
-    })
+    next(responseNext(error, request))
   }
 }
-export default { get, getOne, create, update, deleteOne }
+
+const deleteOne = async (request, response, next) => {
+  try {
+    response.json(
+      await asyncPipe(
+        deleteRecord,
+        curry(responseSuccess)(request)
+      )(getParamsForDelete(request))
+    )
+  } catch (error) {
+    next(responseNext(error, request))
+  }
+}
+export default { get, create, update, deleteOne }
