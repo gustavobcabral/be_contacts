@@ -2,7 +2,10 @@ exports.up = function(knex) {
   return knex.schema
     .createTable('status', function(table) {
       table.increments()
-      table.string('description').notNullable()
+      table
+        .string('description')
+        .notNullable()
+        .unique()
       table
         .dateTime('createdAt')
         .notNullable()
@@ -10,7 +13,10 @@ exports.up = function(knex) {
     })
     .createTable('languages', function(table) {
       table.increments()
-      table.string('name').notNullable()
+      table
+        .string('name')
+        .notNullable()
+        .unique()
       table
         .dateTime('createdAt')
         .notNullable()
@@ -42,7 +48,10 @@ exports.up = function(knex) {
       table.increments()
       table.string('name').notNullable()
       table.string('password').nullable()
-      table.string('email').nullable()
+      table
+        .string('email')
+        .nullable()
+        .unique()
       table
         .boolean('active')
         .notNullable()
