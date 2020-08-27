@@ -7,7 +7,6 @@ const columnPrimary = 'phone'
 const fields = ['phone', 'name', 'id_status', 'id_language']
 
 const getAllWithDetails = async queryParams => {
-  // async function getAllWithDetails(queryParams) {
   const { sort = 'name:ASC', perPage, currentPage } = queryParams
   return knex
     .select()
@@ -21,8 +20,8 @@ const getAllWithDetails = async queryParams => {
     .orderByRaw(crud.parseOrderBy(sort))
     .paginate(perPage, currentPage)
 }
-const getOneWithDetails = async phone => {
-  return knex
+const getOneWithDetails = async phone =>
+  knex
     .select(['details_contacts.*', 'contacts.*'])
     .from(tableName)
     .leftJoin(
@@ -32,15 +31,11 @@ const getOneWithDetails = async phone => {
       'contacts.phone'
     )
     .where(columnPrimary, '=', phone)
-}
 
-const createRecord = async data => {
-  return crud.createRecord(data, tableName)
-}
+const createRecord = async data => crud.createRecord(data, tableName)
 
-const updateRecord = async ({ id, data }) => {
-  return crud.updateRecord({ id, data, tableName, columnPrimary })
-}
+const updateRecord = async ({ id, data }) =>
+  crud.updateRecord({ id, data, tableName, columnPrimary })
 
 async function deleteRecord(id) {
   detailsContact.deleteRecordByPhone(id)

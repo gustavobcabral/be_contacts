@@ -20,6 +20,7 @@ import {
   uniqBy,
   map,
   get as getLodash,
+  getOr,
   omit,
   orderBy,
   countBy
@@ -66,16 +67,15 @@ const mapToGetDetailsOneContact = (list, contactsUnique) => {
 
 const mountDetailsDataForContacts = detailsContacts => {
   if (!isEmpty(detailsContacts)) {
-    const { list } = detailsContacts
+    const list = getOr([detailsContacts], 'list', detailsContacts)
     const uniqueContacts = uniqBy(columnPrimary, list)
-    const withoutDetails = getLodash(
+    const withoutDetails = getOr(
+      0,
       'null',
       countBy('phone_contact', uniqueContacts)
     )
     const withDetails = uniqueContacts.length - withoutDetails
-    const listOrganized = pipe(curry(mapToGetDetailsOneContact)(list))(
-      uniqueContacts
-    )
+    const listOrganized = mapToGetDetailsOneContact(list, uniqueContacts)
     return {
       ...detailsContacts,
       withDetails,
@@ -87,7 +87,13 @@ const mountDetailsDataForContacts = detailsContacts => {
 }
 
 const mountDetailsDataForOneContact = detailsContact => {
-  return pipe(mountDetailsDataForContacts, first)(detailsContact)
+  return {
+    ...getContactProps(first(detailsContact)),
+    details: reduceToGetDetails(
+      getLodash(columnPrimary, first(detailsContact)),
+      detailsContact
+    )
+  }
 }
 
 const get = async (request, response, next) => {
@@ -109,10 +115,6 @@ const getOne = async (request, response, next) => {
     response.json(
       await asyncPipe(
         getOneWithDetails,
-        data => {
-          console.log(data)
-          return data
-        },
         mountDetailsDataForOneContact,
         curry(responseSuccess)(request)
       )(getParamsForGetOne(request))

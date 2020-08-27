@@ -10,49 +10,47 @@ const getAll = async (tableName, queryParams = {}) => {
   return sql
 }
 
-const getOneRecord = async ({ id, tableName, columnPrimary }) => {
-  return knex
+const getOneRecord = async ({ id, tableName, columnPrimary }) =>
+  knex
     .select()
     .from(tableName)
     .where(columnPrimary, '=', id)
     .first()
-}
 
-const createRecord = async (data, tableName) => {
-  return await knex(tableName)
+const createRecord = async (data, tableName) =>
+  await knex(tableName)
     .returning('*')
     .insert(data)
-}
 
-const prepareDataUpdated = (id, data) => {
-  return { totalAffected: data.length, id, data }
-}
+const prepareDataUpdated = (id, data) => ({
+  totalAffected: data.length,
+  id,
+  data
+})
 
-const updateRecord = async ({ id, data, tableName, columnPrimary }) => {
-  return prepareDataUpdated(
+const updateRecord = async ({ id, data, tableName, columnPrimary }) =>
+  prepareDataUpdated(
     id,
     await knex(tableName)
       .update(data, Object.keys(data))
       .where(columnPrimary, id)
   )
-}
 
 const prepareDataDeleted = (id, totalAffected) => ({
   totalAffected,
   id
 })
 
-const deleteRecord = async ({ id, tableName, columnPrimary }) => {
-  return prepareDataDeleted(
+const deleteRecord = async ({ id, tableName, columnPrimary }) =>
+  prepareDataDeleted(
     id,
     await knex(tableName)
       .where(columnPrimary, id)
       .delete()
   )
-}
 
-const parseOrderBy = sort => {
-  return pipe(
+const parseOrderBy = sort =>
+  pipe(
     split(','),
     map(field => {
       const arrayField = split(':', field)
@@ -61,7 +59,6 @@ const parseOrderBy = sort => {
       return sort.length === 1 ? column : `${column} ${order}`
     })
   )(sort)
-}
 
 export default {
   getAll,
