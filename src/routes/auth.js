@@ -3,6 +3,6 @@ import authController from '../controllers/authController'
 
 const routes = Router()
 
-routes.get('/:email/:password', authController.authenticate)
+routes.post('/', authController.authenticate)
 
 export default routes

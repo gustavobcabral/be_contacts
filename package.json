@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "desc",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "cross-env NODE_ENV=development ts-node-dev --respawn --transpile-only --ignore-watch node_modules src/index.js | pino-pretty",
     "dev": "nodemon src/index.js --exec ts-node-dev --no-deps --respawn --transpileOnly",

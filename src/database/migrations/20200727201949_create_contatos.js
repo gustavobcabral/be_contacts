@@ -77,8 +77,8 @@ exports.up = function(knex) {
 exports.down = function(knex) {
   return knex.schema
     .dropTable('details_contacts')
-    .dropTable('publishers')
     .dropTable('contacts')
+    .dropTable('publishers')
     .dropTable('status')
     .dropTable('languages')
 }

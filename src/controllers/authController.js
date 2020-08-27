@@ -1,25 +1,18 @@
-import {
-  responseNext,
-  responseSuccess,
-  responseError
-} from '../helpers/responseGeneric'
-import crud from '../models/crudGeneric'
+import { responseNext, responseError } from '../helpers/responseGeneric'
+import { getRecordForAuth } from '../models/publishersModel'
 import {
   NO_EMAIL_VALID,
   PASSWORD_WRONG,
   NOT_ACTIVE
 } from '../constants/publishers'
-import { omit, getOr } from 'lodash/fp'
+import { AUTHORIZED } from '../constants/security'
+import { getOr } from 'lodash/fp'
 import { createJwtToken, encrypt } from '../helpers/genericHelpers'
 
-async function authenticate(req, res, next) {
+const authenticate = async (req, res, next) => {
   try {
-    const { email, password } = req.params
-    const publisher = await crud.getOneRecord({
-      id: email,
-      tableName: 'contacts',
-      columnPrimary: 'email'
-    })
+    const { email, password } = req.body
+    const publisher = await getRecordForAuth(email, 'email')
     if (!publisher) {
       next(responseError({ cod: NO_EMAIL_VALID, error: NO_EMAIL_VALID }))
     }
@@ -28,21 +21,20 @@ async function authenticate(req, res, next) {
     }
 
     const encryptPassword = encrypt(password)
-    const passwordValid = await crud.getOneRecord({
-      id: encryptPassword,
-      tableName: 'contacts',
-      columnPrimary: 'password'
-    })
-    if (!passwordValid) {
+
+    if (!(await getRecordForAuth(encryptPassword, 'password'))) {
       next(responseError({ cod: PASSWORD_WRONG, error: PASSWORD_WRONG }))
     }
-    const userData = omit(['password'], passwordValid)
-    const token = createJwtToken({ email, id: passwordValid.id })
-    const data = {
-      ...userData,
-      token
+    const jwtToken = createJwtToken({ email, id: publisher.id })
+    const responseSuccess = {
+      status: true,
+      cod: AUTHORIZED,
+      data: {
+        ...publisher,
+        jwtToken
+      }
     }
-    res.json(responseSuccess(req, data))
+    res.json(responseSuccess)
   } catch (error) {
     next(responseNext(error, req))
   }

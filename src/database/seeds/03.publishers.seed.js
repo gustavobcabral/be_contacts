@@ -1,12 +1,11 @@
-import { encrypt } from '../../helpers/genericHelpers'
-
+const crypto = require('crypto')
 const table = 'publishers'
 
 exports.seed = function(knex) {
   const data = [
     {
       name: 'Admin',
-      password: encrypt('123456'),
+      password: crypto.createHmac('sha256', '123456').digest('hex'),
       email: 'admin@example.com',
       active: true
     }

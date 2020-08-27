@@ -20,6 +20,13 @@ const getOneRecord = async id => {
   )
 }
 
+const getRecordForAuth = async (id, column) => {
+  return omit(
+    omitColumns,
+    await crud.getOneRecord({ id, tableName, columnPrimary: column })
+  )
+}
+
 const createRecord = async data => {
   const parseData = data.password
     ? {
@@ -44,4 +51,11 @@ const updateRecord = async ({ id, data }) => {
 const deleteRecord = async id => {
   return crud.deleteRecord({ id, tableName, columnPrimary })
 }
-export { getAll, getOneRecord, createRecord, updateRecord, deleteRecord }
+export {
+  getAll,
+  getOneRecord,
+  createRecord,
+  updateRecord,
+  deleteRecord,
+  getRecordForAuth
+}

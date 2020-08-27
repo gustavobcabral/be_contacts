@@ -22,8 +22,6 @@ const authGuard = (req, res, next) => {
       process.env.JWT_SECRET || JWT_SECRET
     )
 
-    // // eslint-disable-next-line fp/no-mutation
-    // req.user = jwtPayload
     return next()
   } catch (error) {
     next(

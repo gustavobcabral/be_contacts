@@ -27,6 +27,7 @@ const responseSuccess = (request, data) => ({
 })
 
 const responseError = err => ({
+  ...err,
   status: false,
   cod: err.cod,
   error: err.message || err.response || err.error || err
