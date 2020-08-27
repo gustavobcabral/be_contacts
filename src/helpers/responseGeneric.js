@@ -1,3 +1,6 @@
+import HttpStatus from 'http-status-codes'
+import { find, pipe, get } from 'lodash/fp'
+
 import {
   GET_ERROR,
   POST_ERROR,
@@ -8,7 +11,6 @@ import {
   PUT_OK,
   DEL_OK
 } from '../constants/db'
-import { find, pipe, get } from 'lodash/fp'
 
 const methods = [
   { method: 'GET', errorDesc: GET_ERROR, successDesc: GET_OK },
@@ -27,8 +29,8 @@ const responseSuccess = (request, data) => ({
 })
 
 const responseError = err => ({
-  ...err,
   status: false,
+  httpErrorCode: err.httpErrorCode || HttpStatus.INTERNAL_SERVER_ERROR,
   cod: err.cod,
   error: err.message || err.response || err.error || err
 })

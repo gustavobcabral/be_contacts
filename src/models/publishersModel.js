@@ -21,10 +21,7 @@ const getOneRecord = async id => {
 }
 
 const getRecordForAuth = async (id, column) => {
-  return omit(
-    omitColumns,
-    await crud.getOneRecord({ id, tableName, columnPrimary: column })
-  )
+  return crud.getOneRecord({ id, tableName, columnPrimary: column })
 }
 
 const createRecord = async data => {
@@ -57,5 +54,6 @@ export {
   createRecord,
   updateRecord,
   deleteRecord,
-  getRecordForAuth
+  getRecordForAuth,
+  omitColumns
 }

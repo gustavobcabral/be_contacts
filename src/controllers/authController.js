@@ -1,12 +1,13 @@
+import HttpStatus from 'http-status-codes'
 import { responseNext, responseError } from '../helpers/responseGeneric'
-import { getRecordForAuth } from '../models/publishersModel'
+import { getRecordForAuth, omitColumns } from '../models/publishersModel'
 import {
   NO_EMAIL_VALID,
   PASSWORD_WRONG,
   NOT_ACTIVE
 } from '../constants/publishers'
 import { AUTHORIZED } from '../constants/security'
-import { getOr, get } from 'lodash/fp'
+import { getOr, get, omit } from 'lodash/fp'
 import { createJwtToken, encrypt } from '../helpers/genericHelpers'
 
 const authenticate = async (req, res, next) => {
@@ -16,23 +17,41 @@ const authenticate = async (req, res, next) => {
     const encryptPassword = encrypt(password)
 
     if (!publisher) {
-      next(responseError({ cod: NO_EMAIL_VALID, error: NO_EMAIL_VALID }))
+      return next(
+        responseError({
+          cod: NO_EMAIL_VALID,
+          error: NO_EMAIL_VALID,
+          httpErrorCode: HttpStatus.UNAUTHORIZED
+        })
+      )
     }
-
     if (getOr('', 'password', publisher) !== encryptPassword) {
-      next(responseError({ cod: PASSWORD_WRONG, error: PASSWORD_WRONG }))
+      return next(
+        responseError({
+          cod: PASSWORD_WRONG,
+          error: PASSWORD_WRONG,
+          httpErrorCode: HttpStatus.UNAUTHORIZED
+        })
+      )
     }
 
     if (!getOr(false, 'active', publisher)) {
-      next(responseError({ cod: NOT_ACTIVE, error: NOT_ACTIVE }))
+      return next(
+        responseError({
+          cod: NOT_ACTIVE,
+          error: NOT_ACTIVE,
+          httpErrorCode: HttpStatus.UNAUTHORIZED
+        })
+      )
     }
 
     const jwtToken = createJwtToken({ email, id: get('id', publisher) })
+    const publisherDataPublic = omit(omitColumns, publisher)
     const responseSuccess = {
       status: true,
       cod: AUTHORIZED,
       data: {
-        ...publisher,
+        ...publisherDataPublic,
         jwtToken
       }
     }
