@@ -1,4 +1,7 @@
 import { get, find } from 'lodash/fp'
+import jwt from 'jsonwebtoken'
+import { JWT_SECRET } from '../constants/security'
+import crypto from 'crypto'
 
 const getParamsForUpdate = request => ({
   data: get('body', request),
@@ -15,11 +18,18 @@ const defaultValueForQuery = (request, objectDefault) =>
     ? getParamsForGet(request)
     : { ...getParamsForGet(request), ...objectDefault }
 
+const createJwtToken = param =>
+  jwt.sign(param, process.env.JWT_KEY || JWT_SECRET)
+
+const encrypt = password => crypto.createHmac('sha256', password).digest('hex')
+
 export {
   getParamsForGet,
   getParamsForUpdate,
   getParamsForCreate,
   getParamsForGetOne,
   getParamsForDelete,
-  defaultValueForQuery
+  defaultValueForQuery,
+  createJwtToken,
+  encrypt
 }

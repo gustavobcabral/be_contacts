@@ -1,22 +1,41 @@
 import crud from './crudGeneric'
+import { encrypt } from '../helpers/genericHelpers'
+import { map, omit } from 'lodash/fp'
 
 const tableName = 'publishers'
 const columnPrimary = 'id'
+const omitColumns = ['password']
 
 async function getAll() {
-  return crud.getAll(tableName)
+  return map(pub => omit(omitColumns, pub), await crud.getAll(tableName))
 }
 
 async function getOneRecord(id) {
-  return crud.getOneRecord({ id, tableName, columnPrimary })
+  return omit(
+    omitColumns,
+    await crud.getOneRecord({ id, tableName, columnPrimary })
+  )
 }
 
 async function createRecord(data) {
-  return crud.createRecord(data, tableName)
+  const parseData = data.password
+    ? {
+        ...data,
+        password: encrypt(data.password)
+      }
+    : data
+  return crud.createRecord(parseData, tableName)
 }
 
 async function updateRecord(id, data) {
-  return crud.updateRecord({ id, data, tableName, columnPrimary })
+  const parseData = data.password
+    ? {
+        ...data,
+        password: encrypt(data.password)
+      }
+    : data
+
+  return crud.updateRecord({ id, parseData, tableName, columnPrimary })
 }
 
 async function deleteRecord(id) {
