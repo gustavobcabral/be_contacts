@@ -6,18 +6,21 @@ const tableName = 'publishers'
 const columnPrimary = 'id'
 const omitColumns = ['password']
 
-async function getAll() {
-  return map(pub => omit(omitColumns, pub), await crud.getAll(tableName))
+const getAll = async queryParams => {
+  return map(
+    pub => omit(omitColumns, pub),
+    await crud.getAll(tableName, queryParams)
+  )
 }
 
-async function getOneRecord(id) {
+const getOneRecord = async id => {
   return omit(
     omitColumns,
     await crud.getOneRecord({ id, tableName, columnPrimary })
   )
 }
 
-async function createRecord(data) {
+const createRecord = async data => {
   const parseData = data.password
     ? {
         ...data,
@@ -27,7 +30,7 @@ async function createRecord(data) {
   return crud.createRecord(parseData, tableName)
 }
 
-async function updateRecord(id, data) {
+const updateRecord = async ({ id, data }) => {
   const parseData = data.password
     ? {
         ...data,
@@ -38,7 +41,7 @@ async function updateRecord(id, data) {
   return crud.updateRecord({ id, parseData, tableName, columnPrimary })
 }
 
-async function deleteRecord(id) {
+const deleteRecord = async id => {
   return crud.deleteRecord({ id, tableName, columnPrimary })
 }
 export { getAll, getOneRecord, createRecord, updateRecord, deleteRecord }

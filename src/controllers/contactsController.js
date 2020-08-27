@@ -109,6 +109,10 @@ const getOne = async (request, response, next) => {
     response.json(
       await asyncPipe(
         getOneWithDetails,
+        data => {
+          console.log(data)
+          return data
+        },
         mountDetailsDataForOneContact,
         curry(responseSuccess)(request)
       )(getParamsForGetOne(request))
@@ -117,6 +121,7 @@ const getOne = async (request, response, next) => {
     next(responseNext(error, request))
   }
 }
+
 const create = async (request, response, next) => {
   try {
     response.json(

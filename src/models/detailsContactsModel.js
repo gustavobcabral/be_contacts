@@ -7,7 +7,7 @@ const fields = ['createdAt', 'information', 'id_publisher', 'phone_contact']
 
 async function getDetailsOneContact(phone, limit = 5) {
   return knex
-    .select('*')
+    .select()
     .from(tableName)
     .where('phone_contact', '=', phone)
     .orderBy('createdAt', 'desc')
@@ -16,20 +16,20 @@ async function getDetailsOneContact(phone, limit = 5) {
 
 async function getDetailsAllContact() {
   return knex
-    .select(['details_contacts.*', 'contacts.*'])
+    .select()
     .from(tableName)
     .join('contacts', 'details_contacts.phone_contact', '=', 'contacts.phone')
 }
 
-async function creatRecord(data) {
+const createRecord = async data => {
   return crud.createRecord(data, tableName)
 }
 
-async function updateRecord(data, id) {
+const updateRecord = async ({ id, data }) => {
   return crud.updateRecord({ id, data, tableName, columnPrimary })
 }
 
-async function deleteRecord(id) {
+const deleteRecord = async id => {
   return crud.deleteRecord({ id, tableName, columnPrimary })
 }
 
@@ -42,7 +42,7 @@ async function deleteRecordByPhone(phone) {
 export {
   getDetailsOneContact,
   getDetailsAllContact,
-  creatRecord,
+  createRecord,
   updateRecord,
   deleteRecord,
   deleteRecordByPhone,
