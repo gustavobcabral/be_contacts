@@ -26,6 +26,7 @@ const getAllWithDetails = async queryParams => {
     .orderByRaw(crud.parseOrderBy(sort))
     .paginate(perPage, currentPage)
 }
+
 const getOneWithDetails = async phone =>
   knex
     .select(

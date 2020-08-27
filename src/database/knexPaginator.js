@@ -25,6 +25,7 @@ const setupKnexPaginator = function(knex) {
       getTotals
         ? this.clone()
             .clearOrder()
+            .clearSelect()
             .count('* as total')
             .first()
         : Promise.resolve(),

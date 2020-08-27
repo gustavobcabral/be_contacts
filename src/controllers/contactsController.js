@@ -47,7 +47,7 @@ const reduceToGetDetails = (phone, listAllDetails) => {
     orderBy(['createdAt'], ['desc']),
     reduce(
       (acc, current) =>
-        phone === current.phone && !isNull(current.createdAt)
+        phone === current.phone && !isNull(current.phone_contact)
           ? [...acc, getDetailsProps(current)]
           : acc,
       []
