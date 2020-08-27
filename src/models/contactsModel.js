@@ -9,7 +9,13 @@ const fields = ['phone', 'name', 'id_status', 'id_language']
 const getAllWithDetails = async queryParams => {
   const { sort = 'name:ASC', perPage, currentPage } = queryParams
   return knex
-    .select()
+    .select(
+      'contacts.name',
+      'contacts.phone',
+      'contacts.id_status',
+      'contacts.id_language',
+      'details_contacts.*'
+    )
     .from(tableName)
     .leftJoin(
       'details_contacts',
@@ -22,7 +28,13 @@ const getAllWithDetails = async queryParams => {
 }
 const getOneWithDetails = async phone =>
   knex
-    .select(['details_contacts.*', 'contacts.*'])
+    .select(
+      'contacts.name',
+      'contacts.phone',
+      'contacts.id_status',
+      'contacts.id_language',
+      'details_contacts.*'
+    )
     .from(tableName)
     .leftJoin(
       'details_contacts',

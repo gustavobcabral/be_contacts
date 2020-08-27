@@ -87,10 +87,11 @@ const mountDetailsDataForContacts = detailsContacts => {
 }
 
 const mountDetailsDataForOneContact = detailsContact => {
+  const contact = first(detailsContact)
   return {
-    ...getContactProps(first(detailsContact)),
+    ...getContactProps(contact),
     details: reduceToGetDetails(
-      getLodash(columnPrimary, first(detailsContact)),
+      getLodash(columnPrimary, contact),
       detailsContact
     )
   }
