@@ -22,6 +22,18 @@ exports.up = function(knex) {
         .notNullable()
         .defaultTo(knex.fn.now())
     })
+    .createTable('responsibility', function(table) {
+      table.increments()
+      table
+        .string('description')
+        .notNullable()
+        .unique()
+      table
+        .dateTime('createdAt')
+        .notNullable()
+        .defaultTo(knex.fn.now())
+    })
+
     .createTable('contacts', function(table) {
       table
         .string('phone')
@@ -52,6 +64,8 @@ exports.up = function(knex) {
         .string('email')
         .nullable()
         .unique()
+      table.integer('id_responsibility').defaultTo(1)
+
       table
         .boolean('active')
         .notNullable()
@@ -60,6 +74,11 @@ exports.up = function(knex) {
         .dateTime('createdAt')
         .notNullable()
         .defaultTo(knex.fn.now())
+
+      table
+        .foreign('id_responsibility')
+        .references('id')
+        .inTable('responsibility')
     })
     .createTable('details_contacts', function(table) {
       table.increments()
@@ -80,6 +99,22 @@ exports.up = function(knex) {
         .foreign('phone_contact')
         .references('phone')
         .inTable('contacts')
+    })
+
+    .createTable('permissions', function(table) {
+      table.increments()
+      table.string('method').notNullable()
+      table.string('page').notNullable()
+      table.integer('id_minimum_responsibility_required').notNullable()
+      table
+        .dateTime('createdAt')
+        .notNullable()
+        .defaultTo(knex.fn.now())
+
+      table
+        .foreign('id_minimum_responsibility_required')
+        .references('id')
+        .inTable('responsibility')
     })
 }
 

@@ -17,6 +17,19 @@ const getOneRecord = async ({ id, tableName, columnPrimary }) =>
     .where(columnPrimary, '=', id)
     .first()
 
+const getAllWithWhere = async ({ tableName, where }) =>
+  knex
+    .select()
+    .from(tableName)
+    .where(where)
+
+const getOneWithWhere = async ({ tableName, where }) =>
+  knex
+    .select()
+    .from(tableName)
+    .where(where)
+    .first()
+
 const createRecord = async (data, tableName) =>
   await knex(tableName)
     .returning('*')
@@ -66,5 +79,7 @@ export default {
   updateRecord,
   deleteRecord,
   getOneRecord,
-  parseOrderBy
+  parseOrderBy,
+  getAllWithWhere,
+  getOneWithWhere
 }

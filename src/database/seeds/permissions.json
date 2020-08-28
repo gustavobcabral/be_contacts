@@ -1,0 +1,84 @@
+[
+  {
+    "method": "get",
+    "page": "contacts",
+    "id_minimum_responsibility_required": "1"
+  },
+  {
+    "method": "post",
+    "page": "contacts",
+    "id_minimum_responsibility_required": "2"
+  },
+  {
+    "method": "put",
+    "page": "contacts",
+    "id_minimum_responsibility_required": "2"
+  },
+  {
+    "method": "delete",
+    "page": "contacts",
+    "id_minimum_responsibility_required": "3"
+  },
+  {
+    "method": "get",
+    "page": "publishers",
+    "id_minimum_responsibility_required": "2"
+  },
+  {
+    "method": "post",
+    "page": "publishers",
+    "id_minimum_responsibility_required": "2"
+  },
+  {
+    "method": "put",
+    "page": "publishers",
+    "id_minimum_responsibility_required": "2"
+  },
+  {
+    "method": "delete",
+    "page": "publishers",
+    "id_minimum_responsibility_required": "2"
+  },
+  {
+    "method": "get",
+    "page": "status",
+    "id_minimum_responsibility_required": "1"
+  },
+  {
+    "method": "post",
+    "page": "status",
+    "id_minimum_responsibility_required": "2"
+  },
+  {
+    "method": "put",
+    "page": "status",
+    "id_minimum_responsibility_required": "2"
+  },
+  {
+    "method": "delete",
+    "page": "status",
+    "id_minimum_responsibility_required": "2"
+  },
+  {
+    "method": "get",
+    "page": "detailscontacts",
+    "id_minimum_responsibility_required": "1"
+  },
+  {
+    "method": "post",
+    "page": "detailscontacts",
+    "id_minimum_responsibility_required": "2"
+  },
+  {
+    "method": "put",
+    "page": "detailscontacts",
+    "id_minimum_responsibility_required": "2"
+  },
+  {
+    "method": "delete",
+    "page": "detailscontacts",
+    "id_minimum_responsibility_required": "3"
+  }
+
+
+]

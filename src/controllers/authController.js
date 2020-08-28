@@ -45,7 +45,12 @@ const authenticate = async (req, res, next) => {
       )
     }
 
-    const jwtToken = createJwtToken({ email, id: get('id', publisher) })
+    const jwtToken = createJwtToken({
+      email,
+      id: get('id', publisher),
+      // eslint-disable-next-line @typescript-eslint/camelcase
+      id_responsibility: get('id_responsibility', publisher)
+    })
     const publisherDataPublic = omit(omitColumns, publisher)
     const responseSuccess = {
       status: true,

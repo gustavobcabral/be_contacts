@@ -17,10 +17,12 @@ const authGuard = (req, res, next) => {
       )
     }
 
-    jwt.verify(
+    const jwtPayload = jwt.verify(
       token.replace('Bearer ', ''),
       process.env.JWT_SECRET || JWT_SECRET
     )
+    // eslint-disable-next-line fp/no-mutation
+    req.user = jwtPayload
 
     return next()
   } catch (error) {
