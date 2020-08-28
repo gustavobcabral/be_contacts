@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import publishersController from '../controllers/publishersController'
+import publishersController from '../controllers/publishers.controller'
 
 const routes = Router()
 

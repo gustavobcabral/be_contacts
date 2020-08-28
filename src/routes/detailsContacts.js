@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import detailsContactsController from '../controllers/detailsContactsController'
+import detailsContactsController from '../controllers/detailsContacts.controller'
 
 const routes = Router()
 

@@ -1,14 +1,14 @@
 import HttpStatus from 'http-status-codes'
-import { responseNext, responseError } from '../helpers/responseGeneric'
+import { responseNext, responseError } from '../shared/helpers/responseGeneric'
 import { getRecordForAuth, omitColumns } from '../models/publishersModel'
 import {
   NO_EMAIL_VALID,
   PASSWORD_WRONG,
   NOT_ACTIVE
-} from '../constants/publishers'
-import { AUTHORIZED } from '../constants/security'
+} from '../shared/constants/publishers'
+import { AUTHORIZED } from '../shared/constants/security'
 import { getOr, get, omit } from 'lodash/fp'
-import { createJwtToken, encrypt } from '../helpers/genericHelpers'
+import { createJwtToken, encrypt } from '../shared/helpers/genericHelpers'
 
 const authenticate = async (req, res, next) => {
   try {

@@ -1,5 +1,5 @@
 import crud from './crudGeneric'
-import { encrypt } from '../helpers/genericHelpers'
+import { encrypt } from '../shared/helpers/genericHelpers'
 import { map, omit, curry } from 'lodash/fp'
 import asyncPipe from 'pipeawait'
 

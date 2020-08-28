@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import languagesController from '../controllers/languagesController'
+import languagesController from '../controllers/languages.controller'
 
 const routes = Router()
 

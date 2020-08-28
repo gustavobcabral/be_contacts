@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 import HttpStatus from 'http-status-codes'
-import { responseError } from './responseGeneric'
+import { responseError } from '../helpers/responseGeneric'
 import { UNAUTHORIZED, NO_TOKEN, JWT_SECRET } from '../constants/security'
 
 const authGuard = (req, res, next) => {

@@ -1,7 +1,7 @@
 import express from 'express'
 import routes from './routes'
 import bodyParser from 'body-parser'
-import errorHandler from '../src/helpers/error.middleware'
+import errorHandler from '../src/shared/middleware/error.middleware'
 const app = express()
 const PORT = process.env.PORT || 3333
 

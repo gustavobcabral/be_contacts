@@ -1,12 +1,12 @@
 import { Router } from 'express'
-import authGuard from './helpers/authGuard.middleware'
+import authGuard from './shared/middleware/authGuard.middleware'
 import contacts from './routes/contacts'
 import publishers from './routes/publishers'
 import status from './routes/status'
 import detailsContacts from './routes/detailsContacts'
 import languages from './routes/languages'
 import auth from './routes/auth'
-import { permissionGuard } from './helpers/permissions.middleware'
+import { permissionGuard } from './shared/middleware/permissions.middleware'
 const routes = Router()
 
 routes.use('/auth', auth)
