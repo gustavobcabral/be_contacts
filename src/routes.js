@@ -7,6 +7,7 @@ import detailsContacts from './routes/detailsContacts.route'
 import languages from './routes/languages.route'
 import auth from './routes/auth.route'
 import { permissionGuard } from './shared/middleware/permissions.middleware'
+
 const routes = Router()
 
 routes.use('/auth', auth)
