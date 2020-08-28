@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { getUserPermission } from '../models/permissionsModel'
+import { getUserPermission } from '../models/permissions.model'
 
 const hasPermission = async (userIdResponsibility, page, method) => {
   const { id_minimum_responsibility_required } = await getUserPermission(

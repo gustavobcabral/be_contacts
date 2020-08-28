@@ -1,4 +1,4 @@
-import { responseError } from '../helpers/responseGeneric'
+import { responseError } from '../helpers/responseGeneric.helper'
 import HttpStatus from 'http-status-codes'
 
 const errorHandler = (err, req, res, next) => {

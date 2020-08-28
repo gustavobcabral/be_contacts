@@ -1,14 +1,17 @@
 import HttpStatus from 'http-status-codes'
-import { responseNext, responseError } from '../shared/helpers/responseGeneric'
-import { getRecordForAuth, omitColumns } from '../models/publishersModel'
+import {
+  responseNext,
+  responseError
+} from '../shared/helpers/responseGeneric.helper'
+import { getRecordForAuth, omitColumns } from '../models/publishers.model'
 import {
   NO_EMAIL_VALID,
   PASSWORD_WRONG,
   NOT_ACTIVE
-} from '../shared/constants/publishers'
-import { AUTHORIZED } from '../shared/constants/security'
+} from '../shared/constants/publishers.constant'
+import { AUTHORIZED } from '../shared/constants/security.constant'
 import { getOr, get, omit } from 'lodash/fp'
-import { createJwtToken, encrypt } from '../shared/helpers/genericHelpers'
+import { createJwtToken, encrypt } from '../shared/helpers/generic.helper'
 
 const authenticate = async (req, res, next) => {
   try {

@@ -3,14 +3,14 @@ const {
   createRecord,
   updateRecord,
   deleteRecord
-} = require('../models/languagesModel')
+} = require('../models/languages.model')
 import {
   getParamsForUpdate,
   getParamsForCreate,
   getParamsForDelete,
   defaultValueForQuery
-} from '../shared/helpers/genericHelpers'
-import { responseSuccess } from '../shared/helpers/responseGeneric'
+} from '../shared/helpers/generic.helper'
+import { responseSuccess } from '../shared/helpers/responseGeneric.helper'
 import asyncPipe from 'pipeawait'
 import { curry } from 'lodash/fp'
 

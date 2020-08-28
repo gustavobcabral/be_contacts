@@ -4,15 +4,15 @@ const {
   createRecord,
   updateRecord,
   deleteRecord
-} = require('../models/publishersModel')
-import { responseSuccess } from '../shared/helpers/responseGeneric'
+} = require('../models/publishers.model')
+import { responseSuccess } from '../shared/helpers/responseGeneric.helper'
 import {
   getParamsForUpdate,
   getParamsForCreate,
   getParamsForGetOne,
   getParamsForDelete,
   defaultValueForQuery
-} from '../shared/helpers/genericHelpers'
+} from '../shared/helpers/generic.helper'
 import asyncPipe from 'pipeawait'
 import { curry } from 'lodash/fp'
 

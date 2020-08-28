@@ -1,8 +1,8 @@
 import HttpStatus from 'http-status-codes'
-import { ADMIN } from '../constants/permissions'
+import { ADMIN } from '../constants/permissions.constant'
 import { hasPermission } from '../../services/permissions.service'
-import { responseError } from '../helpers/responseGeneric'
-import { NO_PERMISSION_ENOUGH } from '../constants/security'
+import { responseError } from '../helpers/responseGeneric.helper'
+import { NO_PERMISSION_ENOUGH } from '../constants/security.constant'
 
 const permissionGuard = async (req, res, next) => {
   try {

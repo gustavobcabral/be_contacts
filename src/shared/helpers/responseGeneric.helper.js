@@ -10,7 +10,7 @@ import {
   POST_OK,
   PUT_OK,
   DEL_OK
-} from '../constants/db'
+} from '../constants/db.constant'
 
 const methods = [
   { method: 'GET', errorDesc: GET_ERROR, successDesc: GET_OK },

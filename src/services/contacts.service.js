@@ -6,8 +6,8 @@ import {
   getAllWithDetails,
   columnPrimary,
   fields
-} from '../models/contactsModel'
-import { fields as fieldsDetailsContact } from '../models/detailsContactsModel'
+} from '../models/contacts.model'
+import { fields as fieldsDetailsContact } from '../models/detailsContacts.model'
 import asyncPipe from 'pipeawait'
 import {
   first,
@@ -25,14 +25,14 @@ import {
   orderBy,
   countBy
 } from 'lodash/fp'
-import { responseSuccess } from '../shared/helpers/responseGeneric'
+import { responseSuccess } from '../shared/helpers/responseGeneric.helper'
 import {
   getParamsForUpdate,
   getParamsForGet,
   getParamsForCreate,
   getParamsForGetOne,
   getParamsForDelete
-} from '../shared/helpers/genericHelpers'
+} from '../shared/helpers/generic.helper'
 
 const getDetailsProps = detailsContact => {
   return omit(['phone_contact'], pick(fieldsDetailsContact, detailsContact))

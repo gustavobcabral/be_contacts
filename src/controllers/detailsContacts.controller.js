@@ -1,5 +1,5 @@
 import detailsService from '../services/detailsContacts.service'
-import { responseNext } from '../shared/helpers/responseGeneric'
+import { responseNext } from '../shared/helpers/responseGeneric.helper'
 
 const get = async (request, response, next) => {
   try {

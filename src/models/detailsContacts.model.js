@@ -1,5 +1,5 @@
 import knex from '../database/connection'
-import crud from './crudGeneric'
+import crud from './crudGeneric.model'
 
 const tableName = 'details_contacts'
 const columnPrimary = 'id'

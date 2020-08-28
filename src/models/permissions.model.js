@@ -1,4 +1,4 @@
-import crud from './crudGeneric'
+import crud from './crudGeneric.model'
 import { toLower } from 'lodash/fp'
 
 const tableName = 'permissions'

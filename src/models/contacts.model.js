@@ -1,6 +1,6 @@
 import knex from '../database/connection'
-import * as detailsContact from './detailsContactsModel'
-import crud from './crudGeneric'
+import * as detailsContact from './detailsContacts.model'
+import crud from './crudGeneric.model'
 
 const tableName = 'contacts'
 const columnPrimary = 'phone'

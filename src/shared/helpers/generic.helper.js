@@ -1,6 +1,6 @@
 import { get } from 'lodash/fp'
 import jwt from 'jsonwebtoken'
-import { JWT_SECRET } from '../constants/security'
+import { JWT_SECRET } from '../constants/security.constant'
 import crypto from 'crypto'
 
 const getParamsForUpdate = request => ({

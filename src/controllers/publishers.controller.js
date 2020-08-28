@@ -1,4 +1,4 @@
-import { responseNext } from '../shared/helpers/responseGeneric'
+import { responseNext } from '../shared/helpers/responseGeneric.helper'
 import publishers from '../services/publishers.service'
 
 const get = async (request, response, next) => {

@@ -3,14 +3,14 @@ const {
   createRecord,
   updateRecord,
   deleteRecord
-} = require('../models/detailsContactsModel')
-import { responseSuccess } from '../shared/helpers/responseGeneric'
+} = require('../models/detailsContacts.model')
+import { responseSuccess } from '../shared/helpers/responseGeneric.helper'
 import {
   getParamsForUpdate,
   getParamsForCreate,
   getParamsForDelete,
   defaultValueForQuery
-} from '../shared/helpers/genericHelpers'
+} from '../shared/helpers/generic.helper'
 import asyncPipe from 'pipeawait'
 import { curry } from 'lodash/fp'
 
