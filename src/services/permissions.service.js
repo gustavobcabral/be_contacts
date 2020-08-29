@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import {
   getUserPermission,
+  getOneWithWhere,
   getAll,
   createRecord,
   updateRecord,
-  deleteRecord
+  deleteRecord,
+  putFields
 } from '../models/permissions.model'
 import {
   getParamsForUpdate,
@@ -14,8 +16,8 @@ import {
 } from '../shared/helpers/generic.helper'
 import { responseSuccess } from '../shared/helpers/responseGeneric.helper'
 import asyncPipe from 'pipeawait'
-import { curry } from 'lodash/fp'
-
+import { curry, get as getLodash, pick } from 'lodash/fp'
+import { NOT_ALLOWED_DELETE } from '../shared/constants/permissions.constant'
 const hasPermission = async (userIdResponsibility, page, method) => {
   const { id_minimum_responsibility_required } = await getUserPermission(
     page,
@@ -37,14 +39,26 @@ const create = async request =>
     curry(responseSuccess)(request)
   )(getParamsForCreate(request))
 
+const filterWhatCanUpdate = data => pick(putFields, data)
+
 const update = async request =>
   asyncPipe(
+    filterWhatCanUpdate,
     updateRecord,
     curry(responseSuccess)(request)
   )(getParamsForUpdate(request))
 
+const verifyIfCanDelete = async id => {
+  const permissionWantDelete = await getOneWithWhere({ id })
+  if (getLodash('page', permissionWantDelete) === 'permissions') {
+    throw NOT_ALLOWED_DELETE
+  }
+  return id
+}
+
 const deleteOne = async request =>
   asyncPipe(
+    verifyIfCanDelete,
     deleteRecord,
     curry(responseSuccess)(request)
   )(getParamsForDelete(request))

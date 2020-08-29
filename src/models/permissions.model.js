@@ -4,6 +4,7 @@ import { toLower } from 'lodash/fp'
 const tableName = 'permissions'
 const columnPrimary = 'id'
 const fields = ['method', 'page', 'id_minimum_responsibility_required']
+const putFields = ['id_minimum_responsibility_required']
 
 const getUserPermission = async (page, method) =>
   crud.getOneWithWhere({
@@ -12,6 +13,8 @@ const getUserPermission = async (page, method) =>
   })
 
 const getAll = async queryParams => crud.getAll(tableName, queryParams)
+
+const getOneWithWhere = async where => crud.getOneWithWhere(tableName, where)
 
 const createRecord = async data => crud.createRecord(data, tableName)
 
@@ -23,9 +26,11 @@ const deleteRecord = async id =>
 
 export {
   getUserPermission,
+  getOneWithWhere,
   getAll,
   createRecord,
   updateRecord,
   deleteRecord,
-  fields
+  fields,
+  putFields
 }
