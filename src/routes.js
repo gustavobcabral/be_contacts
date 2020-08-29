@@ -5,12 +5,14 @@ import publishers from './routes/publishers.route'
 import status from './routes/status.route'
 import detailsContacts from './routes/detailsContacts.route'
 import languages from './routes/languages.route'
+import permissions from './routes/permissions.route'
 import auth from './routes/auth.route'
 import { permissionGuard } from './shared/middleware/permissions.middleware'
 
 const routes = Router()
 
 routes.use('/auth', auth)
+routes.use('/permissions', authGuard, permissionGuard, permissions)
 routes.use('/contacts', authGuard, permissionGuard, contacts)
 routes.use('/publishers', publishers)
 routes.use('/status', status)

@@ -78,6 +78,26 @@
     "method": "delete",
     "page": "detailscontacts",
     "id_minimum_responsibility_required": "3"
+  },
+  {
+    "method": "get",
+    "page": "permissions",
+    "id_minimum_responsibility_required": "4"
+  },
+  {
+    "method": "post",
+    "page": "permissions",
+    "id_minimum_responsibility_required": "4"
+  },
+  {
+    "method": "put",
+    "page": "permissions",
+    "id_minimum_responsibility_required": "4"
+  },
+  {
+    "method": "delete",
+    "page": "permissions",
+    "id_minimum_responsibility_required": "4"
   }
 
 
