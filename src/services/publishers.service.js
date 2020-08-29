@@ -15,6 +15,8 @@ import {
 } from '../shared/helpers/generic.helper'
 import asyncPipe from 'pipeawait'
 import { curry } from 'lodash/fp'
+import { NOT_ALLOWED_DELETE_ADMIN } from '../shared/constants/security.constant'
+import { ID_ADMIN } from '../shared/constants/publishers.constant'
 
 const get = async request => {
   const paramsQuery = defaultValueForQuery(request, {
@@ -41,8 +43,15 @@ const update = async request =>
     curry(responseSuccess)(request)
   )(getParamsForUpdate(request))
 
+const verifyIfCanDelete = id => {
+  if (parseInt(id) === ID_ADMIN) {
+    throw NOT_ALLOWED_DELETE_ADMIN
+  }
+  return id
+}
 const deleteOne = async request =>
   asyncPipe(
+    verifyIfCanDelete,
     deleteRecord,
     curry(responseSuccess)(request)
   )(getParamsForDelete(request))
