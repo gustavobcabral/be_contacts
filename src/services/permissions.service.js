@@ -18,6 +18,7 @@ import { responseSuccess } from '../shared/helpers/responseGeneric.helper'
 import asyncPipe from 'pipeawait'
 import { curry, get as getLodash, pick } from 'lodash/fp'
 import { NOT_ALLOWED_DELETE } from '../shared/constants/permissions.constant'
+
 const hasPermission = async (userIdResponsibility, page, method) => {
   const { id_minimum_responsibility_required } = await getUserPermission(
     page,
@@ -39,7 +40,10 @@ const create = async request =>
     curry(responseSuccess)(request)
   )(getParamsForCreate(request))
 
-const filterWhatCanUpdate = data => pick(putFields, data)
+const filterWhatCanUpdate = obj => ({
+  ...obj,
+  data: pick(putFields, getLodash('data', obj))
+})
 
 const update = async request =>
   asyncPipe(

@@ -37,11 +37,14 @@ const create = async request =>
     curry(responseSuccess)(request)
   )(getParamsForCreate(request))
 
-const verifyWhatCanUpdate = data => {
-  if (toInteger(getLodash('id', data)) === ID_ADMIN) {
-    return omit(['id_responsibility'], data)
+const verifyWhatCanUpdate = obj => {
+  if (toInteger(getLodash('id', obj)) === ID_ADMIN) {
+    return {
+      ...obj,
+      data: omit(['id_responsibility'], getLodash('data', obj))
+    }
   }
-  return data
+  return obj
 }
 
 const update = async request =>

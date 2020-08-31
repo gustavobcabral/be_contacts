@@ -48,26 +48,28 @@ const authenticate = async (req, res, next) => {
       )
     }
 
-    const jwtToken = createJwtToken({
-      email,
-      id: get('id', publisher),
-      // eslint-disable-next-line @typescript-eslint/camelcase
-      id_responsibility: get('id_responsibility', publisher)
-    })
-    const publisherDataPublic = omit(omitColumns, publisher)
-    const responseSuccess = {
-      status: true,
-      cod: AUTHORIZED,
-      data: {
-        ...publisherDataPublic,
-        jwtToken
-      }
-    }
-
-    res.json(responseSuccess)
+    res.json(jwtSignIn(publisher))
   } catch (error) {
     next(responseNext(error, req))
   }
 }
 
-export default { authenticate }
+const jwtSignIn = publisher => {
+  const jwtToken = createJwtToken({
+    email: get('email', publisher),
+    id: get('id', publisher),
+    // eslint-disable-next-line @typescript-eslint/camelcase
+    id_responsibility: get('id_responsibility', publisher)
+  })
+  const publisherDataPublic = omit(omitColumns, publisher)
+  return {
+    status: true,
+    cod: AUTHORIZED,
+    data: {
+      ...publisherDataPublic,
+      jwtToken
+    }
+  }
+}
+
+export default { authenticate, jwtSignIn }

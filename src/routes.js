@@ -7,11 +7,13 @@ import detailsContacts from './routes/detailsContacts.route'
 import languages from './routes/languages.route'
 import permissions from './routes/permissions.route'
 import auth from './routes/auth.route'
+import reAuth from './routes/reAuth.route'
 import { permissionGuard } from './shared/middleware/permissions.middleware'
 
 const routes = Router()
 
 routes.use('/auth', auth)
+routes.use('/reauth', authGuard, reAuth)
 routes.use('/permissions', authGuard, permissionGuard, permissions)
 routes.use('/contacts', authGuard, permissionGuard, contacts)
 routes.use('/publishers', publishers)
