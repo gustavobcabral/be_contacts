@@ -12,24 +12,13 @@ import {
 import { AUTHORIZED } from '../shared/constants/security.constant'
 import { getOr, get, omit } from 'lodash/fp'
 import { createJwtToken, encrypt } from '../shared/helpers/generic.helper'
-import simpleLog from 'simple-node-logger'
 
 const authenticate = async (req, res, next) => {
   try {
-    const log = simpleLog.createSimpleLogger('authenticate.log')
     const { email, password } = req.body
     const publisher = await getRecordForAuth(email, 'email')
     const encryptPassword = encrypt(password)
     if (!publisher) {
-      log.info(
-        NO_EMAIL_VALID,
-        ' : ',
-        email,
-        ' at ',
-        new Date().toJSON(),
-        ' request headers: ',
-        req.headers
-      )
       return next(
         responseError({
           cod: NO_EMAIL_VALID,
@@ -39,17 +28,6 @@ const authenticate = async (req, res, next) => {
       )
     }
     if (getOr('', 'password', publisher) !== encryptPassword) {
-      log.info(
-        PASSWORD_WRONG,
-        ' : ',
-        password,
-        ' email: ',
-        email,
-        ' at ',
-        new Date().toJSON(),
-        ' request headers: ',
-        req.headers
-      )
       return next(
         responseError({
           cod: PASSWORD_WRONG,
@@ -60,15 +38,6 @@ const authenticate = async (req, res, next) => {
     }
 
     if (!getOr(false, 'active', publisher)) {
-      log.info(
-        NOT_ACTIVE,
-        ' : ',
-        email,
-        ' at ',
-        new Date().toJSON(),
-        ' request headers: ',
-        req.headers
-      )
       return next(
         responseError({
           cod: NOT_ACTIVE,
