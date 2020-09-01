@@ -22,7 +22,11 @@
     "prettier.singleQuote": true,
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": true
-    }
+    },
+    "cSpell.words": [
+      "HAVETOREAUTHENTICATE",
+      "camelcase"
+    ]
   },
   "extensions": {
     "recommendations": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]

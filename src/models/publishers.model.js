@@ -5,7 +5,7 @@ import asyncPipe from 'pipeawait'
 
 const tableName = 'publishers'
 const columnPrimary = 'id'
-const omitColumns = ['password']
+const omitColumns = ['password', 'have_to_reauthenticate']
 
 const removeColumnNotAllowed = data => map(pub => omit(omitColumns, pub), data)
 

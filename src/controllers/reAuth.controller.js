@@ -10,6 +10,8 @@ import {
 } from '../shared/constants/publishers.constant'
 import { getOr } from 'lodash/fp'
 import authController from './auth.controller'
+import publisherService from '../services/publishers.service'
+
 const reAuthenticate = async (req, res, next) => {
   try {
     const { email } = req.body
@@ -34,6 +36,7 @@ const reAuthenticate = async (req, res, next) => {
         })
       )
     }
+    await publisherService.setValueReAuthenticate(publisher.id, false)
 
     res.json(authController.jwtSignIn(publisher))
   } catch (error) {

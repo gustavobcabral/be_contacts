@@ -4,6 +4,7 @@ import {
   responseError
 } from '../shared/helpers/responseGeneric.helper'
 import { getRecordForAuth, omitColumns } from '../models/publishers.model'
+import publisherService from '../services/publishers.service'
 import {
   NO_EMAIL_VALID,
   PASSWORD_WRONG,
@@ -46,6 +47,8 @@ const authenticate = async (req, res, next) => {
         })
       )
     }
+
+    await publisherService.setValueReAuthenticate(publisher.id, false)
 
     res.json(jwtSignIn(publisher))
   } catch (error) {

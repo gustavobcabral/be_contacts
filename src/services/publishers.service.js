@@ -37,19 +37,40 @@ const create = async request =>
     curry(responseSuccess)(request)
   )(getParamsForCreate(request))
 
-const verifyWhatCanUpdate = obj => {
-  if (toInteger(getLodash('id', obj)) === ID_ADMIN) {
-    return {
-      ...obj,
-      data: omit(['id_responsibility'], getLodash('data', obj))
-    }
+const verifyWhatCanUpdate = obj =>
+  toInteger(getLodash('id', obj)) === ID_ADMIN
+    ? {
+        ...obj,
+        data: omit(['id_responsibility'], getLodash('data', obj))
+      }
+    : obj
+
+const setValueReAuthenticate = async (id, value) =>
+  // eslint-disable-next-line @typescript-eslint/camelcase
+  Boolean(await updateRecord({ id, data: { have_to_reauthenticate: value } }))
+
+const reBuildObjectDataToReauthenticate = obj => ({
+  id: getLodash('id', obj),
+  data: {
+    ...getLodash('data', obj),
+    // eslint-disable-next-line @typescript-eslint/camelcase
+    have_to_reauthenticate: true
   }
-  return obj
-}
+})
+
+const verifyIfIsNecessaryReAuthenticate = async obj =>
+  getLodash('data.id_responsibility', obj) &&
+  toInteger(getLodash('data.id_responsibility', obj)) !==
+    toInteger(
+      getLodash('id_responsibility', await getOneRecord(getLodash('id', obj)))
+    )
+    ? reBuildObjectDataToReauthenticate(obj)
+    : obj
 
 const update = async request =>
   asyncPipe(
     verifyWhatCanUpdate,
+    verifyIfIsNecessaryReAuthenticate,
     updateRecord,
     curry(responseSuccess)(request)
   )(getParamsForUpdate(request))
@@ -68,4 +89,11 @@ const deleteOne = async request =>
     curry(responseSuccess)(request)
   )(getParamsForDelete(request))
 
-export default { get, getOne, create, update, deleteOne }
+export default {
+  get,
+  getOne,
+  create,
+  update,
+  deleteOne,
+  setValueReAuthenticate
+}

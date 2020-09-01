@@ -34,7 +34,7 @@ const authGuard = (req, res, next) => {
       responseError({
         cod: UNAUTHORIZED,
         httpErrorCode: HttpStatus.UNAUTHORIZED,
-        message: error
+        error
       })
     )
   }

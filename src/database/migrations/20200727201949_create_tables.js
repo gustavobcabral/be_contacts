@@ -60,21 +60,24 @@ exports.up = function(knex) {
       table.increments()
       table.string('name').notNullable()
       table.string('password').nullable()
+      table.string('hash').nullable()
       table
         .string('email')
         .nullable()
         .unique()
       table.integer('id_responsibility').defaultTo(1)
-
       table
         .boolean('active')
         .notNullable()
         .defaultTo(true)
       table
+        .boolean('have_to_reauthenticate')
+        .notNullable()
+        .defaultTo(false)
+      table
         .dateTime('createdAt')
         .notNullable()
         .defaultTo(knex.fn.now())
-
       table
         .foreign('id_responsibility')
         .references('id')
