@@ -11,6 +11,10 @@ const getParamsForUpdate = request => ({
 const getParamsForGet = request => get('query', request)
 const getParamsForCreate = request => get('body', request)
 const getParamsForGetOne = request => get('params.id', request)
+const getParamsForGetOneWithUser = request => ({
+  id: get('params.id', request),
+  user: get('user', request)
+})
 const getParamsForDelete = request => getParamsForGetOne(request)
 
 const defaultValueForQuery = (request, objectDefault) => {
@@ -29,5 +33,6 @@ export {
   getParamsForDelete,
   defaultValueForQuery,
   createJwtToken,
-  encrypt
+  encrypt,
+  getParamsForGetOneWithUser
 }

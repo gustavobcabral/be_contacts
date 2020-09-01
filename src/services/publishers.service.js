@@ -3,7 +3,8 @@ const {
   getOneRecord,
   createRecord,
   updateRecord,
-  deleteRecord
+  deleteRecord,
+  omitColumns
 } = require('../models/publishers.model')
 import { responseSuccess } from '../shared/helpers/responseGeneric.helper'
 import {
@@ -15,19 +16,43 @@ import {
 } from '../shared/helpers/generic.helper'
 import asyncPipe from 'pipeawait'
 import { curry, get as getLodash, omit, toInteger } from 'lodash/fp'
-import { NOT_ALLOWED_DELETE_ADMIN } from '../shared/constants/security.constant'
+import {
+  NOT_ALLOWED_DELETE_ADMIN,
+  NOT_ALLOWED_GET_DATA_MORE_RESPONSIBILITY
+} from '../shared/constants/security.constant'
 import { ID_ADMIN } from '../shared/constants/publishers.constant'
 
 const get = async request => {
-  const paramsQuery = defaultValueForQuery(request, {
-    sort: 'name:asc'
-  })
+  const paramsQuery = {
+    ...defaultValueForQuery(request, {
+      sort: 'name:asc'
+    }),
+    user: getLodash('user', request)
+  }
   return asyncPipe(getAll, curry(responseSuccess)(request))(paramsQuery)
 }
+
+const verifyIfCurrentUserCanSeeThisData = async ({
+  data,
+  idResponsibility
+}) => {
+  if (toInteger(idResponsibility) < getLodash('id_responsibility', data))
+    throw NOT_ALLOWED_GET_DATA_MORE_RESPONSIBILITY
+
+  return data
+}
+
+const prepareDataToVerification = (request, data) => ({
+  data,
+  idResponsibility: getLodash('user.id_responsibility', request)
+})
 
 const getOne = async request =>
   asyncPipe(
     getOneRecord,
+    curry(prepareDataToVerification)(request),
+    verifyIfCurrentUserCanSeeThisData,
+    omit(omitColumns),
     curry(responseSuccess)(request)
   )(getParamsForGetOne(request))
 

@@ -16,9 +16,9 @@ routes.use('/auth', auth)
 routes.use('/reauth', authGuard, reAuth)
 routes.use('/permissions', authGuard, permissionGuard, permissions)
 routes.use('/contacts', authGuard, permissionGuard, contacts)
-routes.use('/publishers', publishers)
-routes.use('/status', status)
-routes.use('/detailsContacts', detailsContacts)
-routes.use('/languages', languages)
+routes.use('/publishers', authGuard, permissionGuard, publishers)
+routes.use('/status', authGuard, permissionGuard, status)
+routes.use('/detailsContacts', authGuard, permissionGuard, detailsContacts)
+routes.use('/languages', authGuard, permissionGuard, languages)
 
 export default routes

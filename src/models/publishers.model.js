@@ -1,6 +1,8 @@
 import crud from './crudGeneric.model'
+import knex from '../database/connection'
+
 import { encrypt } from '../shared/helpers/generic.helper'
-import { map, omit, curry } from 'lodash/fp'
+import { map, omit, curry, get as getLodash } from 'lodash/fp'
 import asyncPipe from 'pipeawait'
 
 const tableName = 'publishers'
@@ -10,13 +12,20 @@ const omitColumns = ['password', 'have_to_reauthenticate']
 const removeColumnNotAllowed = data => map(pub => omit(omitColumns, pub), data)
 
 const getAll = async queryParams =>
-  await asyncPipe(
-    curry(crud.getAll)(tableName),
-    removeColumnNotAllowed
-  )(queryParams)
+  await asyncPipe(getAllAllowedForMe, removeColumnNotAllowed)(queryParams)
+
+const getAllAllowedForMe = async queryParams =>
+  knex
+    .select()
+    .from(tableName)
+    .where(
+      'id_responsibility',
+      '<=',
+      getLodash('user.id_responsibility', queryParams)
+    )
 
 const getOneRecord = async id =>
-  omit(omitColumns, await crud.getOneRecord({ id, tableName, columnPrimary }))
+  crud.getOneRecord({ id, tableName, columnPrimary })
 
 const getRecordForAuth = async (id, column) =>
   crud.getOneRecord({ id, tableName, columnPrimary: column })
