@@ -35,9 +35,12 @@ const responseError = err => ({
   error: err.message || err.response || err.error || err
 })
 
-const responseNext = (error, request) => ({
-  error,
-  cod: findCod(request, 'errorDesc')
-})
+const responseNext = (error, request) => {
+  return {
+    error: error.error || error,
+    httpErrorCode: error.httpErrorCode || HttpStatus.INTERNAL_SERVER_ERROR,
+    cod: findCod(request, 'errorDesc')
+  }
+}
 
 export { responseSuccess, responseError, responseNext }

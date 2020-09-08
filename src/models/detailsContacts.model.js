@@ -18,7 +18,12 @@ async function getDetailsAllContact() {
   return knex
     .select()
     .from(tableName)
-    .join('contacts', 'details_contacts.phone_contact', '=', 'contacts.phone')
+    .leftJoin(
+      'contacts',
+      'details_contacts.phone_contact',
+      '=',
+      'contacts.phone'
+    )
 }
 
 const createRecord = async data => {

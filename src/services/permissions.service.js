@@ -42,19 +42,17 @@ const checkPermissions = async req => {
   const { user, query, method, baseUrl } = req
   const page = baseUrl.slice(1)
   const reAuthenticate = await haveToReAuthenticate(user.id)
+  const userCanAccess = await hasPermission(
+    user.id_responsibility,
+    query.page || page,
+    method
+  )
   const codMessage = reAuthenticate
     ? HAVE_TO_REAUTHENTICATE
     : NO_PERMISSION_ENOUGH
-  if (
-    user.id_responsibility !== ADMIN &&
-    (reAuthenticate ||
-      !(await hasPermission(
-        user.id_responsibility,
-        query.page || page,
-        method
-      )))
-  )
+  if (user.id_responsibility !== ADMIN && (reAuthenticate || !userCanAccess)) {
     throw codMessage
+  }
 }
 
 const get = async request => {

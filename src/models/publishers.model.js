@@ -1,7 +1,6 @@
 import crud from './crudGeneric.model'
 import knex from '../database/connection'
 
-import { encrypt } from '../shared/helpers/generic.helper'
 import { map, omit, curry, get as getLodash } from 'lodash/fp'
 import asyncPipe from 'pipeawait'
 
@@ -30,31 +29,17 @@ const getOneRecord = async id =>
 const getRecordForAuth = async (id, column) =>
   crud.getOneRecord({ id, tableName, columnPrimary: column })
 
-const createRecord = async data => {
-  const parseData = data.password
-    ? {
-        ...data,
-        password: encrypt(data.password)
-      }
-    : data
-  return await asyncPipe(
-    curry(crud.createRecord)(parseData),
+const createRecord = async data =>
+  await asyncPipe(
+    curry(crud.createRecord)(data),
     removeColumnNotAllowed
   )(tableName)
-}
 
-const updateRecord = async ({ id, data }) => {
-  const parseData = data.password
-    ? {
-        ...data,
-        password: encrypt(data.password)
-      }
-    : data
-  return await asyncPipe(crud.updateRecord, data => ({
+const updateRecord = async ({ id, data }) =>
+  await asyncPipe(crud.updateRecord, data => ({
     ...data,
     data: removeColumnNotAllowed(data.data)
-  }))({ id, data: parseData, tableName, columnPrimary })
-}
+  }))({ id, data, tableName, columnPrimary })
 
 const deleteRecord = async id =>
   crud.deleteRecord({ id, tableName, columnPrimary })
