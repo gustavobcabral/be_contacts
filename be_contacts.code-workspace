@@ -25,7 +25,9 @@
     },
     "cSpell.words": [
       "HAVETOREAUTHENTICATE",
-      "camelcase"
+      "camelcase",
+      "postgres",
+      "postgresql"
     ]
   },
   "extensions": {

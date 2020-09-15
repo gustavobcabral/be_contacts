@@ -9,7 +9,8 @@ exports.seed = function(knex) {
       email: 'admin@example.com',
       // eslint-disable-next-line @typescript-eslint/camelcase
       id_responsibility: 4,
-      active: true
+      active: true,
+      createdAt: '2020-08-31T13:59:35.232Z'
     }
   ]
   return knex(table)
