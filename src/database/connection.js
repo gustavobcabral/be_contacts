@@ -1,6 +1,8 @@
-const knex = require("knex");
-const configuration = require("../../knexfile");
+/* eslint-disable security/detect-object-injection */
+const setupKnexPaginator = require('./knexPaginator')
+const env = process.env.NODE_ENV || 'development'
+const knexfile = require('./knexfile')
+const knex = require('knex')(knexfile[env])
+setupKnexPaginator(knex)
 
-const connection = knex(configuration.development);
-
-module.exports = connection;
+export default knex

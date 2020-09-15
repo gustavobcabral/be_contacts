@@ -1,38 +1,24 @@
-const express = require("express");
+import { Router } from 'express'
+import authGuard from './shared/middleware/authGuard.middleware'
+import contacts from './routes/contacts.route'
+import publishers from './routes/publishers.route'
+import status from './routes/status.route'
+import detailsContacts from './routes/detailsContacts.route'
+import languages from './routes/languages.route'
+import permissions from './routes/permissions.route'
+import auth from './routes/auth.route'
+import reAuth from './routes/reAuth.route'
+import { permissionGuard } from './shared/middleware/permissions.middleware'
 
-const contactsControllers = require("./controllers/contactsController");
-const publishersControllers = require("./controllers/publishersController");
-const statusControllers = require("./controllers/statusController");
-const detailsContacsControllers = require("./controllers/detailsContactsController");
-const languageControllers = require("./controllers/languageController");
+const routes = Router()
 
-const routes = express.Router();
+routes.use('/auth', auth)
+routes.use('/reauth', authGuard, reAuth)
+routes.use('/permissions', authGuard, permissionGuard, permissions)
+routes.use('/contacts', authGuard, permissionGuard, contacts)
+routes.use('/publishers', authGuard, permissionGuard, publishers)
+routes.use('/status', authGuard, permissionGuard, status)
+routes.use('/detailsContacts', authGuard, permissionGuard, detailsContacts)
+routes.use('/languages', authGuard, permissionGuard, languages)
 
-routes.get("/contacts", contactsControllers.get);
-routes.get("/contacts/:id", contactsControllers.getOne);
-routes.post("/contacts", contactsControllers.create);
-routes.put("/contacts/:id", contactsControllers.update);
-routes.delete("/contacts/:id", contactsControllers.deleteOne);
-
-routes.get("/publishers", publishersControllers.get);
-routes.get("/publishers/:id", publishersControllers.getOne);
-routes.post("/publishers", publishersControllers.create);
-routes.put("/publishers/:id", publishersControllers.update);
-routes.delete("/publishers/:id", publishersControllers.deleteOne);
-
-routes.get("/status", statusControllers.get);
-routes.post("/status", statusControllers.create);
-routes.put("/status/:id", statusControllers.update);
-routes.delete("/status/:id", statusControllers.deleteOne);
-
-routes.get("/detailscontacts", detailsContacsControllers.get);
-routes.get("/detailscontacts/:id", detailsContacsControllers.getOne);
-routes.post("/detailscontacts/:id", detailsContacsControllers.create);
-routes.put("/detailscontacts/:id", detailsContacsControllers.update);
-routes.delete("/detailscontacts/:id", detailsContacsControllers.deleteOne);
-
-routes.get("/language", languageControllers.get);
-routes.post("/language", languageControllers.create);
-routes.put("/language/:id", languageControllers.update);
-routes.delete("/language/:id", languageControllers.deleteOne);
-module.exports = routes;
+export default routes
