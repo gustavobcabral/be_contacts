@@ -4,7 +4,14 @@ import crud from './crudGeneric.model'
 
 const tableName = 'contacts'
 const columnPrimary = 'phone'
-const fields = ['phone', 'name', 'id_status', 'id_language']
+const fields = [
+  'phone',
+  'name',
+  'id_status',
+  'id_language',
+  'language_name',
+  'status_description'
+]
 
 const getAllWithDetails = async queryParams => {
   const { sort = 'name:ASC', perPage, currentPage } = queryParams
@@ -14,6 +21,8 @@ const getAllWithDetails = async queryParams => {
       'contacts.phone',
       'contacts.id_status',
       'contacts.id_language',
+      'languages.name as language_name',
+      'status.description as status_description',
       'details_contacts.*'
     )
     .from(tableName)
@@ -23,6 +32,8 @@ const getAllWithDetails = async queryParams => {
       '=',
       'contacts.phone'
     )
+    .leftJoin('languages', 'languages.id', '=', 'contacts.id_language')
+    .leftJoin('status', 'status.id', '=', 'contacts.id_status')
     .orderByRaw(crud.parseOrderBy(sort))
     .paginate(perPage, currentPage)
 }
