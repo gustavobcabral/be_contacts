@@ -10,7 +10,8 @@ const fields = [
   'id_status',
   'id_language',
   'language_name',
-  'status_description'
+  'status_description',
+  'name_publisher'
 ]
 
 const getAllWithDetails = async queryParams => {
@@ -23,7 +24,8 @@ const getAllWithDetails = async queryParams => {
       'contacts.id_language',
       'languages.name as language_name',
       'status.description as status_description',
-      'details_contacts.*'
+      'details_contacts.*',
+      'publishers.name as name_publishers'
     )
     .from(tableName)
     .leftJoin(
@@ -33,6 +35,12 @@ const getAllWithDetails = async queryParams => {
       'contacts.phone'
     )
     .leftJoin('languages', 'languages.id', '=', 'contacts.id_language')
+    .leftJoin(
+      'publishers',
+      'publishers.id',
+      '=',
+      'details_contacts.id_publisher'
+    )
     .leftJoin('status', 'status.id', '=', 'contacts.id_status')
     .orderByRaw(crud.parseOrderBy(sort))
     .paginate(perPage, currentPage)
