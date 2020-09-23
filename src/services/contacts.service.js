@@ -35,7 +35,10 @@ import {
 } from '../shared/helpers/generic.helper'
 
 const getDetailsProps = detailsContact => {
-  return omit(['phone_contact'], pick(fieldsDetailsContact, detailsContact))
+  return pipe(
+    pick([...fieldsDetailsContact, 'name_publisher', 'id_detail']),
+    omit(['phone_contact'])
+  )(detailsContact)
 }
 
 const getContactProps = contact => {

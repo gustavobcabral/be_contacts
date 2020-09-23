@@ -24,8 +24,10 @@ const getAllWithDetails = async queryParams => {
       'contacts.id_language',
       'languages.name as language_name',
       'status.description as status_description',
-      'details_contacts.*',
-      'publishers.name as name_publishers'
+      'details_contacts.createdAt',
+      'details_contacts.information',
+      'details_contacts.id as id_detail',
+      'publishers.name as name_publisher'
     )
     .from(tableName)
     .leftJoin(
