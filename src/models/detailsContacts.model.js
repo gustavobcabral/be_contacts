@@ -26,23 +26,18 @@ async function getDetailsAllContact() {
     )
 }
 
-const createRecord = async data => {
-  return crud.createRecord(data, tableName)
-}
+const createRecord = async data => crud.createRecord(data, tableName)
 
-const updateRecord = async ({ id, data }) => {
-  return crud.updateRecord({ id, data, tableName, columnPrimary })
-}
+const updateRecord = async ({ id, data }) =>
+  crud.updateRecord({ id, data, tableName, columnPrimary })
 
-const deleteRecord = async id => {
-  return crud.deleteRecord({ id, tableName, columnPrimary })
-}
+const deleteRecord = async id =>
+  crud.deleteRecord({ id, tableName, columnPrimary })
 
-async function deleteRecordByPhone(phone) {
-  return knex(tableName)
+const deleteRecordByPhone = phone =>
+  knex(tableName)
     .where('phone_contact', '=', phone)
     .delete()
-}
 
 export {
   getDetailsOneContact,

@@ -41,4 +41,12 @@ const deleteOne = async (request, response, next) => {
   }
 }
 
-export default { get, getOne, create, update, deleteOne }
+const assign = async (request, response, next) => {
+  try {
+    response.json(await contactsService.assign(request))
+  } catch (error) {
+    next(responseNext(error, request))
+  }
+}
+
+export default { get, getOne, create, update, deleteOne, assign }

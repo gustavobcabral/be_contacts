@@ -7,7 +7,10 @@ import {
   columnPrimary,
   fields
 } from '../models/contacts.model'
-import { fields as fieldsDetailsContact } from '../models/detailsContacts.model'
+import {
+  fields as fieldsDetailsContact,
+  createRecord as createRecordDetailsContact
+} from '../models/detailsContacts.model'
 import asyncPipe from 'pipeawait'
 import {
   first,
@@ -26,6 +29,7 @@ import {
   countBy
 } from 'lodash/fp'
 import { responseSuccess } from '../shared/helpers/responseGeneric.helper'
+import { WAITING_FEEDBACK } from '../shared/constants/contacts.constant'
 import {
   getParamsForUpdate,
   getParamsForGet,
@@ -132,4 +136,25 @@ const deleteOne = async request =>
     curry(responseSuccess)(request)
   )(getParamsForDelete(request))
 
-export default { get, getOne, create, update, deleteOne }
+const assign = async request =>
+  asyncPipe(
+    assignAllContactsToAPublisher,
+    curry(responseSuccess)(request)
+  )(getParamsForCreate(request))
+
+const assignAllContactsToAPublisher = async data =>
+  Promise.all(
+    // eslint-disable-next-line @typescript-eslint/camelcase
+    map(async phone_contact =>
+      createRecordDetailsContact({
+        information: WAITING_FEEDBACK,
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        id_publisher: getLodash('id_publisher', data),
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        phone_contact
+      })
+    )(getLodash('phones', data))
+  )
+
+//createRecordDetailsContact
+export default { get, getOne, create, update, deleteOne, assign }
