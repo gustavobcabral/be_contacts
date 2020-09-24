@@ -31,8 +31,13 @@ const createRecord = async data => crud.createRecord(data, tableName)
 const updateRecord = async ({ id, data }) =>
   crud.updateRecord({ id, data, tableName, columnPrimary })
 
+const updateRecords = async ({ where, data }) =>
+  crud.updateRecords({ data, tableName, where })
+
 const deleteRecord = async id =>
   crud.deleteRecord({ id, tableName, columnPrimary })
+
+const deleteRecords = async where => crud.deleteRecords({ where, tableName })
 
 const deleteRecordByPhone = phone =>
   knex(tableName)
@@ -44,7 +49,9 @@ export {
   getDetailsAllContact,
   createRecord,
   updateRecord,
+  updateRecords,
   deleteRecord,
+  deleteRecords,
   deleteRecordByPhone,
   columnPrimary,
   fields

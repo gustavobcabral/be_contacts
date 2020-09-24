@@ -9,7 +9,8 @@ import {
 } from '../models/contacts.model'
 import {
   fields as fieldsDetailsContact,
-  createRecord as createRecordDetailsContact
+  createRecord as createRecordDetailsContact,
+  deleteRecords as deleteRecordsDetailsContact
 } from '../models/detailsContacts.model'
 import asyncPipe from 'pipeawait'
 import {
@@ -156,5 +157,24 @@ const assignAllContactsToAPublisher = async data =>
     )(getLodash('phones', data))
   )
 
-//createRecordDetailsContact
-export default { get, getOne, create, update, deleteOne, assign }
+const cancelAssign = async request =>
+  asyncPipe(
+    cancelAssignAllContactsToAPublisher,
+    curry(responseSuccess)(request)
+  )(getParamsForCreate(request))
+
+const cancelAssignAllContactsToAPublisher = async data =>
+  Promise.all(
+    // eslint-disable-next-line @typescript-eslint/camelcase
+    map(async phone_contact =>
+      deleteRecordsDetailsContact({
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        phone_contact,
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        id_publisher: getLodash('id_publisher', data),
+        information: WAITING_FEEDBACK
+      })
+    )(getLodash('phones', data))
+  )
+
+export default { get, getOne, create, update, deleteOne, assign, cancelAssign }

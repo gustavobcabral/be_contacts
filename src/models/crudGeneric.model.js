@@ -41,6 +41,11 @@ const prepareDataUpdated = (id, data) => ({
   data
 })
 
+const prepareDataUpdatedWithoutId = data => ({
+  totalAffected: data.length,
+  data
+})
+
 const updateRecord = async ({ id, data, tableName, columnPrimary }) =>
   prepareDataUpdated(
     id,
@@ -49,9 +54,20 @@ const updateRecord = async ({ id, data, tableName, columnPrimary }) =>
       .where(columnPrimary, id)
   )
 
+const updateRecords = async ({ data, tableName, where }) =>
+  prepareDataUpdatedWithoutId(
+    await knex(tableName)
+      .update(data, Object.keys(data))
+      .where(where)
+  )
+
 const prepareDataDeleted = (id, totalAffected) => ({
   totalAffected,
   id
+})
+
+const prepareDataDeletedWithoutId = totalAffected => ({
+  totalAffected
 })
 
 const deleteRecord = async ({ id, tableName, columnPrimary }) =>
@@ -59,6 +75,13 @@ const deleteRecord = async ({ id, tableName, columnPrimary }) =>
     id,
     await knex(tableName)
       .where(columnPrimary, id)
+      .delete()
+  )
+
+const deleteRecords = async ({ where, tableName }) =>
+  prepareDataDeletedWithoutId(
+    await knex(tableName)
+      .where(where)
       .delete()
   )
 
@@ -77,7 +100,9 @@ export default {
   getAll,
   createRecord,
   updateRecord,
+  updateRecords,
   deleteRecord,
+  deleteRecords,
   getOneRecord,
   parseOrderBy,
   getAllWithWhere,
