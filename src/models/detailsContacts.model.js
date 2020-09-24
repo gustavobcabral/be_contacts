@@ -6,6 +6,7 @@ const columnPrimary = 'id'
 const fields = ['createdAt', 'information', 'id_publisher', 'phone_contact']
 
 async function getDetailsOneContact(phone, limit = 5) {
+  console.log(phone)
   return knex
     .select()
     .from(tableName)

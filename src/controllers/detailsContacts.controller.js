@@ -8,6 +8,13 @@ const get = async (request, response, next) => {
     next(responseNext(error, request))
   }
 }
+const getDetailsOneContact = async (request, response, next) => {
+  try {
+    response.json(await detailsService.getAllDetailsOneContact(request))
+  } catch (error) {
+    next(responseNext(error, request))
+  }
+}
 
 const create = async (request, response, next) => {
   try {
@@ -32,4 +39,4 @@ const deleteOne = async (request, response, next) => {
     next(responseNext(error, request))
   }
 }
-export default { get, create, update, deleteOne }
+export default { get, create, update, deleteOne, getDetailsOneContact }
