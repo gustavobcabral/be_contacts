@@ -61,6 +61,26 @@
   },
   {
     "method": "get",
+    "page": "languages",
+    "id_minimum_responsibility_required": "1"
+  },
+  {
+    "method": "post",
+    "page": "languages",
+    "id_minimum_responsibility_required": "2"
+  },
+  {
+    "method": "put",
+    "page": "languages",
+    "id_minimum_responsibility_required": "2"
+  },
+  {
+    "method": "delete",
+    "page": "languages",
+    "id_minimum_responsibility_required": "2"
+  },
+  {
+    "method": "get",
     "page": "detailscontacts",
     "id_minimum_responsibility_required": "1"
   },
@@ -99,6 +119,4 @@
     "page": "permissions",
     "id_minimum_responsibility_required": "4"
   }
-
-
 ]

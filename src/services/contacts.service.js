@@ -55,7 +55,7 @@ const reduceToGetDetails = (phone, listAllDetails) => {
     orderBy(['createdAt'], ['desc']),
     reduce(
       (acc, current) =>
-        phone === current.phone && !isNull(current.phone_contact)
+        phone === current.phone && !isNull(current.id_detail)
           ? [...acc, getDetailsProps(current)]
           : acc,
       []
@@ -80,7 +80,7 @@ const mountDetailsDataForContacts = detailsContacts => {
     const withoutDetails = getOr(
       0,
       'null',
-      countBy('phone_contact', uniqueContacts)
+      countBy('id_detail', uniqueContacts)
     )
     const withDetails = uniqueContacts.length - withoutDetails
     const listOrganized = mapToGetDetailsOneContact(list, uniqueContacts)

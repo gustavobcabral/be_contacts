@@ -1,0 +1,17 @@
+[
+  {
+    "information": "o pub 1 teve uma 1 conversa com o contacto 1",
+    "id_publisher": "1",
+    "phone_contact": "1"
+  },
+  {
+    "information": "o pub 1 teve uma 2 conversa com o contacto 1",
+    "id_publisher": "1",
+    "phone_contact": "1"
+  },
+  {
+    "information": "o pub 1 teve uma 1 conversa com o contacto 2",
+    "id_publisher": "1",
+    "phone_contact": "2"
+  }
+]
