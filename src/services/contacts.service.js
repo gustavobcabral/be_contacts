@@ -4,6 +4,7 @@ import {
   updateRecord,
   deleteRecord,
   getAllWithDetails,
+  getSummaryTotals,
   columnPrimary,
   fields
 } from '../models/contacts.model'
@@ -41,8 +42,14 @@ import {
 
 const getDetailsProps = detailsContact => {
   return pipe(
-    pick([...fieldsDetailsContact, 'name_publisher', 'id_detail']),
-    omit(['phone_contact'])
+    pick([
+      ...fieldsDetailsContact,
+      'namePublisher',
+      'idDetail',
+      'createdByName',
+      'updatedByName'
+    ]),
+    omit(['phoneContact'])
   )(detailsContact)
 }
 
@@ -55,7 +62,7 @@ const reduceToGetDetails = (phone, listAllDetails) => {
     orderBy(['createdAt'], ['desc']),
     reduce(
       (acc, current) =>
-        phone === current.phone && !isNull(current.id_detail)
+        phone === current.phone && !isNull(current.idDetail)
           ? [...acc, getDetailsProps(current)]
           : acc,
       []
@@ -77,11 +84,7 @@ const mountDetailsDataForContacts = detailsContacts => {
   if (!isEmpty(detailsContacts)) {
     const list = getOr([detailsContacts], 'list', detailsContacts)
     const uniqueContacts = uniqBy(columnPrimary, list)
-    const withoutDetails = getOr(
-      0,
-      'null',
-      countBy('id_detail', uniqueContacts)
-    )
+    const withoutDetails = getOr(0, 'null', countBy('idDetail', uniqueContacts))
     const withDetails = uniqueContacts.length - withoutDetails
     const listOrganized = mapToGetDetailsOneContact(list, uniqueContacts)
     return {
@@ -145,14 +148,12 @@ const assign = async request =>
 
 const assignAllContactsToAPublisher = async data =>
   Promise.all(
-    // eslint-disable-next-line @typescript-eslint/camelcase
-    map(async phone_contact =>
+    map(async phoneContact =>
       createRecordDetailsContact({
         information: WAITING_FEEDBACK,
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        id_publisher: getLodash('id_publisher', data),
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        phone_contact
+        idPublisher: getLodash('idPublisher', data),
+        createdBy: getLodash('createdBy', data),
+        phoneContact
       })
     )(getLodash('phones', data))
   )
@@ -165,16 +166,41 @@ const cancelAssign = async request =>
 
 const cancelAssignAllContactsToAPublisher = async data =>
   Promise.all(
-    // eslint-disable-next-line @typescript-eslint/camelcase
-    map(async phone_contact =>
+    map(async phoneContact =>
       deleteRecordsDetailsContact({
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        phone_contact,
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        id_publisher: getLodash('id_publisher', data),
+        phoneContact,
+        idPublisher: getLodash('idPublisher', data),
         information: WAITING_FEEDBACK
       })
     )(getLodash('phones', data))
   )
 
-export default { get, getOne, create, update, deleteOne, assign, cancelAssign }
+const getSummaryContacts = async () => {
+  const totals = await getSummaryTotals()
+  const totalContacts = Number(totals.totalContacts.count)
+  const totalContactsContacted = Number(totals.totalContactsContacted.count)
+  const totalContactsWithoutContact = totalContacts - totalContactsContacted
+  const totalPercentContacted = Math.round(
+    (totalContactsContacted / totalContacts) * 100
+  )
+  const totalPercentWithoutContacted = 100 - totalPercentContacted
+
+  return {
+    totalContacts,
+    totalContactsContacted,
+    totalContactsWithoutContact,
+    totalPercentContacted,
+    totalPercentWithoutContacted
+  }
+}
+
+export default {
+  get,
+  getOne,
+  create,
+  update,
+  deleteOne,
+  assign,
+  cancelAssign,
+  getSummaryContacts
+}

@@ -1,5 +1,5 @@
 const data = require('./detailsContacts.json')
-const table = 'details_contacts'
+const table = 'detailsContacts'
 
 exports.seed = function(knex) {
   return knex(table)

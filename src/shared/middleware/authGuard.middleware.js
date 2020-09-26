@@ -25,6 +25,7 @@ const authGuard = (req, res, next) => {
       token.replace('Bearer ', ''),
       process.env.JWT_SECRET || JWT_SECRET
     )
+
     // eslint-disable-next-line fp/no-mutation
     req.user = jwtPayload
 

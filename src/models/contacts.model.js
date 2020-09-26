@@ -7,11 +7,11 @@ const columnPrimary = 'phone'
 const fields = [
   'phone',
   'name',
-  'id_status',
-  'id_language',
-  'language_name',
-  'status_description',
-  'name_publisher'
+  'idStatus',
+  'idLanguage',
+  'languageName',
+  'statusDescription',
+  'namePublisher'
 ]
 
 const getAllWithDetails = async queryParams => {
@@ -20,30 +20,41 @@ const getAllWithDetails = async queryParams => {
     .select(
       'contacts.name',
       'contacts.phone',
-      'contacts.id_status',
-      'contacts.id_language',
-      'languages.name as language_name',
-      'status.description as status_description',
-      'details_contacts.createdAt',
-      'details_contacts.information',
-      'details_contacts.id as id_detail',
-      'publishers.name as name_publisher'
+      'contacts.idStatus',
+      'contacts.idLanguage',
+      'languages.name as languageName',
+      'status.description as statusDescription',
+      'detailsContacts.createdAt',
+      'detailsContacts.information',
+      'detailsContacts.id as idDetail',
+      'detailsContacts.createdBy',
+      'pubCreator.name as createdByName',
+      'pubUpdater.name as updatedByName',
+      'detailsContacts.updatedBy',
+      'publishers.name as namePublisher'
     )
     .from(tableName)
     .leftJoin(
-      'details_contacts',
-      'details_contacts.phone_contact',
+      'detailsContacts',
+      'detailsContacts.phoneContact',
       '=',
       'contacts.phone'
     )
-    .leftJoin('languages', 'languages.id', '=', 'contacts.id_language')
+    .leftJoin('languages', 'languages.id', '=', 'contacts.idLanguage')
+    .leftJoin('publishers', 'publishers.id', '=', 'detailsContacts.idPublisher')
     .leftJoin(
-      'publishers',
-      'publishers.id',
+      'publishers as pubCreator',
+      'pubCreator.id',
       '=',
-      'details_contacts.id_publisher'
+      'detailsContacts.createdBy'
     )
-    .leftJoin('status', 'status.id', '=', 'contacts.id_status')
+    .leftJoin(
+      'publishers as pubUpdater',
+      'pubUpdater.id',
+      '=',
+      'detailsContacts.updatedBy'
+    )
+    .leftJoin('status', 'status.id', '=', 'contacts.idStatus')
     .orderByRaw(crud.parseOrderBy(sort))
     .paginate(perPage, currentPage)
 }
@@ -53,14 +64,14 @@ const getOneWithDetails = async phone =>
     .select(
       'contacts.name',
       'contacts.phone',
-      'contacts.id_status',
-      'contacts.id_language',
-      'details_contacts.*'
+      'contacts.idStatus',
+      'contacts.idLanguage',
+      'detailsContacts.*'
     )
     .from(tableName)
     .leftJoin(
-      'details_contacts',
-      'details_contacts.phone_contact',
+      'detailsContacts',
+      'detailsContacts.phoneContact',
       '=',
       'contacts.phone'
     )
@@ -76,12 +87,24 @@ async function deleteRecord(id) {
   return crud.deleteRecord({ id, tableName, columnPrimary })
 }
 
+const getSummaryTotals = async () => {
+  const totalContacts = await knex('contacts')
+    .count('phone')
+    .first()
+  const totalContactsContacted = await knex('detailsContacts')
+    .countDistinct('phoneContact')
+    .first()
+
+  return { totalContacts, totalContactsContacted }
+}
+
 export {
   createRecord,
   updateRecord,
   deleteRecord,
   getAllWithDetails,
   getOneWithDetails,
+  getSummaryTotals,
   columnPrimary,
   fields
 }

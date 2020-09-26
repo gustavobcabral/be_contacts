@@ -1,16 +1,22 @@
 import knex from '../database/connection'
 import crud from './crudGeneric.model'
 
-const tableName = 'details_contacts'
+const tableName = 'detailsContacts'
 const columnPrimary = 'id'
-const fields = ['createdAt', 'information', 'id_publisher', 'phone_contact']
+const fields = [
+  'createdAt',
+  'information',
+  'idPublisher',
+  'phoneContact',
+  'createdBy',
+  'updatedBy'
+]
 
 async function getDetailsOneContact(phone, limit = 5) {
-  console.log(phone)
   return knex
     .select()
     .from(tableName)
-    .where('phone_contact', '=', phone)
+    .where('phoneContact', '=', phone)
     .orderBy('createdAt', 'desc')
     .limit(limit)
 }
@@ -19,12 +25,7 @@ async function getDetailsAllContact() {
   return knex
     .select()
     .from(tableName)
-    .leftJoin(
-      'contacts',
-      'details_contacts.phone_contact',
-      '=',
-      'contacts.phone'
-    )
+    .leftJoin('contacts', 'detailsContacts.phoneContact', '=', 'contacts.phone')
 }
 
 const createRecord = async data => crud.createRecord(data, tableName)
@@ -42,7 +43,7 @@ const deleteRecords = async where => crud.deleteRecords({ where, tableName })
 
 const deleteRecordByPhone = phone =>
   knex(tableName)
-    .where('phone_contact', '=', phone)
+    .where('phoneContact', '=', phone)
     .delete()
 
 export {

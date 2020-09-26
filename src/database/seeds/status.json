@@ -1,8 +1,14 @@
 [
   {
-    "description": "Ativo"
+    "description": "estudyBible",
+    "createdBy": "1"
   },
   {
-    "description": "Inativo"
+    "description": "returnVisit",
+    "createdBy": "1"
+  },
+  {
+    "description": "noVisit",
+    "createdBy": "1"
   }
 ]

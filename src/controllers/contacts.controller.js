@@ -56,5 +56,21 @@ const cancelAssign = async (request, response, next) => {
     next(responseNext(error, request))
   }
 }
+const getSummaryContacts = async (request, response, next) => {
+  try {
+    response.json(await contactsService.getSummaryContacts())
+  } catch (error) {
+    next(responseNext(error, request))
+  }
+}
 
-export default { get, getOne, create, update, deleteOne, assign, cancelAssign }
+export default {
+  get,
+  getOne,
+  create,
+  update,
+  deleteOne,
+  assign,
+  cancelAssign,
+  getSummaryContacts
+}
