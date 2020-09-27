@@ -1,7 +1,7 @@
 import knex from '../database/connection'
 import * as detailsContact from './detailsContacts.model'
 import crud from './crudGeneric.model'
-
+import { WAITING_FEEDBACK } from '../shared/constants/contacts.constant'
 const tableName = 'contacts'
 const columnPrimary = 'phone'
 const fields = [
@@ -87,15 +87,35 @@ async function deleteRecord(id) {
   return crud.deleteRecord({ id, tableName, columnPrimary })
 }
 
-const getSummaryTotals = async () => {
+const getSummaryTotals = async idPublisher => {
   const totalContacts = await knex('contacts')
     .count('phone')
     .first()
   const totalContactsContacted = await knex('detailsContacts')
     .countDistinct('phoneContact')
+    .whereNot({ information: WAITING_FEEDBACK })
     .first()
+  const totalContactsAssignByMeWaitingFeedback = await knex('detailsContacts')
+    .countDistinct('phoneContact')
+    .where({ information: WAITING_FEEDBACK, idPublisher })
+    .first()
+  const totalContactsWaitingFeedback = await knex('detailsContacts')
+    .countDistinct('phoneContact')
+    .where({ information: WAITING_FEEDBACK })
+    .first()
+  const totalsContactsWaitingFeedbackByPublisher = await knex('detailsContacts')
+    .count('phoneContact as count')
+    .select('idPublisher')
+    .where({ information: WAITING_FEEDBACK })
+    .groupBy('idPublisher')
 
-  return { totalContacts, totalContactsContacted }
+  return {
+    totalContacts,
+    totalContactsContacted,
+    totalContactsAssignByMeWaitingFeedback,
+    totalContactsWaitingFeedback,
+    totalsContactsWaitingFeedbackByPublisher
+  }
 }
 
 export {

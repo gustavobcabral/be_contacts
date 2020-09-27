@@ -1,5 +1,6 @@
 import contactsService from '../services/contacts.service'
 import { responseNext } from '../shared/helpers/responseGeneric.helper'
+import { get as getLodash } from 'lodash/fp'
 
 const get = async (request, response, next) => {
   try {
@@ -58,7 +59,9 @@ const cancelAssign = async (request, response, next) => {
 }
 const getSummaryContacts = async (request, response, next) => {
   try {
-    response.json(await contactsService.getSummaryContacts())
+    response.json(
+      await contactsService.getSummaryContacts(getLodash('user', request))
+    )
   } catch (error) {
     next(responseNext(error, request))
   }

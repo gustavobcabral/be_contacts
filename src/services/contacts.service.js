@@ -175,8 +175,8 @@ const cancelAssignAllContactsToAPublisher = async data =>
     )(getLodash('phones', data))
   )
 
-const getSummaryContacts = async () => {
-  const totals = await getSummaryTotals()
+const getSummaryContacts = async user => {
+  const totals = await getSummaryTotals(getLodash('id', user))
   const totalContacts = Number(totals.totalContacts.count)
   const totalContactsContacted = Number(totals.totalContactsContacted.count)
   const totalContactsWithoutContact = totalContacts - totalContactsContacted
@@ -185,12 +185,48 @@ const getSummaryContacts = async () => {
   )
   const totalPercentWithoutContacted = 100 - totalPercentContacted
 
+  const totalContactsAssignByMeWaitingFeedback = Number(
+    totals.totalContactsAssignByMeWaitingFeedback.count
+  )
+  const totalContactsWaitingFeedback = Number(
+    totals.totalContactsWaitingFeedback.count
+  )
+
+  const totalPercentContactsWaitingFeedback = Math.round(
+    (totalContactsWaitingFeedback / totalContacts) * 100
+  )
+
+  const totalPercentContactsAssignByMeWaitingFeedback = Math.round(
+    (totalContactsAssignByMeWaitingFeedback / totalContactsWaitingFeedback) *
+      100
+  )
+
+  const totalPercentContactsAssignByOthersWaitingFeedback =
+    100 - totalPercentContactsAssignByMeWaitingFeedback
+
+  const calculatePercentage = count =>
+    Math.round((totalContactsContacted / count) * 100)
+
+  const totalsContactsWaitingFeedbackByPublisher = map(
+    publisher => ({
+      ...publisher,
+      percent: calculatePercentage(publisher.count)
+    }),
+    totals.totalsContactsWaitingFeedbackByPublisher
+  )
+
   return {
     totalContacts,
     totalContactsContacted,
     totalContactsWithoutContact,
     totalPercentContacted,
-    totalPercentWithoutContacted
+    totalPercentWithoutContacted,
+    totalPercentContactsWaitingFeedback,
+    totalContactsWaitingFeedback,
+    totalContactsAssignByMeWaitingFeedback,
+    totalPercentContactsAssignByMeWaitingFeedback,
+    totalsContactsWaitingFeedbackByPublisher,
+    totalPercentContactsAssignByOthersWaitingFeedback
   }
 }
 
