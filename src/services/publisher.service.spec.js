@@ -31,7 +31,9 @@ describe('Service Publishers', () => {
           idResponsibility: 4,
           active: true,
           createdAt: new Date('2020-08-31T13:59:35.232Z'),
-          hash: null
+          hash: null,
+          createdBy: request.user.id,
+          updatedBy: null
         }
       ],
       status: true
@@ -54,7 +56,9 @@ describe('Service Publishers', () => {
         idResponsibility: 4,
         active: true,
         createdAt: new Date('2020-08-31T13:59:35.232Z'),
-        hash: null
+        hash: null,
+        createdBy: request.user.id,
+        updatedBy: null
       },
       status: true
     })
@@ -157,7 +161,9 @@ describe('Service Publishers', () => {
     const response = {
       cod: POST_OK,
       status: true,
-      data: [{ id: 2, ...omit('password', payload) }]
+      data: [
+        { id: 2, createdBy: 1, updatedBy: null, ...omit('password', payload) }
+      ]
     }
 
     const request = {
@@ -182,7 +188,13 @@ describe('Service Publishers', () => {
       cod: PUT_OK,
       status: true,
       data: {
-        data: [{ id: payload.id, ...omit('password', payload) }],
+        data: [
+          {
+            id: payload.id,
+            updatedBy: 1,
+            ...omit('password', payload)
+          }
+        ],
         id: payload.id,
         totalAffected: 1
       }
