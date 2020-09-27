@@ -84,14 +84,12 @@ const verifyWhatCanUpdate = obj =>
     : obj
 
 const setValueReAuthenticate = async (id, value) =>
-  // eslint-disable-next-line @typescript-eslint/camelcase
   Boolean(await updateRecord({ id, data: { haveToReauthenticate: value } }))
 
 const reBuildObjectDataToReauthenticate = obj => ({
   id: getLodash('id', obj),
   data: {
     ...getLodash('data', obj),
-    // eslint-disable-next-line @typescript-eslint/camelcase
     haveToReauthenticate: true
   }
 })
