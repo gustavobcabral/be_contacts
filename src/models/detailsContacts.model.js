@@ -6,10 +6,21 @@ const columnPrimary = 'id'
 const fields = ['createdAt', 'information', 'id_publisher', 'phone_contact']
 
 async function getDetailsOneContact(phone, limit = 5) {
-  console.log(phone)
   return knex
-    .select()
+    .select(
+      'publishers.name',
+      'details_contacts.information',
+      'details_contacts.createdAt',
+      'details_contacts.id_publisher',
+      'details_contacts.id'
+    )
     .from(tableName)
+    .leftJoin(
+      'publishers',
+      'details_contacts.id_publisher',
+      '=',
+      'publishers.id'
+    )
     .where('phone_contact', '=', phone)
     .orderBy('createdAt', 'desc')
     .limit(limit)
