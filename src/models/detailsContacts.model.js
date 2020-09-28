@@ -14,28 +14,16 @@ const fields = [
 
 async function getDetailsOneContact(phone, limit = 5) {
   return knex
-<<<<<<< HEAD
     .select(
-      'publishers.name',
       'details_contacts.information',
       'details_contacts.createdAt',
       'details_contacts.id_publisher',
-      'details_contacts.id'
+      'details_contacts.id',
+      'publishers.name as publisherName'
     )
-    .from(tableName)
-    .leftJoin(
-      'publishers',
-      'details_contacts.id_publisher',
-      '=',
-      'publishers.id'
-    )
-    .where('phone_contact', '=', phone)
-=======
-    .select('detailsContacts.*', 'publishers.name as publisherName')
     .from(tableName)
     .leftJoin('publishers', 'detailsContacts.idPublisher', '=', 'publishers.id')
     .where('phoneContact', '=', phone)
->>>>>>> 2827091c80ae680331fac0f27ebd61e9396ccfa6
     .orderBy('createdAt', 'desc')
     .limit(limit)
 }
