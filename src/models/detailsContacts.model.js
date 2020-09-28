@@ -52,8 +52,10 @@ async function getDetailsAllContact() {
 
 const createRecord = async data => crud.createRecord(data, tableName)
 
-const updateRecord = async ({ id, data }) =>
-  crud.updateRecord({ id, data, tableName, columnPrimary })
+const updateRecord = async ({ id, data }) => {
+  console.log(id, data, "MERDA")
+  return crud.updateRecord({ id, data, tableName, columnPrimary })
+}
 
 const updateRecords = async ({ where, data }) =>
   crud.updateRecords({ data, tableName, where })

@@ -47,6 +47,10 @@ const create = async request =>
 
 const update = async request =>
   asyncPipe(
+    data => {
+      console.log(data, "merda")
+      return data
+    },
     updateRecord,
     curry(responseSuccess)(request)
   )(getParamsForUpdate(request))
