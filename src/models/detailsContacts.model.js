@@ -14,8 +14,9 @@ const fields = [
 
 async function getDetailsOneContact(phone, limit = 5) {
   return knex
-    .select()
+    .select('detailsContacts.*', 'publishers.name as publisherName')
     .from(tableName)
+    .leftJoin('publishers', 'detailsContacts.idPublisher', '=', 'publishers.id')
     .where('phoneContact', '=', phone)
     .orderBy('createdAt', 'desc')
     .limit(limit)
