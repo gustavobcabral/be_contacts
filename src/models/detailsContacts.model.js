@@ -15,10 +15,10 @@ const fields = [
 async function getDetailsOneContact(phone, limit = 5) {
   return knex
     .select(
-      'details_contacts.information',
-      'details_contacts.createdAt',
-      'details_contacts.id_publisher',
-      'details_contacts.id',
+      'detailsContacts.information',
+      'detailsContacts.createdAt',
+      'detailsContacts.idPublisher',
+      'detailsContacts.id',
       'publishers.name as publisherName'
     )
     .from(tableName)
