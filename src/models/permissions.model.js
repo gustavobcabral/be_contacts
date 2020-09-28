@@ -3,8 +3,8 @@ import { toLower } from 'lodash/fp'
 
 const tableName = 'permissions'
 const columnPrimary = 'id'
-const fields = ['method', 'page', 'id_minimum_responsibility_required']
-const putFields = ['id_minimum_responsibility_required']
+const fields = ['method', 'page', 'idMinimumResponsibilityRequired']
+const putFields = ['idMinimumResponsibilityRequired']
 
 const getUserPermission = async (page, method) =>
   crud.getOneWithWhere({

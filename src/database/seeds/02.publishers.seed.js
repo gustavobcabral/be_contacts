@@ -7,8 +7,8 @@ exports.seed = function(knex) {
       name: 'Admin',
       password: crypto.createHmac('sha256', '123456').digest('hex'),
       email: 'admin@example.com',
-      // eslint-disable-next-line @typescript-eslint/camelcase
-      id_responsibility: 4,
+      idResponsibility: 4,
+      createdBy: 1,
       active: true,
       createdAt: '2020-08-31T13:59:35.232Z'
     }

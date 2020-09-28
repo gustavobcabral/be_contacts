@@ -26,16 +26,16 @@ import {
 } from '../shared/constants/security.constant'
 
 const hasPermission = async (userIdResponsibility, page, method) => {
-  const { id_minimum_responsibility_required } = await getUserPermission(
+  const { idMinimumResponsibilityRequired } = await getUserPermission(
     page,
     method
   )
-  return userIdResponsibility >= id_minimum_responsibility_required
+  return userIdResponsibility >= idMinimumResponsibilityRequired
 }
 
 const haveToReAuthenticate = async userId => {
-  const { have_to_reauthenticate } = await getRecordForAuth(userId, 'id')
-  return Boolean(have_to_reauthenticate)
+  const { haveToReauthenticate } = await getRecordForAuth(userId, 'id')
+  return Boolean(haveToReauthenticate)
 }
 
 const checkPermissions = async req => {
@@ -43,14 +43,14 @@ const checkPermissions = async req => {
   const page = baseUrl.slice(1)
   const reAuthenticate = await haveToReAuthenticate(user.id)
   const userCanAccess = await hasPermission(
-    user.id_responsibility,
+    user.idResponsibility,
     query.page || page,
     method
   )
   const codMessage = reAuthenticate
     ? HAVE_TO_REAUTHENTICATE
     : NO_PERMISSION_ENOUGH
-  if (user.id_responsibility !== ADMIN && (reAuthenticate || !userCanAccess)) {
+  if (user.idResponsibility !== ADMIN && (reAuthenticate || !userCanAccess)) {
     throw codMessage
   }
 }

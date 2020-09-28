@@ -6,7 +6,7 @@ import asyncPipe from 'pipeawait'
 
 const tableName = 'publishers'
 const columnPrimary = 'id'
-const omitColumns = ['password', 'have_to_reauthenticate']
+const omitColumns = ['password', 'haveToReauthenticate']
 
 const removeColumnNotAllowed = data => map(pub => omit(omitColumns, pub), data)
 
@@ -18,9 +18,9 @@ const getAllAllowedForMe = async queryParams =>
     .select()
     .from(tableName)
     .where(
-      'id_responsibility',
+      'idResponsibility',
       '<=',
-      getLodash('user.id_responsibility', queryParams)
+      getLodash('user.idResponsibility', queryParams)
     )
 
 const getOneRecord = async id =>

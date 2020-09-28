@@ -8,8 +8,8 @@ import {
 } from '../shared/constants/db.constant'
 
 describe('Service Publishers', () => {
-  test('no data because this user only can get data with id_responsibility <= 1', async () => {
-    const request = { user: { id: 1, id_responsibility: 1 }, method: 'GET' }
+  test('no data because this user only can get data with idResponsibility <= 1', async () => {
+    const request = { user: { id: 1, idResponsibility: 1 }, method: 'GET' }
     const data = await publisherService.get(request)
     expect(data).toEqual({
       cod: 'GET_SUCCESSFUL',
@@ -19,7 +19,7 @@ describe('Service Publishers', () => {
   })
 
   test('all data without password', async () => {
-    const request = { user: { id: 1, id_responsibility: 4 }, method: 'GET' }
+    const request = { user: { id: 1, idResponsibility: 4 }, method: 'GET' }
     const data = await publisherService.get(request)
     expect(data).toEqual({
       cod: GET_OK,
@@ -28,10 +28,12 @@ describe('Service Publishers', () => {
           id: 1,
           name: 'Admin',
           email: 'admin@example.com',
-          id_responsibility: 4,
+          idResponsibility: 4,
           active: true,
           createdAt: new Date('2020-08-31T13:59:35.232Z'),
-          hash: null
+          hash: null,
+          createdBy: request.user.id,
+          updatedBy: null
         }
       ],
       status: true
@@ -40,7 +42,7 @@ describe('Service Publishers', () => {
 
   test('one data without password', async () => {
     const request = {
-      user: { id: 1, id_responsibility: 4 },
+      user: { id: 1, idResponsibility: 4 },
       method: 'GET',
       params: { id: 1 }
     }
@@ -51,10 +53,12 @@ describe('Service Publishers', () => {
         id: 1,
         name: 'Admin',
         email: 'admin@example.com',
-        id_responsibility: 4,
+        idResponsibility: 4,
         active: true,
         createdAt: new Date('2020-08-31T13:59:35.232Z'),
-        hash: null
+        hash: null,
+        createdBy: request.user.id,
+        updatedBy: null
       },
       status: true
     })
@@ -62,12 +66,12 @@ describe('Service Publishers', () => {
 
   test('create a new publisher with weak password (4 characters) must fail', async () => {
     const request = {
-      user: { id: 1, id_responsibility: 4 },
+      user: { id: 1, idResponsibility: 4 },
       method: 'POST',
       body: {
         name: 'test',
         email: 'test@example.com',
-        id_responsibility: 1,
+        idResponsibility: 1,
         password: 'test'
       }
     }
@@ -83,12 +87,12 @@ describe('Service Publishers', () => {
 
   test('create a new publisher with weak password (need a uppercase letter) must fail', async () => {
     const request = {
-      user: { id: 1, id_responsibility: 4 },
+      user: { id: 1, idResponsibility: 4 },
       method: 'POST',
       body: {
         name: 'test',
         email: 'test@example.com',
-        id_responsibility: 1,
+        idResponsibility: 1,
         password: 'testtest'
       }
     }
@@ -104,12 +108,12 @@ describe('Service Publishers', () => {
 
   test('create a new publisher with weak password (need a number) must fail', async () => {
     const request = {
-      user: { id: 1, id_responsibility: 4 },
+      user: { id: 1, idResponsibility: 4 },
       method: 'POST',
       body: {
         name: 'test',
         email: 'test@example.com',
-        id_responsibility: 1,
+        idResponsibility: 1,
         password: 'Testtest'
       }
     }
@@ -125,12 +129,12 @@ describe('Service Publishers', () => {
 
   test('create a new publisher with weak password (need a special character) must fail', async () => {
     const request = {
-      user: { id: 1, id_responsibility: 4 },
+      user: { id: 1, idResponsibility: 4 },
       method: 'POST',
       body: {
         name: 'test',
         email: 'test@example.com',
-        id_responsibility: 1,
+        idResponsibility: 1,
         password: 'T1esttest'
       }
     }
@@ -148,7 +152,7 @@ describe('Service Publishers', () => {
     const payload = {
       name: 'test',
       email: 'test@example.com',
-      id_responsibility: 1,
+      idResponsibility: 1,
       password: 'T1:esttest',
       active: true,
       createdAt: new Date('2020-08-31T13:59:35.232Z'),
@@ -157,11 +161,13 @@ describe('Service Publishers', () => {
     const response = {
       cod: POST_OK,
       status: true,
-      data: [{ id: 2, ...omit('password', payload) }]
+      data: [
+        { id: 2, createdBy: 1, updatedBy: null, ...omit('password', payload) }
+      ]
     }
 
     const request = {
-      user: { id: 1, id_responsibility: 4 },
+      user: { id: 1, idResponsibility: 4 },
       method: 'POST',
       body: payload
     }
@@ -174,7 +180,7 @@ describe('Service Publishers', () => {
       name: 'test atualizado',
       id: 2,
       email: 'test@example.com',
-      id_responsibility: 1,
+      idResponsibility: 1,
       password: 'T1:esttest',
       active: true
     }
@@ -182,14 +188,20 @@ describe('Service Publishers', () => {
       cod: PUT_OK,
       status: true,
       data: {
-        data: [{ id: payload.id, ...omit('password', payload) }],
+        data: [
+          {
+            id: payload.id,
+            updatedBy: 1,
+            ...omit('password', payload)
+          }
+        ],
         id: payload.id,
         totalAffected: 1
       }
     }
 
     const request = {
-      user: { id: 1, id_responsibility: 4 },
+      user: { id: 1, idResponsibility: 4 },
       method: 'PUT',
       body: payload,
       params: { id: payload.id }
@@ -203,13 +215,13 @@ describe('Service Publishers', () => {
       name: 'test atualizado',
       id: 2,
       email: 'test@example.com',
-      id_responsibility: 1,
+      idResponsibility: 1,
       password: 'T1esttest',
       active: true
     }
 
     const request = {
-      user: { id: 1, id_responsibility: 4 },
+      user: { id: 1, idResponsibility: 4 },
       method: 'PUT',
       body: payload,
       params: { id: payload.id }
@@ -232,7 +244,7 @@ describe('Service Publishers', () => {
     }
 
     const request = {
-      user: { id: 1, id_responsibility: 4 },
+      user: { id: 1, idResponsibility: 4 },
       method: 'DELETE',
       params: { id: 2 }
     }

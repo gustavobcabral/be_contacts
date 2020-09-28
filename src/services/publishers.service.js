@@ -47,7 +47,7 @@ const verifyIfCurrentUserCanSeeThisData = async ({
   data,
   idResponsibility
 }) => {
-  if (toInteger(idResponsibility) < getLodash('id_responsibility', data))
+  if (toInteger(idResponsibility) < getLodash('idResponsibility', data))
     throw NOT_ALLOWED_GET_DATA_MORE_RESPONSIBILITY
 
   return data
@@ -55,7 +55,7 @@ const verifyIfCurrentUserCanSeeThisData = async ({
 
 const prepareDataToVerification = (request, data) => ({
   data,
-  idResponsibility: getLodash('user.id_responsibility', request)
+  idResponsibility: getLodash('user.idResponsibility', request)
 })
 
 const getOne = async request =>
@@ -79,28 +79,26 @@ const verifyWhatCanUpdate = obj =>
   toInteger(getLodash('id', obj)) === ID_ADMIN
     ? {
         ...obj,
-        data: omit(['id_responsibility'], getLodash('data', obj))
+        data: omit(['idResponsibility'], getLodash('data', obj))
       }
     : obj
 
 const setValueReAuthenticate = async (id, value) =>
-  // eslint-disable-next-line @typescript-eslint/camelcase
-  Boolean(await updateRecord({ id, data: { have_to_reauthenticate: value } }))
+  Boolean(await updateRecord({ id, data: { haveToReauthenticate: value } }))
 
 const reBuildObjectDataToReauthenticate = obj => ({
   id: getLodash('id', obj),
   data: {
     ...getLodash('data', obj),
-    // eslint-disable-next-line @typescript-eslint/camelcase
-    have_to_reauthenticate: true
+    haveToReauthenticate: true
   }
 })
 
 const verifyIfIsNecessaryReAuthenticate = async obj =>
-  getLodash('data.id_responsibility', obj) &&
-  toInteger(getLodash('data.id_responsibility', obj)) !==
+  getLodash('data.idResponsibility', obj) &&
+  toInteger(getLodash('data.idResponsibility', obj)) !==
     toInteger(
-      getLodash('id_responsibility', await getOneRecord(getLodash('id', obj)))
+      getLodash('idResponsibility', await getOneRecord(getLodash('id', obj)))
     )
     ? reBuildObjectDataToReauthenticate(obj)
     : obj
