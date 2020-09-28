@@ -3,7 +3,8 @@ const {
   getDetailsOneContact,
   createRecord,
   updateRecord,
-  deleteRecord
+  deleteRecord,
+  getOne
 } = require('../models/detailsContacts.model')
 import { responseSuccess } from '../shared/helpers/responseGeneric.helper'
 import {
@@ -31,6 +32,12 @@ const getAllDetailsOneContact = async request => {
     curry(responseSuccess)(request)
   )(getParamsForGetOne(request))
 }
+const getOneDetail = async request => {
+  return asyncPipe(
+    getOne,
+    curry(responseSuccess)(request)
+  )(getParamsForGetOne(request))
+}
 
 const create = async request =>
   asyncPipe(
@@ -50,4 +57,11 @@ const deleteOne = async request =>
     curry(responseSuccess)(request)
   )(getParamsForDelete(request))
 
-export default { get, create, update, deleteOne, getAllDetailsOneContact }
+export default {
+  get,
+  create,
+  update,
+  deleteOne,
+  getAllDetailsOneContact,
+  getOneDetail
+}

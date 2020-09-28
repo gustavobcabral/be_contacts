@@ -8,6 +8,14 @@ const get = async (request, response, next) => {
     next(responseNext(error, request))
   }
 }
+const getOne = async (request, response, next) => {
+  try {
+    response.json(await detailsService.getOneDetail(request))
+  } catch (error) {
+    next(responseNext(error, request))
+  }
+}
+
 const getDetailsOneContact = async (request, response, next) => {
   try {
     response.json(await detailsService.getAllDetailsOneContact(request))
@@ -39,4 +47,4 @@ const deleteOne = async (request, response, next) => {
     next(responseNext(error, request))
   }
 }
-export default { get, create, update, deleteOne, getDetailsOneContact }
+export default { get, create, update, deleteOne, getDetailsOneContact, getOne }
