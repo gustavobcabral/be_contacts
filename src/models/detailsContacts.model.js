@@ -24,9 +24,15 @@ async function getDetailsOneContact(phone, limit = 5) {
 
 async function getOne(id) {
   return knex
-    .select('detailsContacts.*', 'publishers.name as publisherName')
+    .select(
+      'detailsContacts.*',
+      'publishers.name as publisherName',
+      'contacts.idStatus'
+    )
     .from(tableName)
     .leftJoin('publishers', 'detailsContacts.idPublisher', '=', 'publishers.id')
+    .leftJoin('contacts', 'detailsContacts.phoneContact', '=', 'contacts.phone')
+
     .where('detailsContacts.id', id)
     .first()
 }
