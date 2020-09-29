@@ -12,8 +12,8 @@ const fields = [
   'updatedBy'
 ]
 
-async function getDetailsOneContact(phone, limit = 5) {
-  return knex
+const getDetailsOneContact = async (phone, limit = 5) =>
+  knex
     .select(
       'detailsContacts.information',
       'detailsContacts.createdAt',
@@ -26,10 +26,9 @@ async function getDetailsOneContact(phone, limit = 5) {
     .where('phoneContact', '=', phone)
     .orderBy('createdAt', 'desc')
     .limit(limit)
-}
 
-async function getOne(id) {
-  return knex
+const getOne = async id =>
+  knex
     .select(
       'detailsContacts.*',
       'publishers.name as publisherName',
@@ -41,21 +40,17 @@ async function getOne(id) {
 
     .where('detailsContacts.id', id)
     .first()
-}
 
-async function getDetailsAllContact() {
-  return knex
+const getDetailsAllContact = async () =>
+  knex
     .select()
     .from(tableName)
     .leftJoin('contacts', 'detailsContacts.phoneContact', '=', 'contacts.phone')
-}
 
 const createRecord = async data => crud.createRecord(data, tableName)
 
-const updateRecord = async ({ id, data }) => {
-  console.log(id, data, "MERDA")
-  return crud.updateRecord({ id, data, tableName, columnPrimary })
-}
+const updateRecord = async ({ id, data }) =>
+  crud.updateRecord({ id, data, tableName, columnPrimary })
 
 const updateRecords = async ({ where, data }) =>
   crud.updateRecords({ data, tableName, where })
