@@ -15,7 +15,7 @@ exports.up = function(knex) {
     .createTable('publishers', function(table) {
       table.increments()
       table.string('name').notNullable()
-      table.string('password').nullable()
+      table.string('password', 25).nullable()
       table.string('hash').nullable()
       table
         .string('email')
@@ -102,9 +102,10 @@ exports.up = function(knex) {
         .string('phone')
         .notNullable()
         .primary()
-      table.string('name')
+      table.string('name').nullable()
+      table.string('gender', 6).nullable()
       table.integer('idStatus').notNullable()
-      table.integer('idLanguage')
+      table.integer('idLanguage').nullable()
       table.integer('createdBy').notNullable()
       table.integer('updatedBy').nullable()
 
