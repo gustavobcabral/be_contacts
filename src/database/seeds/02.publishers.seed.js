@@ -5,6 +5,7 @@ exports.seed = function(knex) {
   const data = [
     {
       name: 'Admin',
+      phone: '0983222111',
       password: crypto.createHmac('sha256', '123456').digest('hex'),
       email: 'admin@example.com',
       idResponsibility: 4,

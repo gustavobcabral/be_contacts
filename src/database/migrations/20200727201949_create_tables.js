@@ -15,6 +15,7 @@ exports.up = function(knex) {
     .createTable('publishers', function(table) {
       table.increments()
       table.string('name').notNullable()
+      table.string('phone', 30).notNullable()
       table.string('password').nullable()
       table.string('hash').nullable()
       table
