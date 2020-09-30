@@ -6,7 +6,8 @@ import {
   getAllWithDetails,
   getSummaryTotals,
   columnPrimary,
-  fields
+  fields,
+  getAllWaitingFeedback
 } from '../models/contacts.model'
 import {
   fields as fieldsDetailsContact,
@@ -205,7 +206,7 @@ const getSummaryContacts = async user => {
     100 - totalPercentContactsAssignByMeWaitingFeedback
 
   const calculatePercentage = count =>
-    Math.round((totalContactsContacted / count) * 100)
+    Math.round((count / totalContactsWaitingFeedback) * 100)
 
   const totalsContactsWaitingFeedbackByPublisher = map(
     publisher => ({
@@ -230,6 +231,12 @@ const getSummaryContacts = async user => {
   }
 }
 
+const getAllContactsWaitingFeedback = async request =>
+  asyncPipe(
+    getAllWaitingFeedback,
+    curry(responseSuccess)(request)
+  )(getParamsForCreate(request))
+
 export default {
   get,
   getOne,
@@ -238,5 +245,6 @@ export default {
   deleteOne,
   assign,
   cancelAssign,
-  getSummaryContacts
+  getSummaryContacts,
+  getAllContactsWaitingFeedback
 }

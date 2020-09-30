@@ -21,7 +21,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n    {\n        \"phone\": \"4\",\n        \"name\": \"abel\",\n        \"idStatus\": \"1\",\n        \"idLanguage\": \"1\"\n    },\n    {\n        \"phone\": \"5\",\n        \"name\": \"bel\",\n        \"idStatus\": \"1\",\n        \"idLanguage\": \"1\"\n    },\n    {\n        \"phone\": \"6\",\n        \"name\": \"carol\",\n        \"idStatus\": \"1\",\n        \"idLanguage\": \"1\"\n    }\n]",
+							"raw": "[\n    {\n        \"phone\": \"4\",\n        \"name\": \"aaaaa\",\n        \"idStatus\": \"1\",\n        \"idLanguage\": \"1\"\n    },\n    {\n        \"phone\": \"5\",\n        \"name\": \"bbbbbb\",\n        \"idStatus\": \"1\",\n        \"idLanguage\": \"1\"\n    },\n    {\n        \"phone\": \"6\",\n        \"name\": \"carol\",\n        \"idStatus\": \"1\",\n        \"idLanguage\": \"1\"\n    }\n]",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -201,7 +201,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": " {\n        \"phones\": [\"1\",\"2\",\"3\"],\n        \"idPublisher\": \"1\"\n}",
+							"raw": " {\n        \"phones\": [\"5\"],\n        \"idPublisher\": \"3\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -253,6 +253,44 @@
 							"path": [
 								"contacts",
 								"assign"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all contacts waiting",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3333/contacts/waiting",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3333",
+							"path": [
+								"contacts",
+								"waiting"
 							]
 						}
 					},
@@ -514,7 +552,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"id 1 atualizado\"\n}",
+							"raw": "{\n    \"name\": \"Portugues\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -681,7 +719,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"carlos4\",\n    \"email\": \"carlos4@example.com\",\n    \"password\": \"Revelacion21:4\",\n    \"active\":1,\n    \"idResponsibility\":1\n}",
+							"raw": "{\n    \"name\": \"Rodrigo Pereira\",\n    \"email\": \"rodrigo@example.com\",\n    \"password\": \"Revelacion21:4\",\n    \"active\":1,\n    \"idResponsibility\":1\n}",
 							"options": {
 								"raw": {
 									"language": "json"

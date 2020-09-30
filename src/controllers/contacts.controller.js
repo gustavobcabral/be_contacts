@@ -66,6 +66,13 @@ const getSummaryContacts = async (request, response, next) => {
     next(responseNext(error, request))
   }
 }
+const getAllContactsWaitingFeedback = async (request, response, next) => {
+  try {
+    response.json(await contactsService.getAllContactsWaitingFeedback(request))
+  } catch (error) {
+    next(responseNext(error, request))
+  }
+}
 
 export default {
   get,
@@ -75,5 +82,6 @@ export default {
   deleteOne,
   assign,
   cancelAssign,
-  getSummaryContacts
+  getSummaryContacts,
+  getAllContactsWaitingFeedback
 }
