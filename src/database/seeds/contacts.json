@@ -2,6 +2,7 @@
   {
     "phone": "1",
     "name": "abel",
+    "gender": "male",
     "idStatus": "1",
     "createdBy": "1",
     "idLanguage": "1"
@@ -9,6 +10,7 @@
   {
     "phone": "2",
     "name": "bel",
+    "gender": "female",
     "idStatus": "1",
     "createdBy": "1",
     "idLanguage": "1"
@@ -16,6 +18,7 @@
   {
     "phone": "3",
     "name": "carol",
+    "gender": "female",
     "idStatus": "1",
     "createdBy": "1",
     "idLanguage": "1"
