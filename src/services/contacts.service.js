@@ -197,13 +197,19 @@ const getSummaryContacts = async user => {
     (totalContactsWaitingFeedback / totalContacts) * 100
   )
 
-  const totalPercentContactsAssignByMeWaitingFeedback = Math.round(
-    (totalContactsAssignByMeWaitingFeedback / totalContactsWaitingFeedback) *
-      100
-  )
+  const totalPercentContactsAssignByMeWaitingFeedback =
+    totalContactsWaitingFeedback > 0
+      ? Math.round(
+          (totalContactsAssignByMeWaitingFeedback /
+            totalContactsWaitingFeedback) *
+            100
+        )
+      : 0
 
   const totalPercentContactsAssignByOthersWaitingFeedback =
-    100 - totalPercentContactsAssignByMeWaitingFeedback
+    totalContactsWaitingFeedback > 0
+      ? 100 - totalPercentContactsAssignByMeWaitingFeedback
+      : 0
 
   const calculatePercentage = count =>
     Math.round((count / totalContactsWaitingFeedback) * 100)
@@ -214,6 +220,32 @@ const getSummaryContacts = async user => {
       percent: calculatePercentage(publisher.count)
     }),
     totals.totalsContactsWaitingFeedbackByPublisher
+  )
+
+  const totalContactsByGender = totals.totalContactsByGender
+
+  const calculatePercentageByGender = count =>
+    Math.round((count / totalContactsContacted) * 100)
+
+  const totalContactsByGenderContacted = map(
+    gender => ({
+      ...gender,
+      percent: calculatePercentageByGender(gender.count)
+    }),
+    totals.totalContactsByGenderContacted
+  )
+
+  const totalContactsByLanguage = totals.totalContactsByLanguage
+
+  const calculatePercentageByLanguage = count =>
+    Math.round((count / totalContactsContacted) * 100)
+
+  const totalContactsByLanguageContacted = map(
+    language => ({
+      ...language,
+      percent: calculatePercentageByLanguage(language.count)
+    }),
+    totals.totalContactsByLanguageContacted
   )
 
   return {
@@ -227,7 +259,11 @@ const getSummaryContacts = async user => {
     totalContactsAssignByMeWaitingFeedback,
     totalPercentContactsAssignByMeWaitingFeedback,
     totalsContactsWaitingFeedbackByPublisher,
-    totalPercentContactsAssignByOthersWaitingFeedback
+    totalPercentContactsAssignByOthersWaitingFeedback,
+    totalContactsByGender,
+    totalContactsByGenderContacted,
+    totalContactsByLanguage,
+    totalContactsByLanguageContacted
   }
 }
 
