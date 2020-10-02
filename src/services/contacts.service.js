@@ -223,6 +223,7 @@ const getSummaryContacts = async user => {
   )
 
   const totalContactsByGender = totals.totalContactsByGender
+
   const calculatePercentageByGender = count =>
     Math.round((count / totalContactsContacted) * 100)
 
@@ -232,6 +233,19 @@ const getSummaryContacts = async user => {
       percent: calculatePercentageByGender(gender.count)
     }),
     totals.totalContactsByGenderContacted
+  )
+
+  const totalContactsByLanguage = totals.totalContactsByLanguage
+
+  const calculatePercentageByLanguage = count =>
+    Math.round((count / totalContactsContacted) * 100)
+
+  const totalContactsByLanguageContacted = map(
+    language => ({
+      ...language,
+      percent: calculatePercentageByLanguage(language.count)
+    }),
+    totals.totalContactsByLanguageContacted
   )
 
   return {
@@ -247,7 +261,9 @@ const getSummaryContacts = async user => {
     totalsContactsWaitingFeedbackByPublisher,
     totalPercentContactsAssignByOthersWaitingFeedback,
     totalContactsByGender,
-    totalContactsByGenderContacted
+    totalContactsByGenderContacted,
+    totalContactsByLanguage,
+    totalContactsByLanguageContacted
   }
 }
 
