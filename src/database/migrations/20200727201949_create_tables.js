@@ -1,27 +1,5 @@
 exports.up = function(knex) {
   return knex.schema
-    .createTable('status', function(table) {
-      table.increments()
-      table
-        .string('description')
-        .notNullable()
-        .unique()
-      table
-        .dateTime('createdAt')
-        .notNullable()
-        .defaultTo(knex.fn.now())
-    })
-    .createTable('languages', function(table) {
-      table.increments()
-      table
-        .string('name')
-        .notNullable()
-        .unique()
-      table
-        .dateTime('createdAt')
-        .notNullable()
-        .defaultTo(knex.fn.now())
-    })
     .createTable('responsibility', function(table) {
       table.increments()
       table
@@ -34,72 +12,153 @@ exports.up = function(knex) {
         .defaultTo(knex.fn.now())
     })
 
-    .createTable('contacts', function(table) {
-      table
-        .string('phone')
-        .notNullable()
-        .primary()
-      table.string('name')
-      table.integer('id_status').notNullable()
-      table.integer('id_language')
-      table
-        .dateTime('createdAt')
-        .notNullable()
-        .defaultTo(knex.fn.now())
-
-      table
-        .foreign('id_language')
-        .references('id')
-        .inTable('languages')
-      table
-        .foreign('id_status')
-        .references('id')
-        .inTable('status')
-    })
     .createTable('publishers', function(table) {
       table.increments()
       table.string('name').notNullable()
+      table.string('phone', 30).notNullable()
       table.string('password').nullable()
       table.string('hash').nullable()
       table
         .string('email')
         .nullable()
         .unique()
-      table.integer('id_responsibility').defaultTo(1)
+      table.integer('idResponsibility').defaultTo(1)
       table
         .boolean('active')
         .notNullable()
         .defaultTo(true)
       table
-        .boolean('have_to_reauthenticate')
+        .boolean('haveToReauthenticate')
         .notNullable()
         .defaultTo(false)
       table
         .dateTime('createdAt')
         .notNullable()
         .defaultTo(knex.fn.now())
+      table.integer('createdBy').notNullable()
+      table.integer('updatedBy').nullable()
+
       table
-        .foreign('id_responsibility')
+        .foreign('createdBy')
+        .references('id')
+        .inTable('publishers')
+      table
+        .foreign('updatedBy')
+        .references('id')
+        .inTable('publishers')
+
+      table
+        .foreign('idResponsibility')
         .references('id')
         .inTable('responsibility')
     })
-    .createTable('details_contacts', function(table) {
+
+    .createTable('status', function(table) {
+      table.increments()
+      table
+        .string('description')
+        .notNullable()
+        .unique()
+      table
+        .dateTime('createdAt')
+        .notNullable()
+        .defaultTo(knex.fn.now())
+      table.integer('createdBy').notNullable()
+      table.integer('updatedBy').nullable()
+
+      table
+        .foreign('createdBy')
+        .references('id')
+        .inTable('publishers')
+      table
+        .foreign('updatedBy')
+        .references('id')
+        .inTable('publishers')
+    })
+    .createTable('languages', function(table) {
+      table.increments()
+      table
+        .string('name')
+        .notNullable()
+        .unique()
+      table
+        .dateTime('createdAt')
+        .notNullable()
+        .defaultTo(knex.fn.now())
+      table.integer('createdBy').notNullable()
+      table.integer('updatedBy').nullable()
+
+      table
+        .foreign('createdBy')
+        .references('id')
+        .inTable('publishers')
+      table
+        .foreign('updatedBy')
+        .references('id')
+        .inTable('publishers')
+    })
+
+    .createTable('contacts', function(table) {
+      table
+        .string('phone')
+        .notNullable()
+        .primary()
+      table.string('name').nullable()
+      table.string('gender', 6).nullable()
+      table.integer('idStatus').notNullable()
+      table.integer('idLanguage').nullable()
+      table.integer('createdBy').notNullable()
+      table.integer('updatedBy').nullable()
+
+      table
+        .dateTime('createdAt')
+        .notNullable()
+        .defaultTo(knex.fn.now())
+      table
+        .foreign('createdBy')
+        .references('id')
+        .inTable('publishers')
+      table
+        .foreign('updatedBy')
+        .references('id')
+        .inTable('publishers')
+
+      table
+        .foreign('idLanguage')
+        .references('id')
+        .inTable('languages')
+      table
+        .foreign('idStatus')
+        .references('id')
+        .inTable('status')
+    })
+    .createTable('detailsContacts', function(table) {
       table.increments()
       table.text('information').notNullable()
-      table.integer('id_publisher').notNullable()
-      table.string('phone_contact').notNullable()
+      table.integer('idPublisher').notNullable()
+      table.integer('createdBy').notNullable()
+      table.integer('updatedBy').nullable()
+      table.string('phoneContact').notNullable()
       table
         .dateTime('createdAt')
         .notNullable()
         .defaultTo(knex.fn.now())
 
       table
-        .foreign('id_publisher')
+        .foreign('createdBy')
+        .references('id')
+        .inTable('publishers')
+      table
+        .foreign('updatedBy')
+        .references('id')
+        .inTable('publishers')
+      table
+        .foreign('idPublisher')
         .references('id')
         .inTable('publishers')
 
       table
-        .foreign('phone_contact')
+        .foreign('phoneContact')
         .references('phone')
         .inTable('contacts')
     })
@@ -108,14 +167,25 @@ exports.up = function(knex) {
       table.increments()
       table.string('method').notNullable()
       table.string('page').notNullable()
-      table.integer('id_minimum_responsibility_required').notNullable()
+      table.integer('idMinimumResponsibilityRequired').notNullable()
       table
         .dateTime('createdAt')
         .notNullable()
         .defaultTo(knex.fn.now())
+      table.integer('createdBy').notNullable()
+      table.integer('updatedBy').nullable()
 
       table
-        .foreign('id_minimum_responsibility_required')
+        .foreign('createdBy')
+        .references('id')
+        .inTable('publishers')
+      table
+        .foreign('updatedBy')
+        .references('id')
+        .inTable('publishers')
+
+      table
+        .foreign('idMinimumResponsibilityRequired')
         .references('id')
         .inTable('responsibility')
     })
@@ -123,9 +193,11 @@ exports.up = function(knex) {
 
 exports.down = function(knex) {
   return knex.schema
-    .dropTable('details_contacts')
+    .dropTable('detailsContacts')
     .dropTable('contacts')
-    .dropTable('publishers')
     .dropTable('status')
     .dropTable('languages')
+    .dropTable('permissions')
+    .dropTable('publishers')
+    .dropTable('responsibility')
 }

@@ -1,56 +1,80 @@
 import knex from '../database/connection'
 import crud from './crudGeneric.model'
 
-const tableName = 'details_contacts'
+const tableName = 'detailsContacts'
 const columnPrimary = 'id'
-const fields = ['createdAt', 'information', 'id_publisher', 'phone_contact']
+const fields = [
+  'createdAt',
+  'information',
+  'idPublisher',
+  'phoneContact',
+  'createdBy',
+  'updatedBy'
+]
 
-async function getDetailsOneContact(phone, limit = 5) {
-  return knex
-    .select()
+const getDetailsOneContact = async (phone, limit = 5) =>
+  knex
+    .select(
+      'detailsContacts.information',
+      'detailsContacts.createdAt',
+      'detailsContacts.idPublisher',
+      'detailsContacts.id',
+      'publishers.name as publisherName'
+    )
     .from(tableName)
-    .where('phone_contact', '=', phone)
+    .leftJoin('publishers', 'detailsContacts.idPublisher', '=', 'publishers.id')
+    .where('phoneContact', '=', phone)
     .orderBy('createdAt', 'desc')
     .limit(limit)
-}
 
-async function getDetailsAllContact() {
-  return knex
+const getOne = async id =>
+  knex
+    .select(
+      'detailsContacts.*',
+      'publishers.name as publisherName',
+      'contacts.idStatus'
+    )
+    .from(tableName)
+    .leftJoin('publishers', 'detailsContacts.idPublisher', '=', 'publishers.id')
+    .leftJoin('contacts', 'detailsContacts.phoneContact', '=', 'contacts.phone')
+
+    .where('detailsContacts.id', id)
+    .first()
+
+const getDetailsAllContact = async () =>
+  knex
     .select()
     .from(tableName)
-    .leftJoin(
-      'contacts',
-      'details_contacts.phone_contact',
-      '=',
-      'contacts.phone'
-    )
-}
+    .leftJoin('contacts', 'detailsContacts.phoneContact', '=', 'contacts.phone')
 
-const createRecord = async data => {
-  return crud.createRecord(data, tableName)
-}
+const createRecord = async data => crud.createRecord(data, tableName)
 
-const updateRecord = async ({ id, data }) => {
-  return crud.updateRecord({ id, data, tableName, columnPrimary })
-}
+const updateRecord = async ({ id, data }) =>
+  crud.updateRecord({ id, data, tableName, columnPrimary })
 
-const deleteRecord = async id => {
-  return crud.deleteRecord({ id, tableName, columnPrimary })
-}
+const updateRecords = async ({ where, data }) =>
+  crud.updateRecords({ data, tableName, where })
 
-async function deleteRecordByPhone(phone) {
-  return knex(tableName)
-    .where('phone_contact', '=', phone)
+const deleteRecord = async id =>
+  crud.deleteRecord({ id, tableName, columnPrimary })
+
+const deleteRecords = async where => crud.deleteRecords({ where, tableName })
+
+const deleteRecordByPhone = phone =>
+  knex(tableName)
+    .where('phoneContact', '=', phone)
     .delete()
-}
 
 export {
   getDetailsOneContact,
   getDetailsAllContact,
   createRecord,
   updateRecord,
+  updateRecords,
   deleteRecord,
+  deleteRecords,
   deleteRecordByPhone,
   columnPrimary,
-  fields
+  fields,
+  getOne
 }

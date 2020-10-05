@@ -60,8 +60,7 @@ const jwtSignIn = publisher => {
   const jwtToken = createJwtToken({
     email: get('email', publisher),
     id: get('id', publisher),
-    // eslint-disable-next-line @typescript-eslint/camelcase
-    id_responsibility: get('id_responsibility', publisher)
+    idResponsibility: get('idResponsibility', publisher)
   })
   const publisherDataPublic = omit(omitColumns, publisher)
   return {

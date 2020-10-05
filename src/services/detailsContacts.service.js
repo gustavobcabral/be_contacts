@@ -1,18 +1,22 @@
-const {
+import {
   getDetailsAllContact,
+  getDetailsOneContact,
   createRecord,
   updateRecord,
-  deleteRecord
-} = require('../models/detailsContacts.model')
+  deleteRecord,
+  getOne
+} from '../models/detailsContacts.model'
+import { updateRecord as updateRecordContacts } from '../models/contacts.model'
 import { responseSuccess } from '../shared/helpers/responseGeneric.helper'
 import {
+  getParamsForGetOne,
   getParamsForUpdate,
   getParamsForCreate,
   getParamsForDelete,
   defaultValueForQuery
 } from '../shared/helpers/generic.helper'
 import asyncPipe from 'pipeawait'
-import { curry } from 'lodash/fp'
+import { curry, get as getLodash } from 'lodash/fp'
 
 const get = async request => {
   const paramsQuery = defaultValueForQuery(request, {
@@ -23,6 +27,18 @@ const get = async request => {
     curry(responseSuccess)(request)
   )(paramsQuery)
 }
+const getAllDetailsOneContact = async request => {
+  return asyncPipe(
+    getDetailsOneContact,
+    curry(responseSuccess)(request)
+  )(getParamsForGetOne(request))
+}
+const getOneDetail = async request => {
+  return asyncPipe(
+    getOne,
+    curry(responseSuccess)(request)
+  )(getParamsForGetOne(request))
+}
 
 const create = async request =>
   asyncPipe(
@@ -30,11 +46,26 @@ const create = async request =>
     curry(responseSuccess)(request)
   )(getParamsForCreate(request))
 
-const update = async request =>
-  asyncPipe(
-    updateRecord,
-    curry(responseSuccess)(request)
-  )(getParamsForUpdate(request))
+const update = async request => {
+  const data = getParamsForUpdate(request)
+  const dataDetailsContact = {
+    data: getLodash('data.detailsContact', data),
+    id: getLodash('id', data)
+  }
+  const dataContact = {
+    data: getLodash('data.contact', data),
+    id: getLodash('data.contact.phone', data)
+  }
+
+  const resContacts = await updateRecordContacts(dataContact)
+  return {
+    contacts: resContacts,
+    detailsContact: await asyncPipe(
+      updateRecord,
+      curry(responseSuccess)(request)
+    )(dataDetailsContact)
+  }
+}
 
 const deleteOne = async request =>
   asyncPipe(
@@ -42,4 +73,11 @@ const deleteOne = async request =>
     curry(responseSuccess)(request)
   )(getParamsForDelete(request))
 
-export default { get, create, update, deleteOne }
+export default {
+  get,
+  create,
+  update,
+  deleteOne,
+  getAllDetailsOneContact,
+  getOneDetail
+}

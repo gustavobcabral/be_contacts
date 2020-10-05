@@ -1,8 +1,22 @@
 [
   {
-    "description": "Ativo"
+    "id": "1",
+    "description": "estudyBible",
+    "createdBy": "1"
   },
   {
-    "description": "Inativo"
+    "id": "2",
+    "description": "returnVisit",
+    "createdBy": "1"
+  },
+  {
+    "id": "3",
+    "description": "noVisit",
+    "createdBy": "1"
+  },
+  {
+    "id": "4",
+    "description": "sentToOtherCongregation",
+    "createdBy": "1"
   }
 ]

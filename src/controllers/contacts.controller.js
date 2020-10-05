@@ -1,5 +1,6 @@
 import contactsService from '../services/contacts.service'
 import { responseNext } from '../shared/helpers/responseGeneric.helper'
+import { get as getLodash } from 'lodash/fp'
 
 const get = async (request, response, next) => {
   try {
@@ -41,4 +42,46 @@ const deleteOne = async (request, response, next) => {
   }
 }
 
-export default { get, getOne, create, update, deleteOne }
+const assign = async (request, response, next) => {
+  try {
+    response.json(await contactsService.assign(request))
+  } catch (error) {
+    next(responseNext(error, request))
+  }
+}
+
+const cancelAssign = async (request, response, next) => {
+  try {
+    response.json(await contactsService.cancelAssign(request))
+  } catch (error) {
+    next(responseNext(error, request))
+  }
+}
+const getSummaryContacts = async (request, response, next) => {
+  try {
+    response.json(
+      await contactsService.getSummaryContacts(getLodash('user', request))
+    )
+  } catch (error) {
+    next(responseNext(error, request))
+  }
+}
+const getAllContactsWaitingFeedback = async (request, response, next) => {
+  try {
+    response.json(await contactsService.getAllContactsWaitingFeedback(request))
+  } catch (error) {
+    next(responseNext(error, request))
+  }
+}
+
+export default {
+  get,
+  getOne,
+  create,
+  update,
+  deleteOne,
+  assign,
+  cancelAssign,
+  getSummaryContacts,
+  getAllContactsWaitingFeedback
+}
