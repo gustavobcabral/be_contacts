@@ -40,20 +40,45 @@ const getOneDetail = async request => {
   )(getParamsForGetOne(request))
 }
 
-const create = async request =>
-  asyncPipe(
-    createRecord,
-    curry(responseSuccess)(request)
-  )(getParamsForCreate(request))
+const create = async request => {
+  const data = getParamsForCreate(request)
+  const dataDetailsContact = {
+    ...getLodash('detailsContact', data),
+    createdBy: getLodash('createdBy', data)
+  }
+
+  const dataContact = {
+    data: {
+      ...getLodash('contact', data),
+      updatedBy: getLodash('user.id', request)
+    },
+    id: getLodash('contact.phone', data)
+  }
+
+  const resContacts = await updateRecordContacts(dataContact)
+  return {
+    contacts: resContacts,
+    detailsContact: await asyncPipe(
+      createRecord,
+      curry(responseSuccess)(request)
+    )(dataDetailsContact)
+  }
+}
 
 const update = async request => {
   const data = getParamsForUpdate(request)
   const dataDetailsContact = {
-    data: getLodash('data.detailsContact', data),
+    data: {
+      ...getLodash('data.detailsContact', data),
+      updatedBy: getLodash('user.id', request)
+    },
     id: getLodash('id', data)
   }
   const dataContact = {
-    data: getLodash('data.contact', data),
+    data: {
+      ...getLodash('data.contact', data),
+      updatedBy: getLodash('user.id', request)
+    },
     id: getLodash('data.contact.phone', data)
   }
 
