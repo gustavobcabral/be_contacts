@@ -32,7 +32,8 @@ const getOne = async id =>
     .select(
       'detailsContacts.*',
       'publishers.name as publisherName',
-      'contacts.idStatus'
+      'contacts.idStatus',
+      'contacts.gender'
     )
     .from(tableName)
     .leftJoin('publishers', 'detailsContacts.idPublisher', '=', 'publishers.id')
