@@ -19,10 +19,12 @@ const getDetailsOneContact = async (phone, limit = 5) =>
       'detailsContacts.createdAt',
       'detailsContacts.idPublisher',
       'detailsContacts.id',
+      'contacts.name',
       'publishers.name as publisherName'
     )
     .from(tableName)
     .leftJoin('publishers', 'detailsContacts.idPublisher', '=', 'publishers.id')
+    .leftJoin('contacts', 'detailsContacts.phoneContact', '=', 'contacts.phone')
     .where('phoneContact', '=', phone)
     .orderBy('createdAt', 'desc')
     .limit(limit)
@@ -33,6 +35,7 @@ const getOne = async id =>
       'detailsContacts.*',
       'publishers.name as publisherName',
       'contacts.idStatus',
+      'contacts.name',
       'contacts.gender'
     )
     .from(tableName)
