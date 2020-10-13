@@ -1,7 +1,7 @@
 const crypto = require('crypto')
 const table = 'publishers'
 
-exports.seed = function(knex) {
+exports.seed = async function(knex) {
   const data = [
     {
       name: 'Admin',
@@ -14,9 +14,7 @@ exports.seed = function(knex) {
       createdAt: '2020-08-31T13:59:35.232Z'
     }
   ]
-  return knex(table)
-    .del()
-    .then(function() {
-      return knex(table).insert(data)
-    })
+  await knex(table).del()
+  await knex.raw(`ALTER SEQUENCE ${table}_id_seq RESTART WITH 1`)
+  return knex(table).insert(data)
 }
