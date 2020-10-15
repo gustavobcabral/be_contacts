@@ -1,17 +1,26 @@
 [
   {
     "id": "1",
-    "name": "Português",
+    "name": "portuguese",
+    "color": "#dc3545",
     "createdBy": "1"
   },
   {
     "id": "2",
-    "name": "Español",
+    "name": "spanish",
+    "color": "#28a745",
     "createdBy": "1"
   },
   {
     "id": "3",
-    "name": "Ingles",
+    "name": "english",
+    "color": "#007bff",
+    "createdBy": "1"
+  },
+  {
+    "id": "4",
+    "name": "germany",
+    "color": "#ffc107",
     "createdBy": "1"
   }
 ]

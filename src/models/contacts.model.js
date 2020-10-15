@@ -120,17 +120,23 @@ const getSummaryTotals = async idPublisher => {
 
   const totalContactsByLanguage = await knex('contacts')
     .count('phone')
-    .select('languages.name as languageName')
+    .select(
+      'languages.name as languageName',
+      'languages.color as languageColor'
+    )
     .leftJoin('languages', 'languages.id', '=', 'contacts.idLanguage')
-    .groupBy('languages.name')
+    .groupBy('languages.name', 'languages.color')
 
   const totalContactsByLanguageContacted = await knex('detailsContacts')
     .countDistinct('contacts.phone')
-    .select('languages.name as languageName')
+    .select(
+      'languages.name as languageName',
+      'languages.color as languageColor'
+    )
     .leftJoin('contacts', 'contacts.phone', '=', 'detailsContacts.phoneContact')
     .leftJoin('languages', 'languages.id', '=', 'contacts.idLanguage')
     .whereNot({ information: WAITING_FEEDBACK })
-    .groupBy('languages.name')
+    .groupBy('languages.name', 'languages.color')
 
   const totalContactsContacted = await knex('detailsContacts')
     .countDistinct('phoneContact')

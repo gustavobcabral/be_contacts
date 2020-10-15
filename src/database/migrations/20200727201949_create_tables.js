@@ -82,6 +82,10 @@ exports.up = function(knex) {
         .notNullable()
         .unique()
       table
+        .string('color', 10)
+        .unique()
+        .notNullable()
+      table
         .dateTime('createdAt')
         .notNullable()
         .defaultTo(knex.fn.now())
