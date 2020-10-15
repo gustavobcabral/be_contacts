@@ -1,6 +1,6 @@
 [
   {
-    "phone": "0981 111 111",
+    "phone": "0981111111",
     "name": "Abel da silva",
     "gender": "male",
     "idStatus": "1",
@@ -8,7 +8,7 @@
     "idLanguage": "1"
   },
   {
-    "phone": "0982 222 222",
+    "phone": "0982222222",
     "name": "Belendrina de Souza",
     "gender": "female",
     "idStatus": "1",
@@ -16,7 +16,7 @@
     "idLanguage": "2"
   },
   {
-    "phone": "0983 333 333",
+    "phone": "0983333333",
     "name": "Carolina de Lara",
     "gender": "female",
     "idStatus": "1",
@@ -24,7 +24,7 @@
     "idLanguage": "3"
   },
   {
-    "phone": "0984 444 444",
+    "phone": "0984444444",
     "name": "Daniel Gonzalez",
     "gender": "male",
     "idStatus": "1",
