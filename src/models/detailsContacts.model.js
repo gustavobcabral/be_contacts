@@ -21,6 +21,7 @@ const getDetailsOneContact = async (phone, limit = 5) =>
       'detailsContacts.id',
       'contacts.name',
       'contacts.idLanguage',
+      'contacts.gender',
       'publishers.name as publisherName'
     )
     .from(tableName)

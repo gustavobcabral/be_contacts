@@ -11,6 +11,7 @@ const fields = [
   'idLanguage',
   'languageName',
   'statusDescription',
+  'gender',
   'namePublisher'
 ]
 
@@ -22,6 +23,7 @@ const getAllWithDetails = async queryParams => {
       'contacts.phone',
       'contacts.idStatus',
       'contacts.idLanguage',
+      'contacts.gender',
       'languages.name as languageName',
       'status.description as statusDescription',
       'detailsContacts.createdAt',
@@ -65,6 +67,7 @@ const getOneWithDetails = async phone =>
       'contacts.name',
       'contacts.phone',
       'contacts.idStatus',
+      'contacts.gender',
       'contacts.idLanguage',
       'detailsContacts.*'
     )
@@ -94,6 +97,7 @@ const getAllWaitingFeedback = async () =>
       'contacts.phone',
       'contacts.idStatus',
       'contacts.idLanguage',
+      'contacts.gender',
       'detailsContacts.*',
       'publishers.name as publisherName'
     )
