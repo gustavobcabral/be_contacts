@@ -15,6 +15,8 @@ const setupKnexPaginator = function(knex) {
     currentPage = 1,
     getTotals = true
   ) {
+    currentPage = Number(currentPage)
+    perPage = Number(perPage)
     if (currentPage < 1) {
       currentPage = 1
     }
@@ -33,7 +35,7 @@ const setupKnexPaginator = function(knex) {
     ])
     const totals = getTotals
       ? {
-          totalRows: count.total,
+          totalRows: Number(count.total),
           lastPage: Math.ceil(count.total / perPage)
         }
       : {}
@@ -41,8 +43,8 @@ const setupKnexPaginator = function(knex) {
     const basicPagination = {
       perPage,
       currentPage,
-      from: offset,
-      to: offset + result.length
+      from: currentPage - 1,
+      to: currentPage + 1
     }
 
     return {

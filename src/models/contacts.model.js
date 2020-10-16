@@ -2,6 +2,8 @@ import knex from '../database/connection'
 import * as detailsContact from './detailsContacts.model'
 import crud from './crudGeneric.model'
 import { WAITING_FEEDBACK } from '../shared/constants/contacts.constant'
+import { isEmpty, lowerCase } from 'lodash/fp'
+
 const tableName = 'contacts'
 const columnPrimary = 'phone'
 const fields = [
@@ -16,8 +18,8 @@ const fields = [
 ]
 
 const getAll = async queryParams => {
-  const { sort = 'name:ASC', perPage, currentPage } = queryParams
-  return await knex
+  const { sort = 'name:ASC', perPage, currentPage, filter } = queryParams
+  const sql = knex
     .select(
       'contacts.name',
       'contacts.phone',
@@ -30,8 +32,16 @@ const getAll = async queryParams => {
     .from(tableName)
     .leftJoin('languages', 'languages.id', '=', 'contacts.idLanguage')
     .leftJoin('status', 'status.id', '=', 'contacts.idStatus')
-    .orderByRaw(crud.parseOrderBy(sort))
-    .paginate(perPage, currentPage)
+
+  if (!isEmpty(filter)) {
+    sql
+      .where('contacts.name', 'ilike', `%${filter}%`)
+      .orWhere('contacts.phone', 'ilike', `%${filter}%`)
+      .orWhere('contacts.gender', 'ilike', `%${filter}%`)
+      .orWhere('languages.name', 'ilike', `%${filter}%`)
+      .orWhere('status.description', 'ilike', `%${filter}%`)
+  }
+  return sql.orderByRaw(crud.parseOrderBy(sort)).paginate(perPage, currentPage)
 }
 
 const getOneWithDetails = async phone =>
