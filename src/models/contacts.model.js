@@ -15,9 +15,9 @@ const fields = [
   'namePublisher'
 ]
 
-const getAllWithDetails = async queryParams => {
+const getAll = async queryParams => {
   const { sort = 'name:ASC', perPage, currentPage } = queryParams
-  return knex
+  return await knex
     .select(
       'contacts.name',
       'contacts.phone',
@@ -25,37 +25,10 @@ const getAllWithDetails = async queryParams => {
       'contacts.idLanguage',
       'contacts.gender',
       'languages.name as languageName',
-      'status.description as statusDescription',
-      'detailsContacts.createdAt',
-      'detailsContacts.information',
-      'detailsContacts.id as idDetail',
-      'detailsContacts.createdBy',
-      'pubCreator.name as createdByName',
-      'pubUpdater.name as updatedByName',
-      'detailsContacts.updatedBy',
-      'publishers.name as namePublisher'
+      'status.description as statusDescription'
     )
     .from(tableName)
-    .leftJoin(
-      'detailsContacts',
-      'detailsContacts.phoneContact',
-      '=',
-      'contacts.phone'
-    )
     .leftJoin('languages', 'languages.id', '=', 'contacts.idLanguage')
-    .leftJoin('publishers', 'publishers.id', '=', 'detailsContacts.idPublisher')
-    .leftJoin(
-      'publishers as pubCreator',
-      'pubCreator.id',
-      '=',
-      'detailsContacts.createdBy'
-    )
-    .leftJoin(
-      'publishers as pubUpdater',
-      'pubUpdater.id',
-      '=',
-      'detailsContacts.updatedBy'
-    )
     .leftJoin('status', 'status.id', '=', 'contacts.idStatus')
     .orderByRaw(crud.parseOrderBy(sort))
     .paginate(perPage, currentPage)
@@ -181,7 +154,7 @@ export {
   createRecord,
   updateRecord,
   deleteRecord,
-  getAllWithDetails,
+  getAll,
   getOneWithDetails,
   getSummaryTotals,
   getAllWaitingFeedback,

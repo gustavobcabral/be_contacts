@@ -3,7 +3,7 @@ import {
   createRecord,
   updateRecord,
   deleteRecord,
-  getAllWithDetails,
+  getAll,
   getSummaryTotals,
   columnPrimary,
   fields,
@@ -17,19 +17,15 @@ import {
 import asyncPipe from 'pipeawait'
 import {
   first,
-  isEmpty,
   reduce,
   pipe,
   pick,
   isNull,
   curry,
-  uniqBy,
   map,
   get as getLodash,
-  getOr,
   omit,
-  orderBy,
-  countBy
+  orderBy
 } from 'lodash/fp'
 import { responseSuccess } from '../shared/helpers/responseGeneric.helper'
 import { WAITING_FEEDBACK } from '../shared/constants/contacts.constant'
@@ -71,33 +67,6 @@ const reduceToGetDetails = (phone, listAllDetails) => {
   )(listAllDetails)
 }
 
-const mapToGetDetailsOneContact = (list, contactsUnique) => {
-  return map(
-    contact => ({
-      ...getContactProps(contact),
-      details: reduceToGetDetails(getLodash(columnPrimary, contact), list)
-    }),
-    contactsUnique
-  )
-}
-
-const mountDetailsDataForContacts = detailsContacts => {
-  if (!isEmpty(detailsContacts)) {
-    const list = getOr([detailsContacts], 'list', detailsContacts)
-    const uniqueContacts = uniqBy(columnPrimary, list)
-    const withoutDetails = getOr(0, 'null', countBy('idDetail', uniqueContacts))
-    const withDetails = uniqueContacts.length - withoutDetails
-    const listOrganized = mapToGetDetailsOneContact(list, uniqueContacts)
-    return {
-      ...detailsContacts,
-      withDetails,
-      withoutDetails,
-      list: listOrganized
-    }
-  }
-  return []
-}
-
 const mountDetailsDataForOneContact = detailsContact => {
   const contact = first(detailsContact)
   return {
@@ -110,11 +79,7 @@ const mountDetailsDataForOneContact = detailsContact => {
 }
 
 const get = async request =>
-  asyncPipe(
-    getAllWithDetails,
-    mountDetailsDataForContacts,
-    curry(responseSuccess)(request)
-  )(getParamsForGet(request))
+  asyncPipe(getAll, curry(responseSuccess)(request))(getParamsForGet(request))
 
 const getOne = async request =>
   asyncPipe(
