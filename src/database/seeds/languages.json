@@ -22,5 +22,11 @@
     "name": "germany",
     "color": "#ffc107",
     "createdBy": "1"
+  },
+  {
+    "id": "5",
+    "name": "unknown",
+    "color": "#4B0082",
+    "createdBy": "1"
   }
 ]
