@@ -76,7 +76,7 @@ const updateRecord = async ({ id, data }) =>
   crud.updateRecord({ id, data, tableName, columnPrimary })
 
 async function deleteRecord(id) {
-  detailsContact.deleteRecordByPhone(id)
+  await detailsContact.deleteRecordByPhone(id)
   return crud.deleteRecord({ id, tableName, columnPrimary })
 }
 
