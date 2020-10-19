@@ -10,6 +10,14 @@ const get = async (request, response, next) => {
   }
 }
 
+const getAllGenderOfContacts = async (request, response, next) => {
+  try {
+    response.json(await contactsService.getAllGenderOfContacts(request))
+  } catch (error) {
+    next(responseNext(error, request))
+  }
+}
+
 const getOne = async (request, response, next) => {
   try {
     response.json(await contactsService.getOne(request))
@@ -83,5 +91,6 @@ export default {
   assign,
   cancelAssign,
   getSummaryContacts,
-  getAllContactsWaitingFeedback
+  getAllContactsWaitingFeedback,
+  getAllGenderOfContacts
 }

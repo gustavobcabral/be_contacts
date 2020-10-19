@@ -7,7 +7,8 @@ import {
   getSummaryTotals,
   columnPrimary,
   fields,
-  getAllWaitingFeedback
+  getAllWaitingFeedback,
+  getGenders
 } from '../models/contacts.model'
 import {
   fields as fieldsDetailsContact,
@@ -238,6 +239,12 @@ const getAllContactsWaitingFeedback = async request =>
     curry(responseSuccess)(request)
   )(getParamsForCreate(request))
 
+const getAllGenderOfContacts = async request =>
+  asyncPipe(
+    getGenders,
+    curry(responseSuccess)(request)
+  )(getParamsForGet(request))
+
 export default {
   get,
   getOne,
@@ -247,5 +254,6 @@ export default {
   assign,
   cancelAssign,
   getSummaryContacts,
-  getAllContactsWaitingFeedback
+  getAllContactsWaitingFeedback,
+  getAllGenderOfContacts
 }

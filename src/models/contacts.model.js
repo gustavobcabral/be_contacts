@@ -18,7 +18,7 @@ const fields = [
 ]
 
 const getAll = async queryParams => {
-  const { sort = 'name:ASC', perPage, currentPage, filter } = queryParams
+  const { sort = 'name:ASC', perPage, currentPage, filters } = queryParams
   const sql = knex
     .select(
       'contacts.name',
@@ -33,16 +33,23 @@ const getAll = async queryParams => {
     .leftJoin('languages', 'languages.id', '=', 'contacts.idLanguage')
     .leftJoin('status', 'status.id', '=', 'contacts.idStatus')
 
-  if (!isEmpty(filter)) {
-    sql
-      .where('contacts.name', 'ilike', `%${filter}%`)
-      .orWhere('contacts.phone', 'ilike', `%${filter}%`)
-      .orWhere('contacts.gender', 'ilike', `%${filter}%`)
-      .orWhere('languages.name', 'ilike', `%${filter}%`)
-      .orWhere('status.description', 'ilike', `%${filter}%`)
+  if (!isEmpty(filters)) {
+    const { name, phone, gender, language, status } = JSON.parse(filters)
+    console.log(JSON.parse(filters))
+    if (!isEmpty(name)) sql.where('contacts.name', 'ilike', `%${name}%`)
+    if (!isEmpty(phone)) sql.orWhere('contacts.phone', 'ilike', `%${phone}%`)
+    if (!isEmpty(gender)) sql.whereIn('contacts.gender', gender)
+    if (!isEmpty(language)) sql.whereIn('languages.name', language)
+    if (!isEmpty(status)) sql.whereIn('status.description', status)
   }
   return sql.orderByRaw(crud.parseOrderBy(sort)).paginate(perPage, currentPage)
 }
+
+const getGenders = async () =>
+  knex
+    .select('gender')
+    .from(tableName)
+    .groupBy('gender')
 
 const getOneWithDetails = async phone =>
   knex
@@ -168,6 +175,7 @@ export {
   getOneWithDetails,
   getSummaryTotals,
   getAllWaitingFeedback,
+  getGenders,
   columnPrimary,
   fields
 }
