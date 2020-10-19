@@ -35,7 +35,6 @@ const getAll = async queryParams => {
 
   if (!isEmpty(filters)) {
     const { name, phone, gender, language, status } = JSON.parse(filters)
-    console.log(JSON.parse(filters))
     if (!isEmpty(name)) sql.where('contacts.name', 'ilike', `%${name}%`)
     if (!isEmpty(phone)) sql.orWhere('contacts.phone', 'ilike', `%${phone}%`)
     if (!isEmpty(gender)) sql.whereIn('contacts.gender', gender)
