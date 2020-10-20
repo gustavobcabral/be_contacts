@@ -5,7 +5,7 @@ const routes = Router()
 
 routes.get('/summary', contactsController.getSummaryContacts)
 routes.get('/waiting', contactsController.getAllContactsWaitingFeedback)
-routes.get('/byGender', contactsController.getAllGenderOfContacts)
+routes.get('/filters', contactsController.getAllFiltersOfContacts)
 routes.get('/', contactsController.get)
 routes.get('/:id', contactsController.getOne)
 
