@@ -2,7 +2,7 @@ import knex from '../database/connection'
 import * as detailsContact from './detailsContacts.model'
 import crud from './crudGeneric.model'
 import { WAITING_FEEDBACK } from '../shared/constants/contacts.constant'
-import { isEmpty } from 'lodash/fp'
+import { isEmpty, map } from 'lodash/fp'
 
 const tableName = 'contacts'
 const columnPrimary = 'phone'
@@ -35,6 +35,10 @@ const getAll = async queryParams => {
 
   if (!isEmpty(filters)) {
     const { name, phone, genders, languages, status } = JSON.parse(filters)
+    const gendersWithUndefined = map(
+      gender => (gender === 'undefinedGender' ? '' : gender),
+      genders
+    )
     if (!isEmpty(name) && !isEmpty(phone)) {
       sql.where(builder =>
         builder
@@ -43,7 +47,7 @@ const getAll = async queryParams => {
       )
     }
     if (!isEmpty(genders))
-      sql.andWhere(qB => qB.whereIn('contacts.gender', genders))
+      sql.andWhere(qB => qB.whereIn('contacts.gender', gendersWithUndefined))
 
     if (!isEmpty(languages))
       sql.andWhere(qB => qB.whereIn('contacts.idLanguage', languages))
