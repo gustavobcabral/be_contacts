@@ -1,6 +1,6 @@
 import knex from '../database/connection'
 import crud from './crudGeneric.model'
-import { isEmpty } from 'lodash/fp'
+import { isNil } from 'lodash/fp'
 
 const tableName = 'detailsContacts'
 const columnPrimary = 'id'
@@ -13,7 +13,8 @@ const fields = [
   'updatedBy'
 ]
 
-const getDetailsOneContact = async (phone, limit = 5) => {
+const getDetailsOneContact = async ({ id, query }) => {
+  const limit = query.limit || 5
   const sql = knex
     .select(
       'detailsContacts.information',
@@ -28,9 +29,10 @@ const getDetailsOneContact = async (phone, limit = 5) => {
     .from(tableName)
     .leftJoin('publishers', 'detailsContacts.idPublisher', '=', 'publishers.id')
     .leftJoin('contacts', 'detailsContacts.phoneContact', '=', 'contacts.phone')
-    .where('phoneContact', '=', phone)
+    .where('phoneContact', '=', id)
     .orderBy('createdAt', 'desc')
-  if (!isEmpty(limit) && limit > 0) sql.limit(limit)
+
+  if (!isNil(limit) && limit > 0) sql.limit(limit)
   return sql
 }
 

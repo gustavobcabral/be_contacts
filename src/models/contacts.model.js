@@ -67,10 +67,18 @@ const getLanguages = async () =>
     .leftJoin('languages', 'languages.id', '=', 'contacts.idLanguage')
     .groupBy('idLanguage', 'languages.name')
 
+const getStatus = async () =>
+  knex
+    .select('idStatus', 'status.description as statusDescription')
+    .from(tableName)
+    .leftJoin('status', 'status.id', '=', 'contacts.idStatus')
+    .groupBy('idStatus', 'status.description')
+
 const getFilters = async () => {
   const genders = await getGenders()
   const languages = await getLanguages()
-  return { genders, languages }
+  const status = await getStatus()
+  return { genders, languages, status }
 }
 
 const getOneWithDetails = async phone =>

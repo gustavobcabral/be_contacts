@@ -13,7 +13,8 @@ import {
   getParamsForUpdate,
   getParamsForCreate,
   getParamsForDelete,
-  defaultValueForQuery
+  defaultValueForQuery,
+  getParamsForGetOneWithQuery
 } from '../shared/helpers/generic.helper'
 import asyncPipe from 'pipeawait'
 import { curry, get as getLodash } from 'lodash/fp'
@@ -31,7 +32,7 @@ const getAllDetailsOneContact = async request => {
   return asyncPipe(
     getDetailsOneContact,
     curry(responseSuccess)(request)
-  )(getParamsForGetOne(request))
+  )(getParamsForGetOneWithQuery(request))
 }
 const getOneDetail = async request => {
   return asyncPipe(
