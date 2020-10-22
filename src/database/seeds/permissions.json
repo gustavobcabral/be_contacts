@@ -142,5 +142,29 @@
     "page": "permissions",
     "idMinimumResponsibilityRequired": "4",
     "createdBy": "1"
+  },
+  {
+    "method": "get",
+    "page": "responsibility",
+    "idMinimumResponsibilityRequired": "1",
+    "createdBy": "1"
+  },
+  {
+    "method": "post",
+    "page": "responsibility",
+    "idMinimumResponsibilityRequired": "4",
+    "createdBy": "1"
+  },
+  {
+    "method": "put",
+    "page": "responsibility",
+    "idMinimumResponsibilityRequired": "4",
+    "createdBy": "1"
+  },
+  {
+    "method": "delete",
+    "page": "responsibility",
+    "idMinimumResponsibilityRequired": "4",
+    "createdBy": "1"
   }
 ]

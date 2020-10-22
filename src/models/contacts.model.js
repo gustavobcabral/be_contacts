@@ -2,7 +2,7 @@ import knex from '../database/connection'
 import * as detailsContact from './detailsContacts.model'
 import crud from './crudGeneric.model'
 import { WAITING_FEEDBACK } from '../shared/constants/contacts.constant'
-import { isEmpty, map } from 'lodash/fp'
+import { isEmpty } from 'lodash/fp'
 
 const tableName = 'contacts'
 const columnPrimary = 'phone'

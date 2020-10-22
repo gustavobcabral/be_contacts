@@ -9,6 +9,10 @@ const getParamsForUpdate = request => ({
 })
 
 const getParamsForGet = request => get('query', request)
+const getParamsForGetWithUser = request => ({
+  query: get('query', request),
+  user: get('user', request)
+})
 const getParamsForCreate = request => appendEssentialData(request, 'createdBy')
 const getParamsForGetOne = request => get('params.id', request)
 const getParamsForGetOneWithUser = request => ({
@@ -47,5 +51,6 @@ export {
   createJwtToken,
   encrypt,
   getParamsForGetOneWithUser,
-  getParamsForGetOneWithQuery
+  getParamsForGetOneWithQuery,
+  getParamsForGetWithUser
 }
