@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "27e08187-d345-4e96-aeca-0860b5423c94",
-		"name": "Contacts",
+		"name": "Contacts Project",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -21,7 +21,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n    {\n        \"phone\": \"4\",\n        \"name\": \"aaaaa\",\n        \"idStatus\": \"1\",\n        \"idLanguage\": \"1\"\n    },\n    {\n        \"phone\": \"5\",\n        \"name\": \"bbbbbb\",\n        \"idStatus\": \"1\",\n        \"idLanguage\": \"1\"\n    },\n    {\n        \"phone\": \"6\",\n        \"name\": \"carol\",\n        \"idStatus\": \"1\",\n        \"idLanguage\": \"1\"\n    }\n]",
+							"raw": "[\n    {\n        \"phone\": \"9\",\n        \"name\": \"senhor 9\",\n        \"idStatus\": \"1\",\n        \"idLanguage\": \"2\"\n    }\n\n]",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -201,7 +201,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": " {\n        \"phones\": [\"5\"],\n        \"idPublisher\": \"3\"\n}",
+							"raw": " {\n        \"phones\": [\"6\"],\n        \"idPublisher\": \"5\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -719,7 +719,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Rodrigo Pereira\",\n    \"email\": \"rodrigo@example.com\",\n    \"password\": \"Revelacion21:4\",\n    \"active\":1,\n    \"idResponsibility\":1\n}",
+							"raw": "{\n    \"name\": \"Gustavo cabral\",\n    \"email\": \"gustavo@example.com\",\n    \"password\": \"Revelacion21:4\",\n    \"phone\":\"0991888999\",\n    \"active\":1,\n    \"idResponsibility\":1\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -970,6 +970,37 @@
 							"port": "3333",
 							"path": [
 								"permissions"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Responsibility",
+			"item": [
+				{
+					"name": "get",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3333/responsibility",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3333",
+							"path": [
+								"responsibility"
 							]
 						}
 					},
