@@ -108,7 +108,10 @@ exports.up = function(knex) {
         .notNullable()
         .primary()
       table.string('name').nullable()
-      table.string('gender', 6).nullable()
+      table
+        .string('gender', 7)
+        .notNullable()
+        .defaultTo('unknown')
       table
         .integer('idStatus')
         .notNullable()
