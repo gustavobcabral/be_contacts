@@ -35,10 +35,7 @@ const getAll = async queryParams => {
 
   if (!isEmpty(filters)) {
     const { name, phone, genders, languages, status } = JSON.parse(filters)
-    const gendersWithUndefined = map(
-      gender => (gender === 'undefinedGender' ? '' : gender),
-      genders
-    )
+
     if (!isEmpty(name) && !isEmpty(phone)) {
       sql.where(builder =>
         builder
@@ -47,7 +44,7 @@ const getAll = async queryParams => {
       )
     }
     if (!isEmpty(genders))
-      sql.andWhere(qB => qB.whereIn('contacts.gender', gendersWithUndefined))
+      sql.andWhere(qB => qB.whereIn('contacts.gender', genders))
 
     if (!isEmpty(languages))
       sql.andWhere(qB => qB.whereIn('contacts.idLanguage', languages))
