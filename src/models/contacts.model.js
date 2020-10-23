@@ -2,7 +2,7 @@ import knex from '../database/connection'
 import * as detailsContact from './detailsContacts.model'
 import crud from './crudGeneric.model'
 import { WAITING_FEEDBACK } from '../shared/constants/contacts.constant'
-import { isEmpty } from 'lodash/fp'
+import { isEmpty, map, contains } from 'lodash/fp'
 
 const tableName = 'contacts'
 const columnPrimary = 'phone'
@@ -52,7 +52,32 @@ const getAll = async queryParams => {
     if (!isEmpty(status))
       sql.andWhere(qB => qB.whereIn('contacts.idStatus', status))
   }
-  return sql.orderByRaw(crud.parseOrderBy(sort)).paginate(perPage, currentPage)
+  const data = await sql
+    .orderByRaw(crud.parseOrderBy(sort))
+    .paginate(perPage, currentPage)
+
+  const list = await Promise.all(
+    map(async row => {
+      const details = await knex
+        .select()
+        .from('detailsContacts')
+        .where('phoneContact', row.phone)
+        .orderBy('createdAt', 'desc')
+        .first()
+
+      const forbiddenSend = contains(WAITING_FEEDBACK, details.information)
+      return {
+        ...row,
+        forbiddenSend,
+        details
+      }
+    }, data.list)
+  )
+
+  return {
+    ...data,
+    list
+  }
 }
 
 const getGenders = async () =>
