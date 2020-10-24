@@ -2,7 +2,7 @@ import knex from '../database/connection'
 import * as detailsContact from './detailsContacts.model'
 import crud from './crudGeneric.model'
 import { WAITING_FEEDBACK } from '../shared/constants/contacts.constant'
-import { isEmpty, map, contains } from 'lodash/fp'
+import { isEmpty, map, contains, first, last } from 'lodash/fp'
 
 const tableName = 'contacts'
 const columnPrimary = 'phone'
@@ -63,13 +63,20 @@ const getAll = async queryParams => {
         .from('detailsContacts')
         .where('phoneContact', row.phone)
         .orderBy('createdAt', 'desc')
-        .first()
-
-      const forbiddenSend = contains(WAITING_FEEDBACK, details.information)
+        .limit(2)
+      const lastDetails = first(details)
+      const beforeLastDetails = last(details)
+      const forbiddenSend = lastDetails
+        ? contains(WAITING_FEEDBACK, lastDetails.information)
+        : false
       return {
         ...row,
         forbiddenSend,
-        details
+        details: forbiddenSend
+          ? beforeLastDetails
+          : lastDetails
+          ? lastDetails
+          : {}
       }
     }, data.list)
   )

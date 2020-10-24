@@ -5,7 +5,7 @@ exports.seed = async function(knex) {
   const data = [
     {
       name: 'Admin',
-      phone: '0983222111',
+      phone: '595983222111',
       password: crypto.createHmac('sha256', '123456').digest('hex'),
       email: 'admin@example.com',
       idResponsibility: 4,
