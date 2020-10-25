@@ -58,25 +58,35 @@ const getAll = async queryParams => {
 
   const list = await Promise.all(
     map(async row => {
-      const details = await knex
+      const detailsDB = await knex
         .select()
         .from('detailsContacts')
         .where('phoneContact', row.phone)
         .orderBy('createdAt', 'desc')
         .limit(2)
-      const lastDetails = first(details)
-      const beforeLastDetails = last(details)
-      const forbiddenSend = lastDetails
-        ? contains(WAITING_FEEDBACK, lastDetails.information)
-        : false
-      return {
-        ...row,
-        forbiddenSend,
-        details: forbiddenSend
-          ? beforeLastDetails
-          : lastDetails
+      if (detailsDB.length > 0) {
+        const lastDetails = first(detailsDB)
+        const beforeLastDetails = last(detailsDB)
+        const waitingFeedback = contains(
+          WAITING_FEEDBACK,
+          lastDetails.information
+        )
+        const details = !waitingFeedback
           ? lastDetails
+          : !contains(WAITING_FEEDBACK, beforeLastDetails.information)
+          ? beforeLastDetails
           : {}
+        return {
+          ...row,
+          waitingFeedback,
+          details
+        }
+      } else {
+        return {
+          ...row,
+          waitingFeedback: false,
+          details: {}
+        }
       }
     }, data.list)
   )
