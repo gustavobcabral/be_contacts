@@ -29,6 +29,7 @@ const responseSuccess = (request, data) => ({
 })
 
 const responseError = err => ({
+  ...err,
   status: false,
   httpErrorCode: err.httpErrorCode || HttpStatus.INTERNAL_SERVER_ERROR,
   cod: err.cod,
@@ -37,6 +38,7 @@ const responseError = err => ({
 
 const responseNext = (error, request) => {
   return {
+    ...error,
     error: error.error || error,
     httpErrorCode: error.httpErrorCode || HttpStatus.INTERNAL_SERVER_ERROR,
     cod: findCod(request, 'errorDesc')

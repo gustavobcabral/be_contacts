@@ -3,10 +3,9 @@ import contactsController from '../controllers/contacts.controller'
 
 const routes = Router()
 
-routes.get('/summary', contactsController.getSummaryContacts)
-routes.get('/waiting', contactsController.getAllContactsWaitingFeedback)
-routes.get('/filters', contactsController.getAllFiltersOfContacts)
 routes.get('/', contactsController.get)
+routes.get('/summary', contactsController.getSummaryContacts)
+routes.get('/filters', contactsController.getAllFiltersOfContacts)
 routes.get('/:id', contactsController.getOne)
 
 routes.post('/', contactsController.create)

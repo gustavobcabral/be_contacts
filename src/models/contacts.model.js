@@ -153,21 +153,6 @@ async function deleteRecord(id) {
   return crud.deleteRecord({ id, tableName, columnPrimary })
 }
 
-const getAllWaitingFeedback = async () =>
-  await knex('detailsContacts')
-    .select(
-      'contacts.name',
-      'contacts.phone',
-      'contacts.idStatus',
-      'contacts.idLanguage',
-      'contacts.gender',
-      'detailsContacts.*',
-      'publishers.name as publisherName'
-    )
-    .leftJoin('contacts', 'contacts.phone', '=', 'detailsContacts.phoneContact')
-    .leftJoin('publishers', 'publishers.id', '=', 'detailsContacts.idPublisher')
-    .where({ information: WAITING_FEEDBACK })
-
 const getSummaryTotals = async idPublisher => {
   const totalContacts = await knex('contacts')
     .count('phone')
@@ -247,7 +232,6 @@ export {
   getAll,
   getOneWithDetails,
   getSummaryTotals,
-  getAllWaitingFeedback,
   getFilters,
   columnPrimary,
   fields

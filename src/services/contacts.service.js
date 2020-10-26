@@ -1,3 +1,4 @@
+import HttpStatus from 'http-status-codes'
 import {
   getOneWithDetails,
   createRecord,
@@ -7,13 +8,13 @@ import {
   getSummaryTotals,
   columnPrimary,
   fields,
-  getAllWaitingFeedback,
   getFilters
 } from '../models/contacts.model'
 import {
   fields as fieldsDetailsContact,
   createRecord as createRecordDetailsContact,
-  deleteRecords as deleteRecordsDetailsContact
+  deleteRecords as deleteRecordsDetailsContact,
+  getDetailsIsWaitingFeedbackOneContact
 } from '../models/detailsContacts.model'
 import asyncPipe from 'pipeawait'
 import {
@@ -29,7 +30,10 @@ import {
   orderBy
 } from 'lodash/fp'
 import { responseSuccess } from '../shared/helpers/responseGeneric.helper'
-import { WAITING_FEEDBACK } from '../shared/constants/contacts.constant'
+import {
+  WAITING_FEEDBACK,
+  ERROR_PUBLISHER_ALREADY_WAITING_FEEDBACK
+} from '../shared/constants/contacts.constant'
 import {
   getParamsForUpdate,
   getParamsForGet,
@@ -109,9 +113,29 @@ const deleteOne = async request =>
 
 const assign = async request =>
   asyncPipe(
+    verifiyIfThisContactsAreAlreadyWaiting,
     assignAllContactsToAPublisher,
     curry(responseSuccess)(request)
   )(getParamsForCreate(request))
+
+const verifiyIfThisContactsAreAlreadyWaiting = async data =>
+  Promise.all(
+    map(async phoneContact =>
+      verifiyIfThisContactIsAlreadyWaiting(phoneContact)
+    )(getLodash('phones', data))
+  ).then(() => data)
+
+const verifiyIfThisContactIsAlreadyWaiting = async phone => {
+  const data = await getDetailsIsWaitingFeedbackOneContact(phone)
+  if (data.length > 0) {
+    throw {
+      httpErrorCode: HttpStatus.BAD_REQUEST,
+      error: ERROR_PUBLISHER_ALREADY_WAITING_FEEDBACK,
+      extra: { phone }
+    }
+  }
+  return phone
+}
 
 const assignAllContactsToAPublisher = async data =>
   Promise.all(
@@ -233,12 +257,6 @@ const getSummaryContacts = async user => {
   }
 }
 
-const getAllContactsWaitingFeedback = async request =>
-  asyncPipe(
-    getAllWaitingFeedback,
-    curry(responseSuccess)(request)
-  )(getParamsForCreate(request))
-
 const getAllFiltersOfContacts = async request =>
   asyncPipe(
     getFilters,
@@ -254,6 +272,5 @@ export default {
   assign,
   cancelAssign,
   getSummaryContacts,
-  getAllContactsWaitingFeedback,
   getAllFiltersOfContacts
 }

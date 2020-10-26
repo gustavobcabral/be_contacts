@@ -1,15 +1,18 @@
 import {
+  getOne,
+  getDetailsAllContactWaitingFeedback,
+  getFiltersWaitingFeedback,
   getDetailsAllContact,
   getDetailsOneContact,
   createRecord,
   updateRecord,
-  deleteRecord,
-  getOne
+  deleteRecord
 } from '../models/detailsContacts.model'
 import { updateRecord as updateRecordContacts } from '../models/contacts.model'
 import { responseSuccess } from '../shared/helpers/responseGeneric.helper'
 import {
   getParamsForGetOne,
+  getParamsForGet,
   getParamsForUpdate,
   getParamsForCreate,
   getParamsForDelete,
@@ -28,6 +31,23 @@ const get = async request => {
     curry(responseSuccess)(request)
   )(paramsQuery)
 }
+
+const getAllWaitingFeedback = async request => {
+  const paramsQuery = defaultValueForQuery(request, {
+    sort: '"detailsContacts"."createdAt":DESC'
+  })
+  return asyncPipe(
+    getDetailsAllContactWaitingFeedback,
+    curry(responseSuccess)(request)
+  )(paramsQuery)
+}
+
+const getAllFiltersWaitingFeedback = async request =>
+  asyncPipe(
+    getFiltersWaitingFeedback,
+    curry(responseSuccess)(request)
+  )(getParamsForGet(request))
+
 const getAllDetailsOneContact = async request => {
   return asyncPipe(
     getDetailsOneContact,
@@ -101,9 +121,11 @@ const deleteOne = async request =>
 
 export default {
   get,
+  getAllDetailsOneContact,
+  getOneDetail,
+  getAllWaitingFeedback,
+  getAllFiltersWaitingFeedback,
   create,
   update,
-  deleteOne,
-  getAllDetailsOneContact,
-  getOneDetail
+  deleteOne
 }
