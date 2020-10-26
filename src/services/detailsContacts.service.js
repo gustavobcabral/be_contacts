@@ -17,7 +17,8 @@ import {
   getParamsForCreate,
   getParamsForDelete,
   defaultValueForQuery,
-  getParamsForGetOneWithQuery
+  getParamsForGetOneWithQuery,
+  getParamsForGetWithUser
 } from '../shared/helpers/generic.helper'
 import asyncPipe from 'pipeawait'
 import { curry, get as getLodash } from 'lodash/fp'
@@ -33,13 +34,10 @@ const get = async request => {
 }
 
 const getAllWaitingFeedback = async request => {
-  const paramsQuery = defaultValueForQuery(request, {
-    sort: '"detailsContacts"."createdAt":DESC'
-  })
   return asyncPipe(
     getDetailsAllContactWaitingFeedback,
     curry(responseSuccess)(request)
-  )(paramsQuery)
+  )(getParamsForGetWithUser(request))
 }
 
 const getAllFiltersWaitingFeedback = async request =>

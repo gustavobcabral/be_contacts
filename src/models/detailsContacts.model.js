@@ -2,6 +2,7 @@ import knex from '../database/connection'
 import crud from './crudGeneric.model'
 import { isNil, isEmpty } from 'lodash/fp'
 import { WAITING_FEEDBACK } from '../shared/constants/contacts.constant'
+import { ELDER } from '../shared/constants/permissions.constant'
 
 const tableName = 'detailsContacts'
 const columnPrimary = 'id'
@@ -58,7 +59,6 @@ const getOne = async id =>
     .from(tableName)
     .leftJoin('publishers', 'detailsContacts.idPublisher', '=', 'publishers.id')
     .leftJoin('contacts', 'detailsContacts.phoneContact', '=', 'contacts.phone')
-
     .where('detailsContacts.id', id)
     .first()
 
@@ -68,15 +68,18 @@ const getDetailsAllContact = async () =>
     .from(tableName)
     .leftJoin('contacts', 'detailsContacts.phoneContact', '=', 'contacts.phone')
 
-const getDetailsAllContactWaitingFeedback = async queryParams => {
-  const { sort, perPage, currentPage, filters } = queryParams
+const getDetailsAllContactWaitingFeedback = async ({ query, user }) => {
+  const { sort, perPage, currentPage, filters } = query
+  const { idResponsibility } = user
 
   const sql = knex
     .select(
       'detailsContacts.id',
       'detailsContacts.information',
       'detailsContacts.createdAt',
+      'detailsContacts.createdBy',
       'detailsContacts.idPublisher',
+      'publisherCreatedBy.name as publisherNameCreatedBy',
       'publishers.name as publisherName',
       'languages.name as languageName',
       'status.description as statusDescription',
@@ -90,18 +93,40 @@ const getDetailsAllContactWaitingFeedback = async queryParams => {
     .from(tableName)
     .leftJoin('contacts', 'detailsContacts.phoneContact', '=', 'contacts.phone')
     .leftJoin('publishers', 'detailsContacts.idPublisher', '=', 'publishers.id')
+    .leftJoin(
+      'publishers as publisherCreatedBy',
+      'detailsContacts.createdBy',
+      '=',
+      'publisherCreatedBy.id'
+    )
     .leftJoin('languages', 'languages.id', '=', 'contacts.idLanguage')
     .leftJoin('status', 'status.id', '=', 'contacts.idStatus')
     .where('detailsContacts.information', WAITING_FEEDBACK)
 
-  if (!isEmpty(filters)) {
-    const { name, phone, genders, languages, status } = JSON.parse(filters)
+  if (idResponsibility < ELDER) {
+    sql
+      .where('detailsContacts.createdBy', user.id)
+      .orWhere('detailsContacts.idPublisher', user.id)
+  }
 
-    if (!isEmpty(name) && !isEmpty(phone)) {
+  if (!isEmpty(filters)) {
+    const {
+      name,
+      phone,
+      responsible,
+      creator,
+      genders,
+      languages,
+      status
+    } = JSON.parse(filters)
+
+    if (!isEmpty(name) && !isEmpty(phone) && !isEmpty(responsible)) {
       sql.where(builder =>
         builder
           .where('contacts.name', 'ilike', `%${name}%`)
           .orWhere('contacts.phone', 'ilike', `%${phone}%`)
+          .orWhere('publishers.name', 'ilike', `%${responsible}%`)
+          .orWhere('publisherCreatedBy.name', 'ilike', `%${creator}%`)
       )
     }
     if (!isEmpty(genders))

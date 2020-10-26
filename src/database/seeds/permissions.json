@@ -26,7 +26,7 @@
   {
     "method": "get",
     "page": "publishers",
-    "idMinimumResponsibilityRequired": "2",
+    "idMinimumResponsibilityRequired": "1",
     "createdBy": "1"
   },
   {
@@ -104,7 +104,7 @@
   {
     "method": "post",
     "page": "detailscontacts",
-    "idMinimumResponsibilityRequired": "2",
+    "idMinimumResponsibilityRequired": "1",
     "createdBy": "1"
   },
   {
