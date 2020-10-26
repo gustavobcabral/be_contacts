@@ -27,7 +27,9 @@ import {
   map,
   get as getLodash,
   omit,
-  orderBy
+  orderBy,
+  ceil,
+  round
 } from 'lodash/fp'
 import { responseSuccess } from '../shared/helpers/responseGeneric.helper'
 import {
@@ -171,9 +173,8 @@ const getSummaryContacts = async user => {
   const totalContacts = Number(totals.totalContacts.count)
   const totalContactsContacted = Number(totals.totalContactsContacted.count)
   const totalContactsWithoutContact = totalContacts - totalContactsContacted
-  const totalPercentContacted = Math.round(
-    (totalContactsContacted / totalContacts) * 100
-  )
+  const totalPercentContacted = (totalContactsContacted / totalContacts) * 100
+
   const totalPercentWithoutContacted = 100 - totalPercentContacted
 
   const totalContactsAssignByMeWaitingFeedback = Number(
@@ -183,17 +184,14 @@ const getSummaryContacts = async user => {
     totals.totalContactsWaitingFeedback.count
   )
 
-  const totalPercentContactsWaitingFeedback = Math.round(
+  const totalPercentContactsWaitingFeedback =
     (totalContactsWaitingFeedback / totalContacts) * 100
-  )
 
   const totalPercentContactsAssignByMeWaitingFeedback =
     totalContactsWaitingFeedback > 0
-      ? Math.round(
-          (totalContactsAssignByMeWaitingFeedback /
-            totalContactsWaitingFeedback) *
-            100
-        )
+      ? (totalContactsAssignByMeWaitingFeedback /
+          totalContactsWaitingFeedback) *
+        100
       : 0
 
   const totalPercentContactsAssignByOthersWaitingFeedback =
@@ -202,7 +200,7 @@ const getSummaryContacts = async user => {
       : 0
 
   const calculatePercentage = count =>
-    Math.round((count / totalContactsWaitingFeedback) * 100)
+    (count / totalContactsWaitingFeedback) * 100
 
   const totalsContactsWaitingFeedbackByPublisher = map(
     publisher => ({
@@ -215,7 +213,7 @@ const getSummaryContacts = async user => {
   const totalContactsByGender = totals.totalContactsByGender
 
   const calculatePercentageByGender = count =>
-    Math.round((count / totalContactsContacted) * 100)
+    (count / totalContactsContacted) * 100
 
   const totalContactsByGenderContacted = map(
     gender => ({
@@ -228,7 +226,7 @@ const getSummaryContacts = async user => {
   const totalContactsByLanguage = totals.totalContactsByLanguage
 
   const calculatePercentageByLanguage = count =>
-    Math.round((count / totalContactsContacted) * 100)
+    (count / totalContactsContacted) * 100
 
   const totalContactsByLanguageContacted = map(
     language => ({

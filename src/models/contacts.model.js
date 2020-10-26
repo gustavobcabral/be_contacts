@@ -153,7 +153,7 @@ async function deleteRecord(id) {
   return crud.deleteRecord({ id, tableName, columnPrimary })
 }
 
-const getSummaryTotals = async idPublisher => {
+const getSummaryTotals = async userId => {
   const totalContacts = await knex('contacts')
     .count('phone')
     .first()
@@ -197,7 +197,7 @@ const getSummaryTotals = async idPublisher => {
 
   const totalContactsAssignByMeWaitingFeedback = await knex('detailsContacts')
     .countDistinct('phoneContact')
-    .where({ information: WAITING_FEEDBACK, idPublisher })
+    .where({ information: WAITING_FEEDBACK, createdBy: userId })
     .first()
 
   const totalContactsWaitingFeedback = await knex('detailsContacts')
