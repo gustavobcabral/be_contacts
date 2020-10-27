@@ -1,12 +1,33 @@
 import crud from './crudGeneric.model'
 import knex from '../database/connection'
 
-import { map, omit, curry, get as getLodash } from 'lodash/fp'
+import { map, omit, curry, get as getLodash, isNil } from 'lodash/fp'
 import asyncPipe from 'pipeawait'
 
 const tableName = 'publishers'
 const columnPrimary = 'id'
 const omitColumns = ['password', 'haveToReauthenticate']
+
+// const getAllNew = async queryParams =>
+//   await asyncPipe(getAllAllowedForMe, removeColumnNotAllowed)(queryParams)
+
+const getAllNew = async () =>
+  knex
+    .select(
+      'publishers.id',
+      'publishers.name',
+      'publishers.phone',
+      'publishers.email',
+      'publishers.idResponsibility',
+      'responsibility.description as responsibilityDescription '
+    )
+    .from(tableName)
+    .leftJoin(
+      'responsibility',
+      'publishers.idResponsibility',
+      '=',
+      'responsibility.id'
+    )
 
 const removeColumnNotAllowed = data => map(pub => omit(omitColumns, pub), data)
 
@@ -45,6 +66,7 @@ const deleteRecord = async id =>
   crud.deleteRecord({ id, tableName, columnPrimary })
 
 export {
+  getAllNew,
   getAll,
   getOneRecord,
   createRecord,

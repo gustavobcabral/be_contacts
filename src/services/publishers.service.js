@@ -1,4 +1,5 @@
 const {
+  getAllNew,
   getAll,
   getOneRecord,
   createRecord,
@@ -32,6 +33,16 @@ import {
   ERROR_PASSWORD_MINIMUM_LENGTH,
   ERROR_PASSWORD_SPACE
 } from '../shared/constants/publishers.constant'
+
+const getAllInformation = async request => {
+  const paramsQuery = {
+    ...defaultValueForQuery(request, {
+      sort: 'name:asc'
+    }),
+    user: getLodash('user', request)
+  }
+  return asyncPipe(getAllNew, curry(responseSuccess)(request))(paramsQuery)
+}
 
 const get = async request => {
   const paramsQuery = {
@@ -178,6 +189,7 @@ const validatePassword = data => {
 }
 
 export default {
+  getAllInformation,
   get,
   getOne,
   create,
