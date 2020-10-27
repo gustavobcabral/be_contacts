@@ -2,7 +2,6 @@ INSERT INTO "publishers"
 VALUES
   (DEFAULT, 'Alex', '595981111222', NULL, NULL, NULL, 1, true, false, '2020-08-31 09:59:35', 1),
   (DEFAULT, 'Ana Borges', '595981111222', NULL, NULL, NULL, 1, true, false, '2020-08-31 09:59:35', 1),
-  (DEFAULT, 'Ana Carneiro', '595981111222', NULL, NULL, NULL, 1, true, false, '2020-08-31 09:59:35', 1),
   (DEFAULT, 'Ana fonini', '595981111222', NULL, NULL, NULL, 1, true, false, '2020-08-31 09:59:35', 1),
   (DEFAULT, 'ANA FRISK', '595981111222', NULL, NULL, NULL, 1, true, false, '2020-08-31 09:59:35', 1),
   (DEFAULT, 'ana lourenco', '595981111222', NULL, NULL, NULL, 1, true, false, '2020-08-31 09:59:35', 1),
