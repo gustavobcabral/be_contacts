@@ -4,6 +4,7 @@ const table = 'publishers'
 exports.seed = async function(knex) {
   const data = [
     {
+      id: 1,
       name: 'Admin',
       phone: '595983668678',
       password: crypto.createHmac('sha256', '123456').digest('hex'),
@@ -15,6 +16,6 @@ exports.seed = async function(knex) {
     }
   ]
   await knex(table).del()
-  await knex.raw(`ALTER SEQUENCE ${table}_id_seq RESTART WITH 1`)
+  await knex.raw(`ALTER SEQUENCE ${table}_id_seq RESTART WITH 2`)
   return knex(table).insert(data)
 }
