@@ -27,9 +27,7 @@ import {
   map,
   get as getLodash,
   omit,
-  orderBy,
-  ceil,
-  round
+  orderBy
 } from 'lodash/fp'
 import { responseSuccess } from '../shared/helpers/responseGeneric.helper'
 import {
