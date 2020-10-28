@@ -1,9 +1,9 @@
 import { responseNext } from '../shared/helpers/responseGeneric.helper'
 import publishers from '../services/publishers.service'
 
-const getAllInformation = async (request, response, next) => {
+const getAllInformationWithPagination = async (request, response, next) => {
   try {
-    response.json(await publishers.getAllInformation(request))
+    response.json(await publishers.getAllInformationWithPagination(request))
   } catch (error) {
     next(responseNext(error, request))
   }
@@ -48,4 +48,11 @@ const deleteOne = async (request, response, next) => {
   }
 }
 
-export default { getAllInformation, get, getOne, create, update, deleteOne }
+export default {
+  getAllInformationWithPagination,
+  get,
+  getOne,
+  create,
+  update,
+  deleteOne
+}

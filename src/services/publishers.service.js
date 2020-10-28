@@ -1,5 +1,5 @@
 const {
-  getAllNew,
+  getAllWithPagination,
   getAll,
   getOneRecord,
   createRecord,
@@ -34,14 +34,17 @@ import {
   ERROR_PASSWORD_SPACE
 } from '../shared/constants/publishers.constant'
 
-const getAllInformation = async request => {
+const getAllInformationWithPagination = async request => {
   const paramsQuery = {
     ...defaultValueForQuery(request, {
       sort: 'name:asc'
     }),
     user: getLodash('user', request)
   }
-  return asyncPipe(getAllNew, curry(responseSuccess)(request))(paramsQuery)
+  return asyncPipe(
+    getAllWithPagination,
+    curry(responseSuccess)(request)
+  )(paramsQuery)
 }
 
 const get = async request => {
@@ -189,7 +192,7 @@ const validatePassword = data => {
 }
 
 export default {
-  getAllInformation,
+  getAllInformationWithPagination,
   get,
   getOne,
   create,

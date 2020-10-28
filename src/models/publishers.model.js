@@ -10,9 +10,13 @@ const omitColumns = ['password', 'haveToReauthenticate']
 
 // const getAllNew = async queryParams =>
 //   await asyncPipe(getAllAllowedForMe, removeColumnNotAllowed)(queryParams)
+//const getAll = async queryParams => {
+//  const { sort = 'name:ASC', perPage, currentPage, filters } = queryParams
 
-const getAllNew = async () =>
-  knex
+const getAllWithPagination = async queryParams => {
+  const { sort = 'name:ASC', perPage, currentPage, filters } = queryParams
+
+  return knex
     .select(
       'publishers.id',
       'publishers.name',
@@ -28,21 +32,13 @@ const getAllNew = async () =>
       '=',
       'responsibility.id'
     )
+    .orderByRaw(crud.parseOrderBy(sort))
+}
 
 const removeColumnNotAllowed = data => map(pub => omit(omitColumns, pub), data)
 
 const getAll = async queryParams =>
-  await asyncPipe(getAllAllowedForMe, removeColumnNotAllowed)(queryParams)
-
-const getAllAllowedForMe = async queryParams =>
-  knex
-    .select()
-    .from(tableName)
-    .where(
-      'idResponsibility',
-      '<=',
-      getLodash('user.idResponsibility', queryParams)
-    )
+  await asyncPipe(crud.getAll, removeColumnNotAllowed)(queryParams)
 
 const getOneRecord = async id =>
   crud.getOneRecord({ id, tableName, columnPrimary })
@@ -66,7 +62,7 @@ const deleteRecord = async id =>
   crud.deleteRecord({ id, tableName, columnPrimary })
 
 export {
-  getAllNew,
+  getAllWithPagination,
   getAll,
   getOneRecord,
   createRecord,
