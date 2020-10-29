@@ -112,9 +112,9 @@ exports.up = function(knex) {
       table.string('name').nullable()
       table.string('email').nullable()
       table
-        .string('type', 3)
+        .boolean('typeCompany')
         .notNullable()
-        .defaultTo('RES')
+        .defaultTo(false)
       table
         .string('gender', 7)
         .notNullable()
@@ -151,7 +151,7 @@ exports.up = function(knex) {
         .references('id')
         .inTable('status')
 
-      table.index(['name', 'gender', 'idStatus', 'idLanguage', 'type'])
+      table.index(['name', 'gender', 'idStatus', 'idLanguage', 'typeCompany'])
     })
     .createTable('detailsContacts', function(table) {
       table.increments()
