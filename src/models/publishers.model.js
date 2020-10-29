@@ -1,17 +1,12 @@
 import crud from './crudGeneric.model'
 import knex from '../database/connection'
 
-import { map, omit, curry, get as getLodash, isNil } from 'lodash/fp'
+import { map, omit, curry } from 'lodash/fp'
 import asyncPipe from 'pipeawait'
 
 const tableName = 'publishers'
 const columnPrimary = 'id'
 const omitColumns = ['password', 'haveToReauthenticate']
-
-// const getAllNew = async queryParams =>
-//   await asyncPipe(getAllAllowedForMe, removeColumnNotAllowed)(queryParams)
-//const getAll = async queryParams => {
-//  const { sort = 'name:ASC', perPage, currentPage, filters } = queryParams
 
 const getAllWithPagination = async queryParams => {
   const { sort = 'name:ASC', perPage, currentPage, filters } = queryParams
@@ -38,7 +33,10 @@ const getAllWithPagination = async queryParams => {
 const removeColumnNotAllowed = data => map(pub => omit(omitColumns, pub), data)
 
 const getAll = async queryParams =>
-  await asyncPipe(crud.getAll, removeColumnNotAllowed)(queryParams)
+  await asyncPipe(
+    curry(crud.getAll)(tableName),
+    removeColumnNotAllowed
+  )(queryParams)
 
 const getOneRecord = async id =>
   crud.getOneRecord({ id, tableName, columnPrimary })
