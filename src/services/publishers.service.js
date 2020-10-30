@@ -16,7 +16,7 @@ import {
   defaultValueForQuery
 } from '../shared/helpers/generic.helper'
 import asyncPipe from 'pipeawait'
-import { curry, get as getLodash, omit, toInteger } from 'lodash/fp'
+import { curry, get as getLodash, omit, toInteger, getOr } from 'lodash/fp'
 import {
   NOT_ALLOWED_DELETE_ADMIN,
   NOT_ALLOWED_GET_DATA_MORE_RESPONSIBILITY
@@ -150,8 +150,7 @@ const encryptPassword = data =>
     : data
 
 const validatePassword = data => {
-  const password = getLodash('password', data)
-
+  const password = getOr('data.password', 'password', data)
   const passwordRequirements = [
     {
       regex: /.{8,}/, //  deve ter pelo menos 8 chars,
