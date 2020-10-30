@@ -16,7 +16,14 @@ import {
   defaultValueForQuery
 } from '../shared/helpers/generic.helper'
 import asyncPipe from 'pipeawait'
-import { curry, get as getLodash, omit, toInteger, getOr } from 'lodash/fp'
+import {
+  curry,
+  get as getLodash,
+  omit,
+  toInteger,
+  getOr,
+  isEmpty
+} from 'lodash/fp'
 import {
   NOT_ALLOWED_DELETE_ADMIN,
   NOT_ALLOWED_GET_DATA_MORE_RESPONSIBILITY
@@ -121,7 +128,15 @@ const update = async request =>
   asyncPipe(
     verifyWhatCanUpdate,
     verifyIfIsNecessaryReAuthenticate,
+    data => {
+      console.log(data)
+      return data
+    },
     validatePassword,
+    data => {
+      console.log(data)
+      return data
+    },
     encryptPassword,
     updateRecord,
     curry(responseSuccess)(request)
@@ -141,16 +156,28 @@ const deleteOne = async request =>
     curry(responseSuccess)(request)
   )(getParamsForDelete(request))
 
-const encryptPassword = data =>
-  getLodash('password', data)
-    ? {
-        ...data,
-        password: encrypt(getLodash('password', data))
-      }
+const encryptPassword = data => {
+  const password = getOr(getLodash('data.password', data), 'password', data)
+  const modeEdit = Boolean(getLodash('data.password', data))
+  return !isEmpty(password)
+    ? modeEdit
+      ? {
+          ...data,
+          data: {
+            ...data.data,
+            password: encrypt(password)
+          }
+        }
+      : {
+          ...data,
+          password: encrypt(password)
+        }
     : data
+}
 
 const validatePassword = data => {
-  const password = getOr('data.password', 'password', data)
+  const password = getOr(getLodash('data.password', data), 'password', data)
+
   const passwordRequirements = [
     {
       regex: /.{8,}/, //  deve ter pelo menos 8 chars,
@@ -182,7 +209,8 @@ const validatePassword = data => {
       if (!it.regex.test(String(password))) {
         throw {
           httpErrorCode: HttpStatus.BAD_REQUEST,
-          error: it.message
+          error: it.message,
+          extra: password
         }
       }
     })
