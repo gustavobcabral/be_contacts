@@ -128,15 +128,7 @@ const update = async request =>
   asyncPipe(
     verifyWhatCanUpdate,
     verifyIfIsNecessaryReAuthenticate,
-    data => {
-      console.log(data)
-      return data
-    },
     validatePassword,
-    data => {
-      console.log(data)
-      return data
-    },
     encryptPassword,
     updateRecord,
     curry(responseSuccess)(request)
