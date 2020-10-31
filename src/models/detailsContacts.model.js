@@ -71,7 +71,6 @@ const getDetailsAllContact = async () =>
 const getDetailsAllContactWaitingFeedback = async ({ query, user }) => {
   const { sort, perPage, currentPage, filters } = query
   const { idResponsibility } = user
-
   const sql = knex
     .select(
       'detailsContacts.id',

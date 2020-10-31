@@ -10,7 +10,6 @@ const omitColumns = ['password', 'haveToReauthenticate']
 
 const getAllWithPagination = async queryParams => {
   const { sort = 'name:ASC', perPage, currentPage, filters } = queryParams
-
   return knex
     .select(
       'publishers.id',
