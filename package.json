@@ -11,12 +11,13 @@
     "db:seed": "./node_modules/.bin/knex seed:run",
     "db:add": "./node_modules/.bin/knex migrate:make",
     "db:down": "./node_modules/.bin/knex migrate:down",
-    "db:reset": "npm run db:down && npm run db:migrate && npm run db:seed",
-    
+    "db:reset": "npm run db:down && npm run db:migrate && npm run db:seed",    
     "db:up": "./node_modules/.bin/knex migrate:up",
     "lint": "eslint --fix \"src/**/*.js\"",
     "test": "cross-env NODE_ENV=test node ./node_modules/jest/bin/jest.js --forceExit --detectOpenHandles --runInBand",
-    "test:watch": "cross-env NODE_ENV=test node ./node_modules/jest/bin/jest.js --watch --detectOpenHandles --runInBand"
+    "test:watch": "cross-env NODE_ENV=test node ./node_modules/jest/bin/jest.js --watch --detectOpenHandles --runInBand",
+    "heroku-postbuild": "node_modules/.bin/knex migrate:latest"
+
   },
   "keywords": [],
   "author": "",
