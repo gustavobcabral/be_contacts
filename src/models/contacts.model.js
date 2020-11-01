@@ -2,6 +2,8 @@ import knex from '../database/connection'
 import * as detailsContact from './detailsContacts.model'
 import crud from './crudGeneric.model'
 import { WAITING_FEEDBACK } from '../shared/constants/contacts.constant'
+import { isEmpty, map, contains, first, last } from 'lodash/fp'
+
 const tableName = 'contacts'
 const columnPrimary = 'phone'
 const fields = [
@@ -11,52 +13,115 @@ const fields = [
   'idLanguage',
   'languageName',
   'statusDescription',
+  'gender',
   'namePublisher'
 ]
 
-const getAllWithDetails = async queryParams => {
-  const { sort = 'name:ASC', perPage, currentPage } = queryParams
-  return knex
+const getAll = async queryParams => {
+  const { sort = 'name:ASC', perPage, currentPage, filters } = queryParams
+  const sql = knex
     .select(
       'contacts.name',
       'contacts.phone',
       'contacts.idStatus',
       'contacts.idLanguage',
+      'contacts.gender',
       'languages.name as languageName',
-      'status.description as statusDescription',
-      'detailsContacts.createdAt',
-      'detailsContacts.information',
-      'detailsContacts.id as idDetail',
-      'detailsContacts.createdBy',
-      'pubCreator.name as createdByName',
-      'pubUpdater.name as updatedByName',
-      'detailsContacts.updatedBy',
-      'publishers.name as namePublisher'
+      'status.description as statusDescription'
     )
     .from(tableName)
-    .leftJoin(
-      'detailsContacts',
-      'detailsContacts.phoneContact',
-      '=',
-      'contacts.phone'
-    )
     .leftJoin('languages', 'languages.id', '=', 'contacts.idLanguage')
-    .leftJoin('publishers', 'publishers.id', '=', 'detailsContacts.idPublisher')
-    .leftJoin(
-      'publishers as pubCreator',
-      'pubCreator.id',
-      '=',
-      'detailsContacts.createdBy'
-    )
-    .leftJoin(
-      'publishers as pubUpdater',
-      'pubUpdater.id',
-      '=',
-      'detailsContacts.updatedBy'
-    )
     .leftJoin('status', 'status.id', '=', 'contacts.idStatus')
+
+  if (!isEmpty(filters)) {
+    const { name, phone, genders, languages, status } = JSON.parse(filters)
+
+    if (!isEmpty(name) && !isEmpty(phone)) {
+      sql.where(builder =>
+        builder
+          .where('contacts.name', 'ilike', `%${name}%`)
+          .orWhere('contacts.phone', 'ilike', `%${phone}%`)
+      )
+    }
+    if (!isEmpty(genders))
+      sql.andWhere(qB => qB.whereIn('contacts.gender', genders))
+
+    if (!isEmpty(languages))
+      sql.andWhere(qB => qB.whereIn('contacts.idLanguage', languages))
+
+    if (!isEmpty(status))
+      sql.andWhere(qB => qB.whereIn('contacts.idStatus', status))
+  }
+  const data = await sql
     .orderByRaw(crud.parseOrderBy(sort))
     .paginate(perPage, currentPage)
+
+  const list = await Promise.all(
+    map(async row => {
+      const detailsDB = await knex
+        .select()
+        .from('detailsContacts')
+        .where('phoneContact', row.phone)
+        .orderBy('createdAt', 'desc')
+        .limit(2)
+      if (detailsDB.length > 0) {
+        const lastDetails = first(detailsDB)
+        const beforeLastDetails = last(detailsDB)
+        const waitingFeedback = contains(
+          WAITING_FEEDBACK,
+          lastDetails.information
+        )
+        const details = !waitingFeedback
+          ? lastDetails
+          : !contains(WAITING_FEEDBACK, beforeLastDetails.information)
+          ? beforeLastDetails
+          : {}
+        return {
+          ...row,
+          waitingFeedback,
+          details
+        }
+      } else {
+        return {
+          ...row,
+          waitingFeedback: false,
+          details: {}
+        }
+      }
+    }, data.list)
+  )
+
+  return {
+    ...data,
+    list
+  }
+}
+
+const getGenders = async () =>
+  knex
+    .select('gender')
+    .from(tableName)
+    .groupBy('gender')
+
+const getLanguages = async () =>
+  knex
+    .select('idLanguage', 'languages.name as languageName')
+    .from(tableName)
+    .leftJoin('languages', 'languages.id', '=', 'contacts.idLanguage')
+    .groupBy('idLanguage', 'languages.name')
+
+const getStatus = async () =>
+  knex
+    .select('idStatus', 'status.description as statusDescription')
+    .from(tableName)
+    .leftJoin('status', 'status.id', '=', 'contacts.idStatus')
+    .groupBy('idStatus', 'status.description')
+
+const getFilters = async () => {
+  const genders = await getGenders()
+  const languages = await getLanguages()
+  const status = await getStatus()
+  return { genders, languages, status }
 }
 
 const getOneWithDetails = async phone =>
@@ -65,6 +130,7 @@ const getOneWithDetails = async phone =>
       'contacts.name',
       'contacts.phone',
       'contacts.idStatus',
+      'contacts.gender',
       'contacts.idLanguage',
       'detailsContacts.*'
     )
@@ -83,25 +149,11 @@ const updateRecord = async ({ id, data }) =>
   crud.updateRecord({ id, data, tableName, columnPrimary })
 
 async function deleteRecord(id) {
-  detailsContact.deleteRecordByPhone(id)
+  await detailsContact.deleteRecordByPhone(id)
   return crud.deleteRecord({ id, tableName, columnPrimary })
 }
 
-const getAllWaitingFeedback = async () =>
-  await knex('detailsContacts')
-    .select(
-      'contacts.name',
-      'contacts.phone',
-      'contacts.idStatus',
-      'contacts.idLanguage',
-      'detailsContacts.*',
-      'publishers.name as publisherName'
-    )
-    .leftJoin('contacts', 'contacts.phone', '=', 'detailsContacts.phoneContact')
-    .leftJoin('publishers', 'publishers.id', '=', 'detailsContacts.idPublisher')
-    .where({ information: WAITING_FEEDBACK })
-
-const getSummaryTotals = async idPublisher => {
+const getSummaryTotals = async userId => {
   const totalContacts = await knex('contacts')
     .count('phone')
     .first()
@@ -120,17 +172,23 @@ const getSummaryTotals = async idPublisher => {
 
   const totalContactsByLanguage = await knex('contacts')
     .count('phone')
-    .select('languages.name as languageName')
+    .select(
+      'languages.name as languageName',
+      'languages.color as languageColor'
+    )
     .leftJoin('languages', 'languages.id', '=', 'contacts.idLanguage')
-    .groupBy('languages.name')
+    .groupBy('languages.name', 'languages.color')
 
   const totalContactsByLanguageContacted = await knex('detailsContacts')
     .countDistinct('contacts.phone')
-    .select('languages.name as languageName')
+    .select(
+      'languages.name as languageName',
+      'languages.color as languageColor'
+    )
     .leftJoin('contacts', 'contacts.phone', '=', 'detailsContacts.phoneContact')
     .leftJoin('languages', 'languages.id', '=', 'contacts.idLanguage')
     .whereNot({ information: WAITING_FEEDBACK })
-    .groupBy('languages.name')
+    .groupBy('languages.name', 'languages.color')
 
   const totalContactsContacted = await knex('detailsContacts')
     .countDistinct('phoneContact')
@@ -139,7 +197,7 @@ const getSummaryTotals = async idPublisher => {
 
   const totalContactsAssignByMeWaitingFeedback = await knex('detailsContacts')
     .countDistinct('phoneContact')
-    .where({ information: WAITING_FEEDBACK, idPublisher })
+    .where({ information: WAITING_FEEDBACK, createdBy: userId })
     .first()
 
   const totalContactsWaitingFeedback = await knex('detailsContacts')
@@ -171,10 +229,10 @@ export {
   createRecord,
   updateRecord,
   deleteRecord,
-  getAllWithDetails,
+  getAll,
   getOneWithDetails,
   getSummaryTotals,
-  getAllWaitingFeedback,
+  getFilters,
   columnPrimary,
   fields
 }

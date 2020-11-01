@@ -1,38 +1,39 @@
+import HttpStatus from 'http-status-codes'
 import {
   getOneWithDetails,
   createRecord,
   updateRecord,
   deleteRecord,
-  getAllWithDetails,
+  getAll,
   getSummaryTotals,
   columnPrimary,
   fields,
-  getAllWaitingFeedback
+  getFilters
 } from '../models/contacts.model'
 import {
   fields as fieldsDetailsContact,
   createRecord as createRecordDetailsContact,
-  deleteRecords as deleteRecordsDetailsContact
+  deleteRecords as deleteRecordsDetailsContact,
+  getDetailsIsWaitingFeedbackOneContact
 } from '../models/detailsContacts.model'
 import asyncPipe from 'pipeawait'
 import {
   first,
-  isEmpty,
   reduce,
   pipe,
   pick,
   isNull,
   curry,
-  uniqBy,
   map,
   get as getLodash,
-  getOr,
   omit,
-  orderBy,
-  countBy
+  orderBy
 } from 'lodash/fp'
 import { responseSuccess } from '../shared/helpers/responseGeneric.helper'
-import { WAITING_FEEDBACK } from '../shared/constants/contacts.constant'
+import {
+  WAITING_FEEDBACK,
+  ERROR_PUBLISHER_ALREADY_WAITING_FEEDBACK
+} from '../shared/constants/contacts.constant'
 import {
   getParamsForUpdate,
   getParamsForGet,
@@ -71,33 +72,6 @@ const reduceToGetDetails = (phone, listAllDetails) => {
   )(listAllDetails)
 }
 
-const mapToGetDetailsOneContact = (list, contactsUnique) => {
-  return map(
-    contact => ({
-      ...getContactProps(contact),
-      details: reduceToGetDetails(getLodash(columnPrimary, contact), list)
-    }),
-    contactsUnique
-  )
-}
-
-const mountDetailsDataForContacts = detailsContacts => {
-  if (!isEmpty(detailsContacts)) {
-    const list = getOr([detailsContacts], 'list', detailsContacts)
-    const uniqueContacts = uniqBy(columnPrimary, list)
-    const withoutDetails = getOr(0, 'null', countBy('idDetail', uniqueContacts))
-    const withDetails = uniqueContacts.length - withoutDetails
-    const listOrganized = mapToGetDetailsOneContact(list, uniqueContacts)
-    return {
-      ...detailsContacts,
-      withDetails,
-      withoutDetails,
-      list: listOrganized
-    }
-  }
-  return []
-}
-
 const mountDetailsDataForOneContact = detailsContact => {
   const contact = first(detailsContact)
   return {
@@ -110,11 +84,7 @@ const mountDetailsDataForOneContact = detailsContact => {
 }
 
 const get = async request =>
-  asyncPipe(
-    getAllWithDetails,
-    mountDetailsDataForContacts,
-    curry(responseSuccess)(request)
-  )(getParamsForGet(request))
+  asyncPipe(getAll, curry(responseSuccess)(request))(getParamsForGet(request))
 
 const getOne = async request =>
   asyncPipe(
@@ -143,9 +113,29 @@ const deleteOne = async request =>
 
 const assign = async request =>
   asyncPipe(
+    verifiyIfThisContactsAreAlreadyWaiting,
     assignAllContactsToAPublisher,
     curry(responseSuccess)(request)
   )(getParamsForCreate(request))
+
+const verifiyIfThisContactsAreAlreadyWaiting = async data =>
+  Promise.all(
+    map(async phoneContact =>
+      verifiyIfThisContactIsAlreadyWaiting(phoneContact)
+    )(getLodash('phones', data))
+  ).then(() => data)
+
+const verifiyIfThisContactIsAlreadyWaiting = async phone => {
+  const data = await getDetailsIsWaitingFeedbackOneContact(phone)
+  if (data.length > 0) {
+    throw {
+      httpErrorCode: HttpStatus.BAD_REQUEST,
+      error: ERROR_PUBLISHER_ALREADY_WAITING_FEEDBACK,
+      extra: { phone }
+    }
+  }
+  return phone
+}
 
 const assignAllContactsToAPublisher = async data =>
   Promise.all(
@@ -181,9 +171,8 @@ const getSummaryContacts = async user => {
   const totalContacts = Number(totals.totalContacts.count)
   const totalContactsContacted = Number(totals.totalContactsContacted.count)
   const totalContactsWithoutContact = totalContacts - totalContactsContacted
-  const totalPercentContacted = Math.round(
-    (totalContactsContacted / totalContacts) * 100
-  )
+  const totalPercentContacted = (totalContactsContacted / totalContacts) * 100
+
   const totalPercentWithoutContacted = 100 - totalPercentContacted
 
   const totalContactsAssignByMeWaitingFeedback = Number(
@@ -193,17 +182,14 @@ const getSummaryContacts = async user => {
     totals.totalContactsWaitingFeedback.count
   )
 
-  const totalPercentContactsWaitingFeedback = Math.round(
+  const totalPercentContactsWaitingFeedback =
     (totalContactsWaitingFeedback / totalContacts) * 100
-  )
 
   const totalPercentContactsAssignByMeWaitingFeedback =
     totalContactsWaitingFeedback > 0
-      ? Math.round(
-          (totalContactsAssignByMeWaitingFeedback /
-            totalContactsWaitingFeedback) *
-            100
-        )
+      ? (totalContactsAssignByMeWaitingFeedback /
+          totalContactsWaitingFeedback) *
+        100
       : 0
 
   const totalPercentContactsAssignByOthersWaitingFeedback =
@@ -212,7 +198,7 @@ const getSummaryContacts = async user => {
       : 0
 
   const calculatePercentage = count =>
-    Math.round((count / totalContactsWaitingFeedback) * 100)
+    (count / totalContactsWaitingFeedback) * 100
 
   const totalsContactsWaitingFeedbackByPublisher = map(
     publisher => ({
@@ -225,7 +211,7 @@ const getSummaryContacts = async user => {
   const totalContactsByGender = totals.totalContactsByGender
 
   const calculatePercentageByGender = count =>
-    Math.round((count / totalContactsContacted) * 100)
+    (count / totalContactsContacted) * 100
 
   const totalContactsByGenderContacted = map(
     gender => ({
@@ -238,7 +224,7 @@ const getSummaryContacts = async user => {
   const totalContactsByLanguage = totals.totalContactsByLanguage
 
   const calculatePercentageByLanguage = count =>
-    Math.round((count / totalContactsContacted) * 100)
+    (count / totalContactsContacted) * 100
 
   const totalContactsByLanguageContacted = map(
     language => ({
@@ -267,11 +253,11 @@ const getSummaryContacts = async user => {
   }
 }
 
-const getAllContactsWaitingFeedback = async request =>
+const getAllFiltersOfContacts = async request =>
   asyncPipe(
-    getAllWaitingFeedback,
+    getFilters,
     curry(responseSuccess)(request)
-  )(getParamsForCreate(request))
+  )(getParamsForGet(request))
 
 export default {
   get,
@@ -282,5 +268,5 @@ export default {
   assign,
   cancelAssign,
   getSummaryContacts,
-  getAllContactsWaitingFeedback
+  getAllFiltersOfContacts
 }

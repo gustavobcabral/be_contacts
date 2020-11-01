@@ -37,7 +37,6 @@ exports.up = function(knex) {
         .defaultTo(knex.fn.now())
       table.integer('createdBy').notNullable()
       table.integer('updatedBy').nullable()
-
       table
         .foreign('createdBy')
         .references('id')
@@ -51,6 +50,8 @@ exports.up = function(knex) {
         .foreign('idResponsibility')
         .references('id')
         .inTable('responsibility')
+
+      table.index(['phone', 'name', 'email', 'idResponsibility'])
     })
 
     .createTable('status', function(table) {
@@ -82,6 +83,10 @@ exports.up = function(knex) {
         .notNullable()
         .unique()
       table
+        .string('color', 10)
+        .unique()
+        .notNullable()
+      table
         .dateTime('createdAt')
         .notNullable()
         .defaultTo(knex.fn.now())
@@ -103,13 +108,27 @@ exports.up = function(knex) {
         .string('phone')
         .notNullable()
         .primary()
+      table.string('phone2').nullable()
       table.string('name').nullable()
-      table.string('gender', 6).nullable()
-      table.integer('idStatus').notNullable()
-      table.integer('idLanguage').nullable()
+      table.string('email').nullable()
+      table
+        .boolean('typeCompany')
+        .notNullable()
+        .defaultTo(false)
+      table
+        .string('gender', 7)
+        .notNullable()
+        .defaultTo('unknown')
+      table
+        .integer('idStatus')
+        .notNullable()
+        .defaultTo(1)
+      table
+        .integer('idLanguage')
+        .notNullable()
+        .defaultTo(5)
       table.integer('createdBy').notNullable()
       table.integer('updatedBy').nullable()
-
       table
         .dateTime('createdAt')
         .notNullable()
@@ -131,6 +150,8 @@ exports.up = function(knex) {
         .foreign('idStatus')
         .references('id')
         .inTable('status')
+
+      table.index(['name', 'gender', 'idStatus', 'idLanguage', 'typeCompany'])
     })
     .createTable('detailsContacts', function(table) {
       table.increments()
@@ -139,6 +160,7 @@ exports.up = function(knex) {
       table.integer('createdBy').notNullable()
       table.integer('updatedBy').nullable()
       table.string('phoneContact').notNullable()
+
       table
         .dateTime('createdAt')
         .notNullable()
@@ -161,6 +183,8 @@ exports.up = function(knex) {
         .foreign('phoneContact')
         .references('phone')
         .inTable('contacts')
+
+      table.index(['idPublisher', 'phoneContact', 'createdAt', 'createdBy'])
     })
 
     .createTable('permissions', function(table) {

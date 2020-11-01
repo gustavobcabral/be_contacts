@@ -8,6 +8,23 @@ const get = async (request, response, next) => {
     next(responseNext(error, request))
   }
 }
+
+const getAllWaitingFeedback = async (request, response, next) => {
+  try {
+    response.json(await detailsService.getAllWaitingFeedback(request))
+  } catch (error) {
+    next(responseNext(error, request))
+  }
+}
+
+const getAllFiltersWaitingFeedback = async (request, response, next) => {
+  try {
+    response.json(await detailsService.getAllFiltersWaitingFeedback(request))
+  } catch (error) {
+    next(responseNext(error, request))
+  }
+}
+
 const getOne = async (request, response, next) => {
   try {
     response.json(await detailsService.getOneDetail(request))
@@ -47,4 +64,13 @@ const deleteOne = async (request, response, next) => {
     next(responseNext(error, request))
   }
 }
-export default { get, create, update, deleteOne, getDetailsOneContact, getOne }
+export default {
+  get,
+  getOne,
+  getDetailsOneContact,
+  getAllWaitingFeedback,
+  getAllFiltersWaitingFeedback,
+  create,
+  update,
+  deleteOne
+}

@@ -1,6 +1,8 @@
 module.exports = {
   development: {
     client: "postgresql",
+    debud: true,
+
     connection: {
       database: "contacts",
       user: "postgres",
@@ -25,7 +27,7 @@ module.exports = {
       tableName: "knex_migrations",
       directory: __dirname + "/src/database/seeds"
     }
-  },  
+  },
   test: {
     client: "postgresql",
     connection: {
@@ -45,12 +47,12 @@ module.exports = {
       idle: 10000
     },
     migrations: {
-      tableName: 'knex_migrations',
-      directory: __dirname + '/migrations'
+      tableName: "knex_migrations",
+      directory: __dirname + "/migrations"
     },
     seeds: {
-      tableName: 'knex_migrations',
-      directory: __dirname + '/seeds'
+      tableName: "knex_migrations",
+      directory: __dirname + "/seeds"
     }
   },
   production: {

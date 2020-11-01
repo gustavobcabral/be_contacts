@@ -1,21 +1,26 @@
 [
   {
     "id": "1",
-    "description": "estudyBible",
+    "description": "available",
     "createdBy": "1"
   },
   {
     "id": "2",
-    "description": "returnVisit",
+    "description": "bibleStudy",
     "createdBy": "1"
   },
   {
     "id": "3",
-    "description": "noVisit",
+    "description": "returnVisit",
     "createdBy": "1"
   },
   {
     "id": "4",
+    "description": "noVisit",
+    "createdBy": "1"
+  },
+  {
+    "id": "5",
     "description": "sentToOtherCongregation",
     "createdBy": "1"
   }

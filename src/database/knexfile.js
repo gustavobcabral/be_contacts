@@ -1,6 +1,7 @@
 module.exports = {
   development: {
     client: 'postgresql',
+    debud: true,
     connection: {
       database: 'contacts',
       user: 'postgres',
@@ -22,7 +23,7 @@ module.exports = {
       directory: __dirname + '/src/database/migrations'
     },
     seeds: {
-      tableName: 'knex_migrations',
+      tableName: 'knex_seeds',
       directory: __dirname + '/src/database/seeds'
     }
   },

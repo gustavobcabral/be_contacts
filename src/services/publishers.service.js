@@ -1,4 +1,5 @@
 const {
+  getAllWithPagination,
   getAll,
   getOneRecord,
   createRecord,
@@ -15,7 +16,14 @@ import {
   defaultValueForQuery
 } from '../shared/helpers/generic.helper'
 import asyncPipe from 'pipeawait'
-import { curry, get as getLodash, omit, toInteger } from 'lodash/fp'
+import {
+  curry,
+  get as getLodash,
+  omit,
+  toInteger,
+  getOr,
+  isEmpty
+} from 'lodash/fp'
 import {
   NOT_ALLOWED_DELETE_ADMIN,
   NOT_ALLOWED_GET_DATA_MORE_RESPONSIBILITY
@@ -32,6 +40,19 @@ import {
   ERROR_PASSWORD_MINIMUM_LENGTH,
   ERROR_PASSWORD_SPACE
 } from '../shared/constants/publishers.constant'
+
+const getAllInformationWithPagination = async request => {
+  const paramsQuery = {
+    ...defaultValueForQuery(request, {
+      sort: 'name:asc'
+    }),
+    user: getLodash('user', request)
+  }
+  return asyncPipe(
+    getAllWithPagination,
+    curry(responseSuccess)(request)
+  )(paramsQuery)
+}
 
 const get = async request => {
   const paramsQuery = {
@@ -127,16 +148,27 @@ const deleteOne = async request =>
     curry(responseSuccess)(request)
   )(getParamsForDelete(request))
 
-const encryptPassword = data =>
-  getLodash('password', data)
-    ? {
-        ...data,
-        password: encrypt(getLodash('password', data))
-      }
+const encryptPassword = data => {
+  const password = getOr(getLodash('data.password', data), 'password', data)
+  const modeEdit = Boolean(getLodash('data.password', data))
+  return !isEmpty(password)
+    ? modeEdit
+      ? {
+          ...data,
+          data: {
+            ...data.data,
+            password: encrypt(password)
+          }
+        }
+      : {
+          ...data,
+          password: encrypt(password)
+        }
     : data
+}
 
 const validatePassword = data => {
-  const password = getLodash('password', data)
+  const password = getOr(getLodash('data.password', data), 'password', data)
 
   const passwordRequirements = [
     {
@@ -169,7 +201,8 @@ const validatePassword = data => {
       if (!it.regex.test(String(password))) {
         throw {
           httpErrorCode: HttpStatus.BAD_REQUEST,
-          error: it.message
+          error: it.message,
+          extra: password
         }
       }
     })
@@ -178,6 +211,7 @@ const validatePassword = data => {
 }
 
 export default {
+  getAllInformationWithPagination,
   get,
   getOne,
   create,

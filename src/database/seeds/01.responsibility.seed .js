@@ -1,8 +1,10 @@
 const data = require('./responsibility.json')
 const table = 'responsibility'
 
-exports.seed = function(knex) {
-  return knex(table)
-    .del()
-    .insert(data)
+exports.seed = async function(knex) {
+  await knex(table).del()
+  await knex.raw(
+    `ALTER SEQUENCE ${table}_id_seq RESTART WITH ${data.length + 1}`
+  )
+  return knex(table).insert(data)
 }
