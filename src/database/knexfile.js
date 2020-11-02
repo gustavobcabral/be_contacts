@@ -57,6 +57,15 @@ module.exports = {
   production: {
     client: 'pg',
     connection: process.env.DATABASE_URL,
+    migrations: {
+      tableName: 'knex_migrations',
+      directory: __dirname + '/src/database/migrations'
+    },
+    seeds: {
+      tableName: 'knex_seeds',
+      directory: __dirname + '/src/database/seeds'
+    }
+  },
     port: 5432,
     define: {
       charset: 'utf8',
