@@ -1,4 +1,4 @@
-import knex from '../database/connection'
+import knex from '../config/connection'
 import crud from './crudGeneric.model'
 import { isNil, isEmpty } from 'lodash/fp'
 import { WAITING_FEEDBACK } from '../shared/constants/contacts.constant'

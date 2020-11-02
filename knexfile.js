@@ -2,7 +2,6 @@ module.exports = {
   development: {
     client: "postgresql",
     debud: true,
-
     connection: {
       database: "contacts",
       user: "postgres",
@@ -13,20 +12,20 @@ module.exports = {
       charset: "utf8",
       dialectOptions: { collate: "utf8_general_ci" }
     },
+    migrations: {
+      tableName: "knex_migrations",
+      directory:  "./src/config/migrations"
+    },
+    seeds: {
+      tableName: "knex_seeds",
+      directory:  "./src/config/seeds"
+    },
     pool: {
       max: 5,
       min: 0,
       acquire: 30000,
       idle: 10000
     },
-    migrations: {
-      tableName: "knex_migrations",
-      directory: __dirname + "/src/database/migrations"
-    },
-    seeds: {
-      tableName: "knex_migrations",
-      directory: __dirname + "/src/database/seeds"
-    }
   },
   test: {
     client: "postgresql",
@@ -58,10 +57,6 @@ module.exports = {
   production: {
     client: 'pg',
     connection: process.env.DATABASE_URL,
-    migrations: {
-      directory: './database/migrations'
-    },
-    seeds: { directory: './database/seeds' },
     port: 5432,
     define: {
       charset: 'utf8',
@@ -69,6 +64,14 @@ module.exports = {
     },
     dialectOptions: {
       ssl: true
+    },
+    migrations: {
+      tableName: "knex_migrations",
+      directory:  "./src/config/migrations"
+    },
+    seeds: {
+      tableName: "knex_seeds",
+      directory:  "./src/config/seeds"
     },
     pool: {
       max: 5,
