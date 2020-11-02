@@ -16,7 +16,7 @@
     "lint": "eslint --fix \"src/**/*.js\"",
     "test": "cross-env NODE_ENV=test node ./node_modules/jest/bin/jest.js --forceExit --detectOpenHandles --runInBand",
     "test:watch": "cross-env NODE_ENV=test node ./node_modules/jest/bin/jest.js --watch --detectOpenHandles --runInBand",
-    "heroku-postbuild": "node_modules/.bin/knex migrate:down && node_modules/.bin/knex migrate:lastest && node_modules/.bin/knex seed:run"
+    "heroku-postbuild": "node_modules/.bin/knex migrate:down && node_modules/.bin/knex migrate:latest && node_modules/.bin/knex seed:run"
 
   },
   "keywords": [],
