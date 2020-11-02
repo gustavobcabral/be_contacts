@@ -1,6 +1,6 @@
 module.exports = {
   development: {
-    client: 'postgresql',
+    client: 'pg',
     debud: true,
     connection: {
       database: 'contacts',
