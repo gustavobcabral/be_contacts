@@ -66,9 +66,6 @@ module.exports = {
       charset: 'utf8',
       dialectOptions: { collate: 'utf8_general_ci' }
     },
-    dialectOptions: {
-      ssl: true
-    },
     pool: {
       max: 5,
       min: 0,

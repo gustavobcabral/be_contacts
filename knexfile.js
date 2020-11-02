@@ -56,21 +56,16 @@ module.exports = {
     }
   },
   production: {
-    client: 'postgresql',
-    // eslint-disable-next-line @typescript-eslint/camelcase
-    use_env_variable: 'DATABASE_URL',
+    client: 'pg',
+    connection: process.env.DATABASE_URL,
+    migrations: {
+      directory: './database/migrations'
+    },
+    seeds: { directory: './database/seeds' },
     port: 5432,
     define: {
       charset: 'utf8',
       dialectOptions: { collate: 'utf8_general_ci' }
-    },
-    migrations: {
-      tableName: 'knex_migrations',
-      directory: __dirname + '/src/database/migrations'
-    },
-    seeds: {
-      tableName: 'knex_seeds',
-      directory: __dirname + '/src/database/seeds'
     },
     dialectOptions: {
       ssl: true
