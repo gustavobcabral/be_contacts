@@ -63,10 +63,13 @@ module.exports = {
       charset: 'utf8',
       dialectOptions: { collate: 'utf8_general_ci' }
     },
-    seederStorage: 'sequelize',
-    seederStorageTableName: 'SequelizeData',
-    dialectOptions: {
-      ssl: true
+    migrations: {
+      tableName: 'knex_migrations',
+      directory: __dirname + '/src/database/migrations'
+    },
+    seeds: {
+      tableName: 'knex_seeds',
+      directory: __dirname + '/src/database/seeds'
     },
     pool: {
       max: 5,
