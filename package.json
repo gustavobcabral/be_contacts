@@ -4,7 +4,7 @@
   "description": "desc",
   "main": "index.js",
   "scripts": {
-    "start": "cross-env NODE_ENV=production ts-node-dev --respawn --transpile-only --ignore-watch node_modules src/index.js | pino-pretty",
+    "start": "ts-node-dev --respawn --transpile-only --ignore-watch node_modules src/index.js | pino-pretty",
     "dev": "nodemon src/index.js --exec ts-node-dev --no-deps --respawn --transpileOnly",
     "db:migrate": "./node_modules/.bin/knex migrate:latest",
     "db:migrate-test": "cross-env NODE_ENV=test ./node_modules/.bin/knex migrate:latest",
