@@ -82,8 +82,8 @@ const prepareDataToVerification = (request, data) => ({
 const getOne = async request =>
   asyncPipe(
     getOneRecord,
-    curry(prepareDataToVerification)(request),
-    verifyIfCurrentUserCanSeeThisData,
+    //curry(prepareDataToVerification)(request),
+    // verifyIfCurrentUserCanSeeThisData,
     omit(omitColumns),
     curry(responseSuccess)(request)
   )(getParamsForGetOne(request))
