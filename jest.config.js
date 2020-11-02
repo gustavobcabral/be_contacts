@@ -28,6 +28,6 @@ module.exports = {
   },
   coverageReporters: ['html', 'text-summary'],
   collectCoverageFrom: ['src/**/*.js'],
-  coveragePathIgnorePatterns: ['/node_modules/', '/database/'],
+  coveragePathIgnorePatterns: ['/node_modules/', '/config/'],
   verbose: true
 }

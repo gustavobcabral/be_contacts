@@ -1,5 +1,5 @@
 import crud from './crudGeneric.model'
-import knex from '../database/connection'
+import knex from '../config/connection'
 
 import { map, omit, curry } from 'lodash/fp'
 import asyncPipe from 'pipeawait'
