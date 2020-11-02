@@ -55,7 +55,7 @@ module.exports = {
     }
   },
   production: {
-    dialect: 'postgres',
+    client: 'postgresql',
     // eslint-disable-next-line @typescript-eslint/camelcase
     use_env_variable: 'DATABASE_URL',
     port: 5432,
@@ -70,6 +70,9 @@ module.exports = {
     seeds: {
       tableName: 'knex_seeds',
       directory: __dirname + '/src/database/seeds'
+    },
+    dialectOptions: {
+      ssl: true
     },
     pool: {
       max: 5,

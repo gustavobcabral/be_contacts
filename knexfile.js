@@ -56,15 +56,22 @@ module.exports = {
     }
   },
   production: {
-    dialect: "postgres",
-    use_env_variable: "DATABASE_URL",
+    client: 'postgresql',
+    // eslint-disable-next-line @typescript-eslint/camelcase
+    use_env_variable: 'DATABASE_URL',
     port: 5432,
     define: {
-      charset: "utf8",
-      dialectOptions: { collate: "utf8_general_ci" }
+      charset: 'utf8',
+      dialectOptions: { collate: 'utf8_general_ci' }
     },
-    seederStorage: "sequelize",
-    seederStorageTableName: "SequelizeData",
+    migrations: {
+      tableName: 'knex_migrations',
+      directory: __dirname + '/src/database/migrations'
+    },
+    seeds: {
+      tableName: 'knex_seeds',
+      directory: __dirname + '/src/database/seeds'
+    },
     dialectOptions: {
       ssl: true
     },
