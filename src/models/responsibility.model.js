@@ -1,4 +1,4 @@
-import knex from '../database/connection'
+import knex from '../config/connection'
 import { getOr } from 'lodash/fp'
 
 const tableName = 'responsibility'

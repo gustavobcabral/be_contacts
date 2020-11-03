@@ -1,4 +1,4 @@
-const knex = require('./src/database/connection')
+const knex = require('./src/config/connection')
 const knexCleaner = require('knex-cleaner')
 
 module.exports = async () => {

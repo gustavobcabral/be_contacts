@@ -1,4 +1,4 @@
-import knex from '../database/connection'
+import knex from '../config/connection'
 import { split, map, pipe, head, last, includes, curry } from 'lodash/fp'
 
 const getAll = async (tableName, queryParams = {}) => {
