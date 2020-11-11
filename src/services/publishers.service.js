@@ -68,8 +68,8 @@ const verifyIfCurrentUserCanSeeThisData = async ({
   data,
   idResponsibility
 }) => {
-  if (toInteger(idResponsibility) < getLodash('idResponsibility', data))
-    throw NOT_ALLOWED_GET_DATA_MORE_RESPONSIBILITY
+  // if (toInteger(idResponsibility) < getLodash('idResponsibility', data))
+  //   throw NOT_ALLOWED_GET_DATA_MORE_RESPONSIBILITY
 
   return data
 }

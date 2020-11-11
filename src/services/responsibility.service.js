@@ -1,4 +1,4 @@
-const { getAllAllowedForMe } = require('../models/responsibility.model')
+const { getAll } = require('../models/responsibility.model')
 import { getParamsForGetWithUser } from '../shared/helpers/generic.helper'
 import { responseSuccess } from '../shared/helpers/responseGeneric.helper'
 import asyncPipe from 'pipeawait'
@@ -9,10 +9,7 @@ const get = async request => {
     ...getParamsForGetWithUser(request),
     sort: 'description:asc'
   }
-  return asyncPipe(
-    getAllAllowedForMe,
-    curry(responseSuccess)(request)
-  )(paramsQuery)
+  return asyncPipe(getAll, curry(responseSuccess)(request))(paramsQuery)
 }
 
 export default { get }
