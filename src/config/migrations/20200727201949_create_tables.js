@@ -108,6 +108,7 @@ exports.up = function(knex) {
         .string('phone')
         .notNullable()
         .primary()
+      table.string('location').nullable()
       table.string('phone2').nullable()
       table.string('name').nullable()
       table
