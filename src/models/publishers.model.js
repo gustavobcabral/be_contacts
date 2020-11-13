@@ -6,7 +6,7 @@ import asyncPipe from 'pipeawait'
 
 const tableName = 'publishers'
 const columnPrimary = 'id'
-const omitColumns = ['password', 'haveToReauthenticate']
+const omitColumns = ['password', 'haveToReauthenticate', 'hash']
 
 const getAllWithPagination = async queryParams => {
   const { sort = 'name:ASC' } = queryParams

@@ -26,7 +26,7 @@ import {
 } from 'lodash/fp'
 import {
   NOT_ALLOWED_DELETE_ADMIN,
-  NOT_ALLOWED_GET_DATA_MORE_RESPONSIBILITY
+  NOT_ALLOWED_EDIT_DATA_MORE_RESPONSIBILITY
 } from '../shared/constants/security.constant'
 import { encrypt } from '../shared/helpers/generic.helper'
 import HttpStatus from 'http-status-codes'
@@ -64,26 +64,33 @@ const get = async request => {
   return asyncPipe(getAll, curry(responseSuccess)(request))(paramsQuery)
 }
 
-const verifyIfCurrentUserCanSeeThisData = async ({
-  data,
-  idResponsibility
-}) => {
-  // if (toInteger(idResponsibility) < getLodash('idResponsibility', data))
-  //   throw NOT_ALLOWED_GET_DATA_MORE_RESPONSIBILITY
+const verifyIfCurrentUserCanEditThisData = obj => {
+  if (currentUserHasMinusReponsibilityThatDataPublisher(obj))
+    throw NOT_ALLOWED_EDIT_DATA_MORE_RESPONSIBILITY
 
-  return data
+  return obj
 }
 
+const currentUserHasMinusReponsibilityThatDataPublisher = obj =>
+  toInteger(getLodash('idResponsibility', obj)) <
+  toInteger(getLodash('data.idResponsibility', obj))
+
 const prepareDataToVerification = (request, data) => ({
-  data,
+  ...data,
   idResponsibility: getLodash('user.idResponsibility', request)
+})
+
+const appendDisabledFields = (request, obj) => ({
+  ...obj,
+  disabled: currentUserHasMinusReponsibilityThatDataPublisher(
+    prepareDataToVerification(request, { data: obj })
+  )
 })
 
 const getOne = async request =>
   asyncPipe(
     getOneRecord,
-    //curry(prepareDataToVerification)(request),
-    // verifyIfCurrentUserCanSeeThisData,
+    curry(appendDisabledFields)(request),
     omit(omitColumns),
     curry(responseSuccess)(request)
   )(getParamsForGetOne(request))
@@ -97,7 +104,7 @@ const create = async request =>
   )(getParamsForCreate(request))
 
 const verifyWhatCanUpdate = obj =>
-  toInteger(getLodash('id', obj)) === ID_ADMIN
+  toInteger(getLodash('id', obj)) === 99999
     ? {
         ...obj,
         data: omit(['idResponsibility'], getLodash('data', obj))
@@ -124,16 +131,18 @@ const verifyIfIsNecessaryReAuthenticate = async obj =>
     ? reBuildObjectDataToReauthenticate(obj)
     : obj
 
-const update = async request =>
-  asyncPipe(
+const update = async request => {
+  return asyncPipe(
     verifyWhatCanUpdate,
     verifyIfIsNecessaryReAuthenticate,
+    curry(prepareDataToVerification)(request),
+    verifyIfCurrentUserCanEditThisData,
     validatePassword,
     encryptPassword,
     updateRecord,
     curry(responseSuccess)(request)
   )(getParamsForUpdate(request))
-
+}
 const verifyIfCanDelete = id => {
   if (toInteger(id) === ID_ADMIN) {
     throw NOT_ALLOWED_DELETE_ADMIN
