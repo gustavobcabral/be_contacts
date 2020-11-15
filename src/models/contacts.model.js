@@ -14,7 +14,10 @@ const fields = [
   'languageName',
   'statusDescription',
   'gender',
-  'namePublisher'
+  'namePublisher',
+  'phone2',
+  'email',
+  'typeCompany'
 ]
 
 const getAll = async queryParams => {
@@ -129,9 +132,13 @@ const getOneWithDetails = async phone =>
     .select(
       'contacts.name',
       'contacts.phone',
+      'contacts.phone2',
       'contacts.idStatus',
       'contacts.gender',
       'contacts.idLanguage',
+      'contacts.location',
+      'contacts.email',
+      'contacts.typeCompany',
       'detailsContacts.*'
     )
     .from(tableName)
