@@ -1,6 +1,7 @@
 const {
   getAllWithPagination,
   getAll,
+  getFilters,
   getOneRecord,
   createRecord,
   updateRecord,
@@ -12,6 +13,7 @@ import {
   getParamsForUpdate,
   getParamsForCreate,
   getParamsForGetOne,
+  getParamsForGet,
   getParamsForDelete,
   defaultValueForQuery
 } from '../shared/helpers/generic.helper'
@@ -219,8 +221,15 @@ const validatePassword = data => {
   return data
 }
 
+const getAllFiltersOfPublishers = async request =>
+  asyncPipe(
+    getFilters,
+    curry(responseSuccess)(request)
+  )(getParamsForGet(request))
+
 export default {
   getAllInformationWithPagination,
+  getAllFiltersOfPublishers,
   get,
   getOne,
   create,
