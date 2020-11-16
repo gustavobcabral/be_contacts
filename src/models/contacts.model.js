@@ -14,7 +14,12 @@ const fields = [
   'languageName',
   'statusDescription',
   'gender',
-  'namePublisher'
+  'namePublisher',
+  'phone2',
+  'location',
+  'email',
+  'note',
+  'typeCompany'
 ]
 
 const getAll = async queryParams => {
@@ -26,6 +31,10 @@ const getAll = async queryParams => {
       'contacts.idStatus',
       'contacts.idLanguage',
       'contacts.gender',
+      'contacts.typeCompany',
+      'contacts.location',
+      'contacts.email',
+      'contacts.note',
       'languages.name as languageName',
       'status.description as statusDescription'
     )
@@ -34,13 +43,16 @@ const getAll = async queryParams => {
     .leftJoin('status', 'status.id', '=', 'contacts.idStatus')
 
   if (!isEmpty(filters)) {
-    const { name, phone, genders, languages, status } = JSON.parse(filters)
+    const { name, phone, genders, note, languages, status } = JSON.parse(
+      filters
+    )
 
-    if (!isEmpty(name) && !isEmpty(phone)) {
+    if (!isEmpty(name) && !isEmpty(phone) && !isEmpty(note)) {
       sql.where(builder =>
         builder
           .where('contacts.name', 'ilike', `%${name}%`)
           .orWhere('contacts.phone', 'ilike', `%${phone}%`)
+          .orWhere('contacts.note', 'ilike', `%${note}%`)
       )
     }
     if (!isEmpty(genders))
@@ -129,9 +141,14 @@ const getOneWithDetails = async phone =>
     .select(
       'contacts.name',
       'contacts.phone',
+      'contacts.phone2',
       'contacts.idStatus',
       'contacts.gender',
       'contacts.idLanguage',
+      'contacts.typeCompany',
+      'contacts.location',
+      'contacts.email',
+      'contacts.note',
       'detailsContacts.*'
     )
     .from(tableName)

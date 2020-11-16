@@ -7,6 +7,8 @@ routes.get(
   '/withPagination',
   publishersController.getAllInformationWithPagination
 )
+routes.get('/filters', publishersController.getAllFiltersOfPublishers)
+
 routes.get('/', publishersController.get)
 
 routes.get('/:id', publishersController.getOne)

@@ -1,16 +1,16 @@
 import crud from './crudGeneric.model'
 import knex from '../config/connection'
 
-import { map, omit, curry } from 'lodash/fp'
+import { map, omit, curry, isEmpty } from 'lodash/fp'
 import asyncPipe from 'pipeawait'
 
 const tableName = 'publishers'
 const columnPrimary = 'id'
-const omitColumns = ['password', 'haveToReauthenticate']
+const omitColumns = ['password', 'haveToReauthenticate', 'hash']
 
 const getAllWithPagination = async queryParams => {
-  const { sort = 'name:ASC' } = queryParams
-  return knex
+  const { sort = 'name:ASC', perPage, currentPage, filters } = queryParams
+  const sql = knex
     .select(
       'publishers.id',
       'publishers.name',
@@ -26,7 +26,46 @@ const getAllWithPagination = async queryParams => {
       '=',
       'responsibility.id'
     )
+
+  if (!isEmpty(filters)) {
+    const { name, phone, email, responsibility } = JSON.parse(filters)
+
+    if (!isEmpty(name) && !isEmpty(phone)) {
+      sql.where(builder =>
+        builder
+          .where('publishers.name', 'ilike', `%${name}%`)
+          .orWhere('publishers.phone', 'ilike', `%${phone}%`)
+          .orWhere('publishers.email', 'ilike', `%${email}%`)
+      )
+    }
+    if (!isEmpty(responsibility))
+      sql.andWhere(qB =>
+        qB.whereIn('publishers.idResponsibility', responsibility)
+      )
+  }
+  return await sql
     .orderByRaw(crud.parseOrderBy(sort))
+    .paginate(perPage, currentPage)
+}
+
+const getResponsibility = async () =>
+  knex
+    .select(
+      'idResponsibility',
+      'responsibility.description as responsibilityDescription'
+    )
+    .from(tableName)
+    .leftJoin(
+      'responsibility',
+      'responsibility.id',
+      '=',
+      'publishers.idResponsibility'
+    )
+    .groupBy('idResponsibility', 'responsibility.description')
+
+const getFilters = async () => {
+  const responsibility = await getResponsibility()
+  return { responsibility }
 }
 
 const removeColumnNotAllowed = data => map(pub => omit(omitColumns, pub), data)
@@ -61,6 +100,7 @@ const deleteRecord = async id =>
 export {
   getAllWithPagination,
   getAll,
+  getFilters,
   getOneRecord,
   createRecord,
   updateRecord,
