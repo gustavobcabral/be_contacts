@@ -20,6 +20,9 @@ const getDetailsOneContact = async ({ id, query }) => {
   const sql = knex
     .select(
       'detailsContacts.information',
+      knex.raw(
+        `"detailsContacts"."information"='${WAITING_FEEDBACK}' as "waitingFeedback"`
+      ),
       'detailsContacts.createdAt',
       'detailsContacts.idPublisher',
       'detailsContacts.id',
