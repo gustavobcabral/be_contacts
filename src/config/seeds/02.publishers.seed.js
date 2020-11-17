@@ -6,7 +6,7 @@ exports.seed = async function(knex) {
     {
       id: 1,
       name: 'Admin',
-      phone: '595983668678',
+      phone: null,
       password: crypto.createHmac('sha256', '123456').digest('hex'),
       email: 'admin@example.com',
       idResponsibility: 4,
