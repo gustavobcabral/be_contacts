@@ -159,30 +159,39 @@ const deleteOne = async request =>
     curry(responseSuccess)(request)
   )(getParamsForDelete(request))
 
-const encryptPassword = data => {
-  const password = getOr(getLodash('data.password', data), 'password', data)
-  const modeEdit = Boolean(getLodash('data.id', data))
-  return !isEmpty(password)
-    ? modeEdit
-      ? {
-          ...data,
-          data: {
-            ...data.data,
-            password: encrypt(password)
-          }
-        }
-      : {
-          ...data,
-          password: encrypt(password)
-        }
-    : modeEdit
-    ? {
-        ...data,
-        data: {
-          ...omit(['password'], data.data)
-        }
-      }
-    : omit(['password'], data)
+const mountDataWithPasswordForEdit = (obj, password) => ({
+  ...obj,
+  data: {
+    ...obj.data,
+    password
+  }
+})
+
+const mountDataWithoutPasswordForEdit = obj => ({
+  ...obj,
+  data: {
+    ...omit(['password'], obj.data)
+  }
+})
+
+const mountDataWithPasswordForNew = (data, password) => ({
+  ...data,
+  password
+})
+
+const encryptPassword = obj => {
+  const password = getOr(getLodash('data.password', obj), 'password', obj)
+  const modeEdit = Boolean(getLodash('data.id', obj))
+
+  if (!isEmpty(password)) {
+    return modeEdit
+      ? mountDataWithPasswordForEdit(obj, encrypt(password))
+      : mountDataWithPasswordForNew(obj, encrypt(password))
+  }
+
+  return modeEdit
+    ? mountDataWithoutPasswordForEdit(obj)
+    : omit(['password'], obj)
 }
 
 const validatePassword = data => {

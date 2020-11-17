@@ -106,9 +106,11 @@ const getDetailsAllContactWaitingFeedback = async ({ query, user }) => {
     .where('detailsContacts.information', WAITING_FEEDBACK)
 
   if (idResponsibility < ELDER) {
-    sql
-      .where('detailsContacts.createdBy', user.id)
-      .orWhere('detailsContacts.idPublisher', user.id)
+    sql.where(builder =>
+      builder
+        .where('detailsContacts.createdBy', user.id)
+        .orWhere('detailsContacts.idPublisher', user.id)
+    )
   }
 
   if (!isEmpty(filters)) {
