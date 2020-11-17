@@ -161,7 +161,7 @@ const deleteOne = async request =>
 
 const encryptPassword = data => {
   const password = getOr(getLodash('data.password', data), 'password', data)
-  const modeEdit = Boolean(getLodash('data.password', data))
+  const modeEdit = Boolean(getLodash('data.id', data))
   return !isEmpty(password)
     ? modeEdit
       ? {
@@ -175,7 +175,14 @@ const encryptPassword = data => {
           ...data,
           password: encrypt(password)
         }
-    : data
+    : modeEdit
+    ? {
+        ...data,
+        data: {
+          ...omit(['password'], data.data)
+        }
+      }
+    : omit(['password'], data)
 }
 
 const validatePassword = data => {
