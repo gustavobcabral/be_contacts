@@ -43,9 +43,15 @@ const getAll = async queryParams => {
     .leftJoin('status', 'status.id', '=', 'contacts.idStatus')
 
   if (!isEmpty(filters)) {
-    const { name, phone, genders, note, languages, status } = JSON.parse(
-      filters
-    )
+    const {
+      name,
+      phone,
+      genders,
+      note,
+      languages,
+      status,
+      typeCompany
+    } = JSON.parse(filters)
 
     if (!isEmpty(name) && !isEmpty(phone) && !isEmpty(note)) {
       sql.where(builder =>
@@ -63,6 +69,9 @@ const getAll = async queryParams => {
 
     if (!isEmpty(status))
       sql.andWhere(qB => qB.whereIn('contacts.idStatus', status))
+
+    if (typeCompany !== '-1')
+      sql.andWhere(qB => qB.where('contacts.typeCompany', typeCompany))
   }
   const data = await sql
     .orderByRaw(crud.parseOrderBy(sort))
@@ -76,6 +85,7 @@ const getAll = async queryParams => {
         .where('phoneContact', row.phone)
         .orderBy('createdAt', 'desc')
         .limit(2)
+
       if (detailsDB.length > 0) {
         const lastDetails = first(detailsDB)
         const beforeLastDetails = last(detailsDB)

@@ -29,6 +29,7 @@ const getDetailsOneContact = async ({ id, query }) => {
       'contacts.name',
       'contacts.idLanguage',
       'contacts.gender',
+      'contacts.typeCompany',
       'publishers.name as publisherName'
     )
     .from(tableName)
@@ -57,7 +58,8 @@ const getOne = async id =>
       'contacts.idStatus',
       'contacts.idLanguage',
       'contacts.name',
-      'contacts.gender'
+      'contacts.gender',
+      'contacts.typeCompany'
     )
     .from(tableName)
     .leftJoin('publishers', 'detailsContacts.idPublisher', '=', 'publishers.id')
@@ -90,6 +92,7 @@ const getDetailsAllContactWaitingFeedback = async ({ query, user }) => {
       'contacts.idStatus',
       'contacts.idLanguage',
       'contacts.phone',
+      'contacts.typeCompany',
       knex.raw('true as "waitingFeedback"')
     )
     .from(tableName)
@@ -117,18 +120,27 @@ const getDetailsAllContactWaitingFeedback = async ({ query, user }) => {
     const {
       name,
       phone,
+      note,
       responsible,
       creator,
       genders,
       languages,
-      status
+      status,
+      typeCompany
     } = JSON.parse(filters)
 
-    if (!isEmpty(name) && !isEmpty(phone) && !isEmpty(responsible)) {
+    if (
+      !isEmpty(name) &&
+      !isEmpty(phone) &&
+      !isEmpty(creator) &&
+      !isEmpty(responsible) &&
+      !isEmpty(note)
+    ) {
       sql.where(builder =>
         builder
           .where('contacts.name', 'ilike', `%${name}%`)
           .orWhere('contacts.phone', 'ilike', `%${phone}%`)
+          .orWhere('contacts.note', 'ilike', `%${note}%`)
           .orWhere('publishers.name', 'ilike', `%${responsible}%`)
           .orWhere('publisherCreatedBy.name', 'ilike', `%${creator}%`)
       )
@@ -141,6 +153,9 @@ const getDetailsAllContactWaitingFeedback = async ({ query, user }) => {
 
     if (!isEmpty(status))
       sql.andWhere(qB => qB.whereIn('contacts.idStatus', status))
+
+    if (typeCompany !== '-1')
+      sql.andWhere(qB => qB.where('contacts.typeCompany', typeCompany))
   }
   return sql.orderByRaw(crud.parseOrderBy(sort)).paginate(perPage, currentPage)
 }
