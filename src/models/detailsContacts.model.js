@@ -16,7 +16,7 @@ const fields = [
 ]
 
 const getDetailsOneContact = async ({ id, query }) => {
-  const limit = query.limit || 5
+  const { sort, perPage, currentPage, filters, limit } = query
   const sql = knex
     .select(
       'detailsContacts.information',
@@ -36,9 +36,22 @@ const getDetailsOneContact = async ({ id, query }) => {
     .leftJoin('publishers', 'detailsContacts.idPublisher', '=', 'publishers.id')
     .leftJoin('contacts', 'detailsContacts.phoneContact', '=', 'contacts.phone')
     .where('phoneContact', '=', id)
-    .orderBy('createdAt', 'desc')
 
-  if (!isNil(limit) && limit > 0) sql.limit(limit)
+  if (!isNil(limit) && limit > 0) return sql.limit(limit)
+  else if (!isEmpty(filters)) {
+    const { publisher, details } = JSON.parse(filters)
+
+    if (!isEmpty(publisher) && !isEmpty(details)) {
+      sql.where(builder =>
+        builder
+          .where('detailsContacts.information', 'ilike', `%${details}%`)
+          .orWhere('publishers.name', 'ilike', `%${publisher}%`)
+      )
+    }
+    return sql
+      .orderByRaw(crud.parseOrderBy(sort))
+      .paginate(perPage, currentPage)
+  }
   return sql
 }
 
