@@ -86,13 +86,17 @@ const getAll = async queryParams => {
         .orderBy('createdAt', 'desc')
         .limit(2)
 
+      const isWaitingFeedback = await knex
+        .count('id')
+        .from('detailsContacts')
+        .where('phoneContact', row.phone)
+        .where('information', WAITING_FEEDBACK)
+        .first()
+
       if (detailsDB.length > 0) {
         const lastDetails = first(detailsDB)
         const beforeLastDetails = last(detailsDB)
-        const waitingFeedback = contains(
-          WAITING_FEEDBACK,
-          lastDetails.information
-        )
+        const waitingFeedback = isWaitingFeedback.count > 0
         const details = !waitingFeedback
           ? lastDetails
           : !contains(WAITING_FEEDBACK, beforeLastDetails.information)

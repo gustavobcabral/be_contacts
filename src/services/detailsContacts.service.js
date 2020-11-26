@@ -44,7 +44,7 @@ const getAllFiltersWaitingFeedback = async request =>
   asyncPipe(
     getFiltersWaitingFeedback,
     curry(responseSuccess)(request)
-  )(getParamsForGet(request))
+  )(getParamsForGetWithUser(request))
 
 const getAllDetailsOneContact = async request => {
   return asyncPipe(
