@@ -169,7 +169,11 @@ const cancelAssignAllContactsToAPublisher = async data =>
 const getSummaryContacts = async user => {
   const totals = await getSummaryTotals(getLodash('id', user))
   const totalContacts = Number(totals.totalContacts.count)
+
   const totalContactsContacted = Number(totals.totalContactsContacted.count)
+  const totalContactsNotCompanyContacted = Number(
+    totals.totalContactsNotCompanyContacted.count
+  )
   const totalContactsWithoutContact = totalContacts - totalContactsContacted
   const totalPercentContacted = (totalContactsContacted / totalContacts) * 100
 
@@ -211,7 +215,7 @@ const getSummaryContacts = async user => {
   const totalContactsByGender = totals.totalContactsByGender
 
   const calculatePercentageByGender = count =>
-    (count / totalContactsContacted) * 100
+    (count / totalContactsNotCompanyContacted) * 100
 
   const totalContactsByGenderContacted = map(
     gender => ({
@@ -234,6 +238,16 @@ const getSummaryContacts = async user => {
     totals.totalContactsByLanguageContacted
   )
 
+  const calculatePercentageByType = count => (count / totalContacts) * 100
+
+  const totalContactsByType = map(
+    type => ({
+      ...type,
+      percent: calculatePercentageByType(type.count)
+    }),
+    totals.totalContactsByType
+  )
+
   return {
     totalContacts,
     totalContactsContacted,
@@ -249,7 +263,8 @@ const getSummaryContacts = async user => {
     totalContactsByGender,
     totalContactsByGenderContacted,
     totalContactsByLanguage,
-    totalContactsByLanguageContacted
+    totalContactsByLanguageContacted,
+    totalContactsByType
   }
 }
 
