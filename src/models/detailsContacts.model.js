@@ -37,7 +37,8 @@ const getDetailsOneContact = async ({ id, query }) => {
     .leftJoin('contacts', 'detailsContacts.phoneContact', '=', 'contacts.phone')
     .where('phoneContact', '=', id)
 
-  if (!isNil(limit) && limit > 0) return sql.limit(limit)
+  if (!isNil(limit) && limit > 0)
+    return sql.limit(limit).orderByRaw(crud.parseOrderBy(sort))
   else if (!isEmpty(filters)) {
     const { publisher, details } = JSON.parse(filters)
 
@@ -173,16 +174,26 @@ const getDetailsAllContactWaitingFeedback = async ({ query, user }) => {
   return sql.orderByRaw(crud.parseOrderBy(sort)).paginate(perPage, currentPage)
 }
 
-const getGenders = async () =>
-  knex
+const getGenders = async user => {
+  const sql = knex
     .select('gender')
     .from(tableName)
     .leftJoin('contacts', 'detailsContacts.phoneContact', '=', 'contacts.phone')
     .where('detailsContacts.information', WAITING_FEEDBACK)
     .groupBy('gender')
 
-const getLanguages = async () =>
-  knex
+  if (user.idResponsibility < ELDER) {
+    sql.where(builder =>
+      builder
+        .where('detailsContacts.createdBy', user.id)
+        .orWhere('detailsContacts.idPublisher', user.id)
+    )
+  }
+  return sql
+}
+
+const getLanguages = async user => {
+  const sql = knex
     .select('idLanguage', 'languages.name as languageName')
     .from(tableName)
     .leftJoin('contacts', 'detailsContacts.phoneContact', '=', 'contacts.phone')
@@ -190,8 +201,18 @@ const getLanguages = async () =>
     .where('detailsContacts.information', WAITING_FEEDBACK)
     .groupBy('idLanguage', 'languages.name')
 
-const getStatus = async () =>
-  knex
+  if (user.idResponsibility < ELDER) {
+    sql.where(builder =>
+      builder
+        .where('detailsContacts.createdBy', user.id)
+        .orWhere('detailsContacts.idPublisher', user.id)
+    )
+  }
+  return sql
+}
+
+const getStatus = async user => {
+  const sql = knex
     .select('idStatus', 'status.description as statusDescription')
     .from(tableName)
     .leftJoin('contacts', 'detailsContacts.phoneContact', '=', 'contacts.phone')
@@ -199,10 +220,20 @@ const getStatus = async () =>
     .where('detailsContacts.information', WAITING_FEEDBACK)
     .groupBy('idStatus', 'status.description')
 
-const getFiltersWaitingFeedback = async () => {
-  const genders = await getGenders()
-  const languages = await getLanguages()
-  const status = await getStatus()
+  if (user.idResponsibility < ELDER) {
+    sql.where(builder =>
+      builder
+        .where('detailsContacts.createdBy', user.id)
+        .orWhere('detailsContacts.idPublisher', user.id)
+    )
+  }
+  return sql
+}
+
+const getFiltersWaitingFeedback = async ({ user }) => {
+  const genders = await getGenders(user)
+  const languages = await getLanguages(user)
+  const status = await getStatus(user)
   return { genders, languages, status }
 }
 
