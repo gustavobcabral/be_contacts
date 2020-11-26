@@ -185,11 +185,23 @@ const getSummaryTotals = async userId => {
     .count('phone')
     .first()
 
+  const totalContactsByType = await knex('contacts')
+    .count('phone')
+    .select('typeCompany')
+    .groupBy('typeCompany')
+
   const totalContactsByGender = await knex('contacts')
     .count('gender')
     .select('gender')
     .where('typeCompany', false)
     .groupBy('gender')
+
+  const totalContactsNotCompanyContacted = await knex('detailsContacts')
+    .countDistinct('phone')
+    .leftJoin('contacts', 'contacts.phone', '=', 'detailsContacts.phoneContact')
+    .where('contacts.typeCompany', false)
+    .whereNot({ information: WAITING_FEEDBACK })
+    .first()
 
   const totalContactsByGenderContacted = await knex('detailsContacts')
     .countDistinct('phone')
@@ -250,7 +262,9 @@ const getSummaryTotals = async userId => {
     totalContactsByGender,
     totalContactsByGenderContacted,
     totalContactsByLanguage,
-    totalContactsByLanguageContacted
+    totalContactsByLanguageContacted,
+    totalContactsNotCompanyContacted,
+    totalContactsByType
   }
 }
 
