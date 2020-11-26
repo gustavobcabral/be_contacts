@@ -27,6 +27,7 @@ const getDetailsOneContact = async ({ id, query }) => {
       'detailsContacts.idPublisher',
       'detailsContacts.id',
       'contacts.name',
+      'contacts.owner',
       'contacts.idLanguage',
       'contacts.gender',
       'contacts.typeCompany',
@@ -72,6 +73,7 @@ const getOne = async id =>
       'contacts.idStatus',
       'contacts.idLanguage',
       'contacts.name',
+      'contacts.owner',
       'contacts.gender',
       'contacts.typeCompany'
     )
@@ -103,6 +105,7 @@ const getDetailsAllContactWaitingFeedback = async ({ query, user }) => {
       'status.description as statusDescription',
       'contacts.name as contactName',
       'contacts.gender',
+      'contacts.owner',
       'contacts.idStatus',
       'contacts.idLanguage',
       'contacts.phone',
@@ -133,6 +136,7 @@ const getDetailsAllContactWaitingFeedback = async ({ query, user }) => {
   if (!isEmpty(filters)) {
     const {
       name,
+      owner,
       phone,
       note,
       responsible,
@@ -145,6 +149,7 @@ const getDetailsAllContactWaitingFeedback = async ({ query, user }) => {
 
     if (
       !isEmpty(name) &&
+      !isEmpty(owner) &&
       !isEmpty(phone) &&
       !isEmpty(creator) &&
       !isEmpty(responsible) &&
@@ -153,6 +158,7 @@ const getDetailsAllContactWaitingFeedback = async ({ query, user }) => {
       sql.where(builder =>
         builder
           .where('contacts.name', 'ilike', `%${name}%`)
+          .orWhere('contacts.owner', 'ilike', `%${owner}%`)
           .orWhere('contacts.phone', 'ilike', `%${phone}%`)
           .orWhere('contacts.note', 'ilike', `%${note}%`)
           .orWhere('publishers.name', 'ilike', `%${responsible}%`)
