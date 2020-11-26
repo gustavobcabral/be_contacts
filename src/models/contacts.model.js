@@ -9,6 +9,7 @@ const columnPrimary = 'phone'
 const fields = [
   'phone',
   'name',
+  'owner',
   'idStatus',
   'idLanguage',
   'languageName',
@@ -27,6 +28,7 @@ const getAll = async queryParams => {
   const sql = knex
     .select(
       'contacts.name',
+      'contacts.owner',
       'contacts.phone',
       'contacts.idStatus',
       'contacts.idLanguage',
@@ -45,6 +47,7 @@ const getAll = async queryParams => {
   if (!isEmpty(filters)) {
     const {
       name,
+      owner,
       phone,
       genders,
       note,
@@ -53,10 +56,16 @@ const getAll = async queryParams => {
       typeCompany
     } = JSON.parse(filters)
 
-    if (!isEmpty(name) && !isEmpty(phone) && !isEmpty(note)) {
+    if (
+      !isEmpty(name) &&
+      !isEmpty(phone) &&
+      !isEmpty(note) &&
+      !isEmpty(owner)
+    ) {
       sql.where(builder =>
         builder
           .where('contacts.name', 'ilike', `%${name}%`)
+          .orWhere('contacts.owner', 'ilike', `%${owner}%`)
           .orWhere('contacts.phone', 'ilike', `%${phone}%`)
           .orWhere('contacts.note', 'ilike', `%${note}%`)
       )
@@ -154,6 +163,7 @@ const getOneWithDetails = async phone =>
   knex
     .select(
       'contacts.name',
+      'contacts.owner',
       'contacts.phone',
       'contacts.phone2',
       'contacts.idStatus',
