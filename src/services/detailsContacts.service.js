@@ -1,6 +1,7 @@
 import {
   getOne,
   getDetailsAllContactWaitingFeedback,
+  getDetailsIsWaitingFeedbackOneContact,
   getFiltersWaitingFeedback,
   getDetailsAllContact,
   getDetailsOneContact,
@@ -9,10 +10,12 @@ import {
   deleteRecord
 } from '../models/detailsContacts.model'
 import { updateRecord as updateRecordContacts } from '../models/contacts.model'
+import HttpStatus from 'http-status-codes'
+import { ERROR_PUBLISHER_ALREADY_WAITING_FEEDBACK } from '../shared/constants/contacts.constant'
+
 import { responseSuccess } from '../shared/helpers/responseGeneric.helper'
 import {
   getParamsForGetOne,
-  getParamsForGet,
   getParamsForUpdate,
   getParamsForCreate,
   getParamsForDelete,
@@ -72,6 +75,18 @@ const create = async request => {
       updatedBy: getLodash('user.id', request)
     },
     id: getLodash('contact.phone', data)
+  }
+
+  const dataContactsWaitingFeedback = await getDetailsIsWaitingFeedbackOneContact(
+    dataContact.id
+  )
+
+  if (dataContactsWaitingFeedback.length > 0) {
+    throw {
+      httpErrorCode: HttpStatus.BAD_REQUEST,
+      error: ERROR_PUBLISHER_ALREADY_WAITING_FEEDBACK,
+      extra: { phone: dataContact.id }
+    }
   }
 
   const resContacts = await updateRecordContacts(dataContact)
