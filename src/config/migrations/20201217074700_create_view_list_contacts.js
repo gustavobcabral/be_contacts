@@ -15,7 +15,9 @@ exports.up = function(knex) {
         'languages.name as languageName',
         'status.description as statusDescription',
         'dc.createdAtDetailsContacts',
-        'dc.lastConversationInDays'
+        knex.raw(
+          'COALESCE(dc."lastConversationInDays",99999999999) as "lastConversationInDays"'
+        )
       )
       .from('contacts')
       .leftJoin('languages', 'languages.id', '=', 'contacts.idLanguage')
