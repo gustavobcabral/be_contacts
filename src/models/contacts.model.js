@@ -24,25 +24,30 @@ const fields = [
 ]
 
 const getAll = async queryParams => {
-  const { sort = 'name:ASC', perPage, currentPage, filters } = queryParams
+  const {
+    sort = 'lastConversationInDays:DESC',
+    perPage,
+    currentPage,
+    filters
+  } = queryParams
   const sql = knex
     .select(
-      'contacts.name',
-      'contacts.owner',
-      'contacts.phone',
-      'contacts.idStatus',
-      'contacts.idLanguage',
-      'contacts.gender',
-      'contacts.typeCompany',
-      'contacts.location',
-      'contacts.email',
-      'contacts.note',
-      'languages.name as languageName',
-      'status.description as statusDescription'
+      'name',
+      'owner',
+      'phone',
+      'idStatus',
+      'idLanguage',
+      'gender',
+      'typeCompany',
+      'location',
+      'email',
+      'note',
+      'languageName',
+      'statusDescription',
+      'createdAtDetailsContacts',
+      'lastConversationInDays'
     )
-    .from(tableName)
-    .leftJoin('languages', 'languages.id', '=', 'contacts.idLanguage')
-    .leftJoin('status', 'status.id', '=', 'contacts.idStatus')
+    .from('viewListContacts')
 
   if (!isEmpty(filters)) {
     const {
@@ -64,23 +69,21 @@ const getAll = async queryParams => {
     ) {
       sql.where(builder =>
         builder
-          .where('contacts.name', 'ilike', `%${name}%`)
-          .orWhere('contacts.owner', 'ilike', `%${owner}%`)
-          .orWhere('contacts.phone', 'ilike', `%${phone}%`)
-          .orWhere('contacts.note', 'ilike', `%${note}%`)
+          .where('name', 'ilike', `%${name}%`)
+          .orWhere('owner', 'ilike', `%${owner}%`)
+          .orWhere('phone', 'ilike', `%${phone}%`)
+          .orWhere('note', 'ilike', `%${note}%`)
       )
     }
-    if (!isEmpty(genders))
-      sql.andWhere(qB => qB.whereIn('contacts.gender', genders))
+    if (!isEmpty(genders)) sql.andWhere(qB => qB.whereIn('gender', genders))
 
     if (!isEmpty(languages))
-      sql.andWhere(qB => qB.whereIn('contacts.idLanguage', languages))
+      sql.andWhere(qB => qB.whereIn('idLanguage', languages))
 
-    if (!isEmpty(status))
-      sql.andWhere(qB => qB.whereIn('contacts.idStatus', status))
+    if (!isEmpty(status)) sql.andWhere(qB => qB.whereIn('idStatus', status))
 
     if (typeCompany !== '-1')
-      sql.andWhere(qB => qB.where('contacts.typeCompany', typeCompany))
+      sql.andWhere(qB => qB.where('typeCompany', typeCompany))
   }
   const data = await sql
     .orderByRaw(crud.parseOrderBy(sort))
