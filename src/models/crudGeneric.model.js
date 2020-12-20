@@ -1,5 +1,14 @@
 import knex from '../config/connection'
-import { split, map, pipe, head, last, includes, curry } from 'lodash/fp'
+import {
+  split,
+  map,
+  pipe,
+  head,
+  last,
+  includes,
+  trim,
+  replace
+} from 'lodash/fp'
 import { fieldsNoTypeText } from '../shared/constants/db.constant'
 
 const getAll = async (tableName, queryParams = {}) => {
@@ -86,21 +95,23 @@ const deleteRecords = async ({ where, tableName }) =>
       .delete()
   )
 
-const canUpperThisColumn = column =>
-  pipe(split('.'), last, curry(includes)(fieldsNoTypeText))(column)
+const cantUpperThisColumn = column =>
+  pipe(split('.'), last, replace(/"/gi, ''), data => {
+    return includes(data, fieldsNoTypeText)
+  })(column)
 
 const parseOrderBy = sort =>
   pipe(
     split(','),
     map(field => {
       const arrayField = split(':', field)
-      const column = head(arrayField)
-      const order = last(arrayField)
+      const column = trim(head(arrayField))
+      const order = trim(last(arrayField))
       return sort.length === 1
-        ? canUpperThisColumn(column)
+        ? !cantUpperThisColumn(column)
           ? `UPPER(${column})`
           : column
-        : canUpperThisColumn(column)
+        : !cantUpperThisColumn(column)
         ? `UPPER(${column}) ${order}`
         : `${column} ${order}`
     })
