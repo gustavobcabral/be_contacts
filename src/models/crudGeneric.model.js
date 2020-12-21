@@ -95,9 +95,9 @@ const deleteRecords = async ({ where, tableName }) =>
       .delete()
   )
 
-const cantUpperThisColumn = column =>
+const canUpperThisColumn = column =>
   pipe(split('.'), last, replace(/"/gi, ''), data => {
-    return includes(data, fieldsNoTypeText)
+    return !includes(data, fieldsNoTypeText)
   })(column)
 
 const parseOrderBy = sort =>
@@ -108,10 +108,10 @@ const parseOrderBy = sort =>
       const column = trim(head(arrayField))
       const order = trim(last(arrayField))
       return sort.length === 1
-        ? !cantUpperThisColumn(column)
+        ? canUpperThisColumn(column)
           ? `UPPER(${column})`
           : column
-        : !cantUpperThisColumn(column)
+        : canUpperThisColumn(column)
         ? `UPPER(${column}) ${order}`
         : `${column} ${order}`
     })
