@@ -2,7 +2,10 @@ import knex from '../config/connection'
 import crud from './crudGeneric.model'
 import { isNil, isEmpty } from 'lodash/fp'
 import { WAITING_FEEDBACK } from '../shared/constants/contacts.constant'
-import { ELDER } from '../shared/constants/permissions.constant'
+import {
+  ELDER,
+  MINISTERIAL_SERVANT
+} from '../shared/constants/permissions.constant'
 
 const tableName = 'detailsContacts'
 const columnPrimary = 'id'
@@ -125,7 +128,7 @@ const getDetailsAllContactWaitingFeedback = async ({ query, user }) => {
     .leftJoin('status', 'status.id', '=', 'contacts.idStatus')
     .where('detailsContacts.information', WAITING_FEEDBACK)
 
-  if (idResponsibility < ELDER) {
+  if (idResponsibility < MINISTERIAL_SERVANT) {
     sql.where(builder =>
       builder
         .where('detailsContacts.createdBy', user.id)
