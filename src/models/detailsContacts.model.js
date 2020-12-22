@@ -99,7 +99,9 @@ const getDetailsAllContactWaitingFeedback = async ({ query, user }) => {
     .select(
       'detailsContacts.id',
       'detailsContacts.information',
-      'detailsContacts.createdAt',
+      knex.raw(
+        `to_char("detailsContacts"."createdAt",'yyyy-mm-dd') as "createdAt"`
+      ),
       'detailsContacts.createdBy',
       'detailsContacts.idPublisher',
       'publisherCreatedBy.name as publisherNameCreatedBy',
