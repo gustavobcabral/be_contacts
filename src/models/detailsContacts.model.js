@@ -97,44 +97,29 @@ const getDetailsAllContactWaitingFeedback = async ({ query, user }) => {
   const { idResponsibility } = user
   const sql = knex
     .select(
-      'detailsContacts.id',
-      'detailsContacts.information',
-      knex.raw(
-        `to_char("detailsContacts"."createdAt",'yyyy-mm-dd') as "createdAt"`
-      ),
-      'detailsContacts.createdBy',
-      'detailsContacts.idPublisher',
-      'publisherCreatedBy.name as publisherNameCreatedBy',
-      'publishers.name as publisherName',
-      'languages.name as languageName',
-      'status.description as statusDescription',
-      'contacts.name as contactName',
-      'contacts.gender',
-      'contacts.owner',
-      'contacts.idStatus',
-      'contacts.idLanguage',
-      'contacts.phone',
-      'contacts.typeCompany',
-      knex.raw('true as "waitingFeedback"')
+      'id',
+      'information',
+      'createdAt',
+      'createdBy',
+      'idPublisher',
+      'publisherNameCreatedBy',
+      'publisherName',
+      'languageName',
+      'statusDescription',
+      'contactName',
+      'gender',
+      'owner',
+      'idStatus',
+      'idLanguage',
+      'phone',
+      'typeCompany',
+      'waitingFeedback'
     )
-    .from(tableName)
-    .leftJoin('contacts', 'detailsContacts.phoneContact', '=', 'contacts.phone')
-    .leftJoin('publishers', 'detailsContacts.idPublisher', '=', 'publishers.id')
-    .leftJoin(
-      'publishers as publisherCreatedBy',
-      'detailsContacts.createdBy',
-      '=',
-      'publisherCreatedBy.id'
-    )
-    .leftJoin('languages', 'languages.id', '=', 'contacts.idLanguage')
-    .leftJoin('status', 'status.id', '=', 'contacts.idStatus')
-    .where('detailsContacts.information', WAITING_FEEDBACK)
+    .from('viewListContactsWaitingFeedback')
 
   if (idResponsibility < MINISTERIAL_SERVANT) {
     sql.where(builder =>
-      builder
-        .where('detailsContacts.createdBy', user.id)
-        .orWhere('detailsContacts.idPublisher', user.id)
+      builder.where('createdBy', user.id).orWhere('idPublisher', user.id)
     )
   }
 
@@ -162,25 +147,23 @@ const getDetailsAllContactWaitingFeedback = async ({ query, user }) => {
     ) {
       sql.where(builder =>
         builder
-          .where('contacts.name', 'ilike', `%${name}%`)
-          .orWhere('contacts.owner', 'ilike', `%${owner}%`)
-          .orWhere('contacts.phone', 'ilike', `%${phone}%`)
-          .orWhere('contacts.note', 'ilike', `%${note}%`)
-          .orWhere('publishers.name', 'ilike', `%${responsible}%`)
-          .orWhere('publisherCreatedBy.name', 'ilike', `%${creator}%`)
+          .where('contactName', 'ilike', `%${name}%`)
+          .orWhere('owner', 'ilike', `%${owner}%`)
+          .orWhere('phone', 'ilike', `%${phone}%`)
+          .orWhere('note', 'ilike', `%${note}%`)
+          .orWhere('publisherName', 'ilike', `%${responsible}%`)
+          .orWhere('publisherNameCreatedBy', 'ilike', `%${creator}%`)
       )
     }
-    if (!isEmpty(genders))
-      sql.andWhere(qB => qB.whereIn('contacts.gender', genders))
+    if (!isEmpty(genders)) sql.andWhere(qB => qB.whereIn('gender', genders))
 
     if (!isEmpty(languages))
-      sql.andWhere(qB => qB.whereIn('contacts.idLanguage', languages))
+      sql.andWhere(qB => qB.whereIn('idLanguage', languages))
 
-    if (!isEmpty(status))
-      sql.andWhere(qB => qB.whereIn('contacts.idStatus', status))
+    if (!isEmpty(status)) sql.andWhere(qB => qB.whereIn('idStatus', status))
 
     if (typeCompany !== '-1')
-      sql.andWhere(qB => qB.where('contacts.typeCompany', typeCompany))
+      sql.andWhere(qB => qB.where('typeCompany', typeCompany))
   }
   return sql.orderByRaw(crud.parseOrderBy(sort)).paginate(perPage, currentPage)
 }
