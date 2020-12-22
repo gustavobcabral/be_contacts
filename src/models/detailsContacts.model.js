@@ -2,10 +2,7 @@ import knex from '../config/connection'
 import crud from './crudGeneric.model'
 import { isNil, isEmpty } from 'lodash/fp'
 import { WAITING_FEEDBACK } from '../shared/constants/contacts.constant'
-import {
-  ELDER,
-  MINISTERIAL_SERVANT
-} from '../shared/constants/permissions.constant'
+import { MINISTERIAL_SERVANT } from '../shared/constants/permissions.constant'
 
 const tableName = 'detailsContacts'
 const columnPrimary = 'id'
@@ -176,7 +173,7 @@ const getGenders = async user => {
     .where('detailsContacts.information', WAITING_FEEDBACK)
     .groupBy('gender')
 
-  if (user.idResponsibility < ELDER) {
+  if (user.idResponsibility < MINISTERIAL_SERVANT) {
     sql.where(builder =>
       builder
         .where('detailsContacts.createdBy', user.id)
@@ -195,7 +192,7 @@ const getLanguages = async user => {
     .where('detailsContacts.information', WAITING_FEEDBACK)
     .groupBy('idLanguage', 'languages.name')
 
-  if (user.idResponsibility < ELDER) {
+  if (user.idResponsibility < MINISTERIAL_SERVANT) {
     sql.where(builder =>
       builder
         .where('detailsContacts.createdBy', user.id)
@@ -214,7 +211,7 @@ const getStatus = async user => {
     .where('detailsContacts.information', WAITING_FEEDBACK)
     .groupBy('idStatus', 'status.description')
 
-  if (user.idResponsibility < ELDER) {
+  if (user.idResponsibility < MINISTERIAL_SERVANT) {
     sql.where(builder =>
       builder
         .where('detailsContacts.createdBy', user.id)
