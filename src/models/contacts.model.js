@@ -45,10 +45,10 @@ const getAll = async queryParams => {
       'languageName',
       'statusDescription',
       'createdAtDetailsContacts',
-      'lastConversationInDays'
+      'lastConversationInDays',
+      'publisherName'
     )
     .from('viewListContacts')
-
   if (!isEmpty(filters)) {
     const {
       name,
@@ -70,6 +70,7 @@ const getAll = async queryParams => {
       sql.where(builder =>
         builder
           .where('name', 'ilike', `%${name}%`)
+          .orWhere('publisherName', 'ilike', `%${name}%`)
           .orWhere('owner', 'ilike', `%${owner}%`)
           .orWhere('phone', 'ilike', `%${phone}%`)
           .orWhere('note', 'ilike', `%${note}%`)
