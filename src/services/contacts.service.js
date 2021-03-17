@@ -14,7 +14,9 @@ import {
   fields as fieldsDetailsContact,
   createRecord as createRecordDetailsContact,
   deleteRecords as deleteRecordsDetailsContact,
-  getDetailsIsWaitingFeedbackOneContact
+  updateRecord as updateRecordDetailsContact,
+  getDetailsIsWaitingFeedbackOneContact,
+  getIDLastDetailsContactOneContact
 } from '../models/detailsContacts.model'
 import asyncPipe from 'pipeawait'
 import {
@@ -104,6 +106,33 @@ const update = async request =>
     updateRecord,
     curry(responseSuccess)(request)
   )(getParamsForUpdate(request))
+
+const updateSomeRecords = request => {
+  const updatedBy = getLodash('user.id', request)
+  const body = getLodash('body', request)
+  const detailsContacts = { ...getLodash('detailsContacts', body), updatedBy }
+  const phones = getLodash('phones', body)
+  const data = { ...getLodash('contact', body), updatedBy }
+
+  return Promise.all(
+    map(async id => {
+      if (getLodash('idPublisher', detailsContacts)) {
+        const lastDetailContactResult = await getIDLastDetailsContactOneContact(
+          id
+        )
+        if (lastDetailContactResult)
+          updateRecordDetailsContact({
+            id: lastDetailContactResult.id,
+            data: detailsContacts
+          })
+      }
+      updateRecord({ id, data })
+    }, phones)
+  )
+}
+
+const updateSome = async request =>
+  asyncPipe(updateSomeRecords, curry(responseSuccess)(request))(request)
 
 const deleteOne = async request =>
   asyncPipe(
@@ -279,6 +308,7 @@ export default {
   getOne,
   create,
   update,
+  updateSome,
   deleteOne,
   assign,
   cancelAssign,

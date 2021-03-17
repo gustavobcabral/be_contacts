@@ -57,13 +57,20 @@ const getDetailsOneContact = async ({ id, query }) => {
   return sql
 }
 
-const getDetailsIsWaitingFeedbackOneContact = async phoneContact => {
-  return knex
+const getDetailsIsWaitingFeedbackOneContact = async phoneContact =>
+  knex
     .select('detailsContacts.id')
     .from(tableName)
     .where('phoneContact', '=', phoneContact)
     .where('information', WAITING_FEEDBACK)
-}
+
+const getIDLastDetailsContactOneContact = async phoneContact =>
+  knex
+    .select('id')
+    .from(tableName)
+    .where('phoneContact', '=', phoneContact)
+    .orderBy('id', 'desc')
+    .first()
 
 const getOne = async id =>
   knex
@@ -253,6 +260,7 @@ export {
   getDetailsOneContact,
   getDetailsAllContact,
   getDetailsIsWaitingFeedbackOneContact,
+  getIDLastDetailsContactOneContact,
   createRecord,
   updateRecord,
   updateRecords,
