@@ -42,6 +42,14 @@ const update = async (request, response, next) => {
   }
 }
 
+const updateSome = async (request, response, next) => {
+  try {
+    response.json(await contactsService.updateSome(request))
+  } catch (error) {
+    next(responseNext(error, request))
+  }
+}
+
 const deleteOne = async (request, response, next) => {
   try {
     response.json(await contactsService.deleteOne(request))
@@ -80,6 +88,7 @@ export default {
   getOne,
   create,
   update,
+  updateSome,
   deleteOne,
   assign,
   cancelAssign,
