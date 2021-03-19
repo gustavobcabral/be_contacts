@@ -138,7 +138,8 @@ const getDetailsAllContactWaitingFeedback = async ({ query, user }) => {
       genders,
       languages,
       status,
-      typeCompany
+      typeCompany,
+      publishersResponsibles
     } = JSON.parse(filters)
 
     if (
@@ -156,7 +157,6 @@ const getDetailsAllContactWaitingFeedback = async ({ query, user }) => {
           .orWhere('phone', 'ilike', `%${phone}%`)
           .orWhere('note', 'ilike', `%${note}%`)
           .orWhere('publisherName', 'ilike', `%${responsible}%`)
-          .orWhere('publisherNameCreatedBy', 'ilike', `%${creator}%`)
       )
     }
     if (!isEmpty(genders)) sql.andWhere(qB => qB.whereIn('gender', genders))
@@ -165,6 +165,8 @@ const getDetailsAllContactWaitingFeedback = async ({ query, user }) => {
       sql.andWhere(qB => qB.whereIn('idLanguage', languages))
 
     if (!isEmpty(status)) sql.andWhere(qB => qB.whereIn('idStatus', status))
+    if (!isEmpty(publishersResponsibles))
+      sql.andWhere(qB => qB.whereIn('createdBy', publishersResponsibles))
 
     if (typeCompany !== '-1')
       sql.andWhere(qB => qB.where('typeCompany', typeCompany))
@@ -206,6 +208,8 @@ const getLanguages = async user => {
         .orWhere('detailsContacts.idPublisher', user.id)
     )
   }
+  sql.orderBy('idLanguage')
+
   return sql
 }
 
@@ -225,6 +229,30 @@ const getStatus = async user => {
         .orWhere('detailsContacts.idPublisher', user.id)
     )
   }
+  sql.orderBy('idStatus')
+
+  return sql
+}
+const getPublishersResponsibles = async user => {
+  const sql = knex
+    .select(
+      'detailsContacts.createdBy',
+      'publishers.name as publisherNameCreatedBy'
+    )
+    .from(tableName)
+    .leftJoin('contacts', 'detailsContacts.phoneContact', '=', 'contacts.phone')
+    .leftJoin('publishers', 'detailsContacts.createdBy', '=', 'publishers.id')
+    .where('detailsContacts.information', WAITING_FEEDBACK)
+    .groupBy('detailsContacts.createdBy', 'publishers.name')
+
+  if (user.idResponsibility < MINISTERIAL_SERVANT) {
+    sql.where(builder =>
+      builder
+        .where('detailsContacts.createdBy', user.id)
+        .orWhere('detailsContacts.idPublisher', user.id)
+    )
+  }
+  sql.orderBy('publishers.name')
   return sql
 }
 
@@ -232,7 +260,8 @@ const getFiltersWaitingFeedback = async ({ user }) => {
   const genders = await getGenders(user)
   const languages = await getLanguages(user)
   const status = await getStatus(user)
-  return { genders, languages, status }
+  const publishersResponsibles = await getPublishersResponsibles(user)
+  return { genders, languages, status, publishersResponsibles }
 }
 
 const createRecord = async data => crud.createRecord(data, tableName)
