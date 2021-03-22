@@ -199,16 +199,16 @@ async function deleteRecord(id) {
 }
 
 const getSummaryTotals = async userId => {
-  const totalContacts = await knex('contacts')
+  const totalContacts = await knex(tableName)
     .count('phone')
     .first()
 
-  const totalContactsByType = await knex('contacts')
+  const totalContactsByType = await knex(tableName)
     .count('phone')
     .select('typeCompany')
     .groupBy('typeCompany')
 
-  const totalContactsByGender = await knex('contacts')
+  const totalContactsByGender = await knex(tableName)
     .count('gender')
     .select('gender')
     .where('typeCompany', false)
@@ -229,7 +229,7 @@ const getSummaryTotals = async userId => {
     .whereNot({ information: WAITING_FEEDBACK })
     .groupBy('contacts.gender')
 
-  const totalContactsByLanguage = await knex('contacts')
+  const totalContactsByLanguage = await knex(tableName)
     .count('phone')
     .select(
       'languages.name as languageName',
@@ -286,6 +286,14 @@ const getSummaryTotals = async userId => {
   }
 }
 
+const contactsWithSamePhones = async (phone, phone2) => {
+  const sql = knex(tableName)
+    .select('name', 'phone', 'phone2')
+    .where('phone2', phone)
+  if (phone2) sql.orWhere('phone', phone2)
+  return sql.first()
+}
+
 export {
   createRecord,
   updateRecord,
@@ -294,6 +302,7 @@ export {
   getOneWithDetails,
   getSummaryTotals,
   getFilters,
+  contactsWithSamePhones,
   columnPrimary,
   fields
 }
