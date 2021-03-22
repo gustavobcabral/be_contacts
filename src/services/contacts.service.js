@@ -8,7 +8,8 @@ import {
   getSummaryTotals,
   columnPrimary,
   fields,
-  getFilters
+  getFilters,
+  contactsWithSamePhones
 } from '../models/contacts.model'
 import {
   fields as fieldsDetailsContact,
@@ -29,12 +30,14 @@ import {
   map,
   get as getLodash,
   omit,
-  orderBy
+  orderBy,
+  getOr
 } from 'lodash/fp'
 import { responseSuccess } from '../shared/helpers/responseGeneric.helper'
 import {
   WAITING_FEEDBACK,
-  ERROR_PUBLISHER_ALREADY_WAITING_FEEDBACK
+  ERROR_PUBLISHER_ALREADY_WAITING_FEEDBACK,
+  ERROR_CONTACT_PHONE_ALREADY_EXISTS
 } from '../shared/constants/contacts.constant'
 import {
   getParamsForUpdate,
@@ -95,14 +98,33 @@ const getOne = async request =>
     curry(responseSuccess)(request)
   )(getParamsForGetOne(request))
 
+const throwErrorIfExistsSameNumber = async bag => {
+  const data = getOr(bag, 'data', bag)
+  const contact = await contactsWithSamePhones(
+    getLodash('phone', data),
+    getLodash('phone2', data)
+  )
+
+  if (contact) {
+    throw {
+      httpErrorCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      error: ERROR_CONTACT_PHONE_ALREADY_EXISTS,
+      extra: { contact }
+    }
+  }
+  return bag
+}
+
 const create = async request =>
   asyncPipe(
+    throwErrorIfExistsSameNumber,
     createRecord,
     curry(responseSuccess)(request)
   )(getParamsForCreate(request))
 
 const update = async request =>
   asyncPipe(
+    throwErrorIfExistsSameNumber,
     updateRecord,
     curry(responseSuccess)(request)
   )(getParamsForUpdate(request))
