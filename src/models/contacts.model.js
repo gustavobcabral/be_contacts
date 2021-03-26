@@ -17,7 +17,7 @@ const fields = [
   'gender',
   'namePublisher',
   'phone2',
-  'location',
+  'idLocation',
   'email',
   'note',
   'typeCompany'
@@ -39,7 +39,7 @@ const getAll = async queryParams => {
       'idLanguage',
       'gender',
       'typeCompany',
-      'location',
+      'idLocation',
       'email',
       'note',
       'languageName',
@@ -174,7 +174,7 @@ const getOneWithDetails = async phone =>
       'contacts.gender',
       'contacts.idLanguage',
       'contacts.typeCompany',
-      'contacts.location',
+      'contacts.idLocation',
       'contacts.email',
       'contacts.note',
       'detailsContacts.*'

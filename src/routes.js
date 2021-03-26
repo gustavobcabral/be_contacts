@@ -5,6 +5,7 @@ import publishers from './routes/publishers.route'
 import status from './routes/status.route'
 import responsibility from './routes/responsibility.route'
 import detailsContacts from './routes/detailsContacts.route'
+import locations from './routes/locations.route'
 import languages from './routes/languages.route'
 import permissions from './routes/permissions.route'
 import auth from './routes/auth.route'
@@ -22,5 +23,6 @@ routes.use('/status', authGuard, permissionGuard, status)
 routes.use('/detailsContacts', authGuard, permissionGuard, detailsContacts)
 routes.use('/languages', authGuard, permissionGuard, languages)
 routes.use('/responsibility', authGuard, permissionGuard, responsibility)
+routes.use('/locations', authGuard, locations)
 
 export default routes
