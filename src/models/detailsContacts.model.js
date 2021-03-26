@@ -29,6 +29,7 @@ const getDetailsOneContact = async ({ id, query }) => {
       'contacts.name',
       'contacts.owner',
       'contacts.idLanguage',
+      'contacts.idLocation',
       'contacts.gender',
       'contacts.typeCompany',
       'publishers.name as publisherName'
@@ -79,6 +80,7 @@ const getOne = async id =>
       'publishers.name as publisherName',
       'contacts.idStatus',
       'contacts.idLanguage',
+      'contacts.idLocation',
       'contacts.name',
       'contacts.owner',
       'contacts.gender',
