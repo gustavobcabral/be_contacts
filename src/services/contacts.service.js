@@ -246,6 +246,8 @@ const getSummaryContacts = async user => {
           totalContactsWaitingFeedback) *
         100
       : 0
+  const totalContactsAssignByOthersWaitingFeedback =
+    totalContactsWaitingFeedback - totalContactsAssignByMeWaitingFeedback
 
   const totalPercentContactsAssignByOthersWaitingFeedback =
     totalContactsWaitingFeedback > 0
@@ -299,6 +301,19 @@ const getSummaryContacts = async user => {
     totals.totalContactsByType
   )
 
+  const totalContactsByLocation = totals.totalContactsByLocation
+
+  const calculatePercentageByLocation = count =>
+    (count / totalContactsContacted) * 100
+
+  const totalContactsByLocationContacted = map(
+    location => ({
+      ...location,
+      percent: calculatePercentageByLocation(location.count)
+    }),
+    totals.totalContactsByLocationContacted
+  )
+
   return {
     totalContacts,
     totalContactsContacted,
@@ -310,12 +325,15 @@ const getSummaryContacts = async user => {
     totalContactsAssignByMeWaitingFeedback,
     totalPercentContactsAssignByMeWaitingFeedback,
     totalsContactsWaitingFeedbackByPublisher,
+    totalContactsAssignByOthersWaitingFeedback,
     totalPercentContactsAssignByOthersWaitingFeedback,
     totalContactsByGender,
     totalContactsByGenderContacted,
     totalContactsByLanguage,
     totalContactsByLanguageContacted,
-    totalContactsByType
+    totalContactsByType,
+    totalContactsByLocation,
+    totalContactsByLocationContacted
   }
 }
 
