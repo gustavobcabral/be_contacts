@@ -271,6 +271,22 @@ const getSummaryTotals = async userId => {
     .where({ information: WAITING_FEEDBACK })
     .groupBy('publishers.name')
 
+  const totalContactsByLocation = await knex(tableName)
+    .count('phone')
+    .select('cities.name as locationName', 'departments.name as departmentName')
+    .leftJoin('cities', 'cities.id', '=', 'contacts.idLocation')
+    .leftJoin('departments', 'departments.id', '=', 'cities.idDepartment')
+    .groupBy('cities.name', 'departments.name')
+
+  const totalContactsByLocationContacted = await knex('detailsContacts')
+    .countDistinct('contacts.phone')
+    .select('cities.name as locationName', 'departments.name as departmentName')
+    .leftJoin('contacts', 'contacts.phone', '=', 'detailsContacts.phoneContact')
+    .leftJoin('cities', 'cities.id', '=', 'contacts.idLocation')
+    .leftJoin('departments', 'departments.id', '=', 'cities.idDepartment')
+    .whereNot({ information: WAITING_FEEDBACK })
+    .groupBy('cities.name', 'departments.name')
+
   return {
     totalContacts,
     totalContactsContacted,
@@ -282,7 +298,9 @@ const getSummaryTotals = async userId => {
     totalContactsByLanguage,
     totalContactsByLanguageContacted,
     totalContactsNotCompanyContacted,
-    totalContactsByType
+    totalContactsByType,
+    totalContactsByLocation,
+    totalContactsByLocationContacted
   }
 }
 
