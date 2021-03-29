@@ -1,6 +1,6 @@
 import knex from '../config/connection'
 import crud from './crudGeneric.model'
-import { isNil, isEmpty } from 'lodash/fp'
+import { isNil, isEmpty, map, reduce, concat } from 'lodash/fp'
 import { WAITING_FEEDBACK } from '../shared/constants/contacts.constant'
 import { MINISTERIAL_SERVANT } from '../shared/constants/permissions.constant'
 
@@ -178,6 +178,7 @@ const getDetailsAllContactWaitingFeedback = async ({ query, user }) => {
 
 const getGenders = async user => {
   const sql = knex
+    .count('gender')
     .select('gender')
     .from(tableName)
     .leftJoin('contacts', 'detailsContacts.phoneContact', '=', 'contacts.phone')
@@ -196,6 +197,7 @@ const getGenders = async user => {
 
 const getLanguages = async user => {
   const sql = knex
+    .count('idLanguage')
     .select('idLanguage', 'languages.name as languageName')
     .from(tableName)
     .leftJoin('contacts', 'detailsContacts.phoneContact', '=', 'contacts.phone')
@@ -217,6 +219,7 @@ const getLanguages = async user => {
 
 const getStatus = async user => {
   const sql = knex
+    .count('idStatus')
     .select('idStatus', 'status.description as statusDescription')
     .from(tableName)
     .leftJoin('contacts', 'detailsContacts.phoneContact', '=', 'contacts.phone')
@@ -237,6 +240,7 @@ const getStatus = async user => {
 }
 const getPublishersResponsibles = async user => {
   const sql = knex
+    .count('detailsContacts.createdBy')
     .select(
       'detailsContacts.createdBy',
       'publishers.name as publisherNameCreatedBy'
@@ -258,12 +262,50 @@ const getPublishersResponsibles = async user => {
   return sql
 }
 
+const getType = async user => {
+  const sql = knex
+    .count('typeCompany')
+    .select('typeCompany as typeCompanySelected')
+    .from(tableName)
+    .leftJoin('contacts', 'detailsContacts.phoneContact', '=', 'contacts.phone')
+    .groupBy('typeCompany')
+
+  if (user.idResponsibility < MINISTERIAL_SERVANT) {
+    sql.where(builder =>
+      builder
+        .where('detailsContacts.createdBy', user.id)
+        .orWhere('detailsContacts.idPublisher', user.id)
+    )
+  }
+
+  const isTypeCompany = await sql
+
+  const typeBoth = reduce(
+    (acc, isCompany) => acc + Number(isCompany.count),
+    0,
+    isTypeCompany
+  )
+  const typeCompany = concat(isTypeCompany, {
+    count: typeBoth,
+    typeCompanySelected: '-1'
+  })
+  return map(
+    option => ({
+      ...option,
+      typeCompanySelected: String(Number(option.typeCompanySelected))
+    }),
+    typeCompany
+  )
+}
+
 const getFiltersWaitingFeedback = async ({ user }) => {
   const genders = await getGenders(user)
   const languages = await getLanguages(user)
   const status = await getStatus(user)
   const publishersResponsibles = await getPublishersResponsibles(user)
-  return { genders, languages, status, publishersResponsibles }
+  const typeCompany = await getType(user)
+
+  return { genders, languages, status, publishersResponsibles, typeCompany }
 }
 
 const createRecord = async data => crud.createRecord(data, tableName)

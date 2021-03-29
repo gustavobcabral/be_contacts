@@ -2,7 +2,7 @@ import knex from '../config/connection'
 import * as detailsContact from './detailsContacts.model'
 import crud from './crudGeneric.model'
 import { WAITING_FEEDBACK } from '../shared/constants/contacts.constant'
-import { isEmpty, map, contains, first, last } from 'lodash/fp'
+import { isEmpty, map, contains, first, last, reduce, concat } from 'lodash/fp'
 
 const tableName = 'contacts'
 const columnPrimary = 'phone'
@@ -58,6 +58,7 @@ const getAll = async queryParams => {
       note,
       languages,
       status,
+      locations,
       typeCompany
     } = JSON.parse(filters)
 
@@ -82,6 +83,9 @@ const getAll = async queryParams => {
       sql.andWhere(qB => qB.whereIn('idLanguage', languages))
 
     if (!isEmpty(status)) sql.andWhere(qB => qB.whereIn('idStatus', status))
+
+    if (!isEmpty(locations))
+      sql.andWhere(qB => qB.whereIn('idLocation', locations))
 
     if (typeCompany !== '-1')
       sql.andWhere(qB => qB.where('typeCompany', typeCompany))
@@ -138,12 +142,14 @@ const getAll = async queryParams => {
 
 const getGenders = async () =>
   knex
+    .count('gender')
     .select('gender')
     .from(tableName)
     .groupBy('gender')
 
 const getLanguages = async () =>
   knex
+    .count('idLanguage')
     .select('idLanguage', 'languages.name as languageName')
     .from(tableName)
     .leftJoin('languages', 'languages.id', '=', 'contacts.idLanguage')
@@ -151,16 +157,62 @@ const getLanguages = async () =>
 
 const getStatus = async () =>
   knex
+    .count('idStatus')
     .select('idStatus', 'status.description as statusDescription')
     .from(tableName)
     .leftJoin('status', 'status.id', '=', 'contacts.idStatus')
     .groupBy('idStatus', 'status.description')
 
+const getLocations = async () =>
+  knex
+    .select(
+      'contacts.idLocation as value',
+      knex.raw(`CONCAT(cities.name,' - ', departments.name) as label`)
+    )
+    .from(tableName)
+    .leftJoin('cities', 'cities.id', '=', 'contacts.idLocation')
+    .leftJoin('departments', 'departments.id', '=', 'cities.idDepartment')
+    .groupBy('contacts.idLocation', 'cities.name', 'departments.name')
+    .orderBy('cities.name')
+
+const getType = async () => {
+  const isTypeCompany = await knex
+    .count('typeCompany')
+    .select('typeCompany as typeCompanySelected')
+    .from(tableName)
+    .groupBy('typeCompany')
+
+  const typeBoth = reduce(
+    (acc, isCompany) => acc + Number(isCompany.count),
+    0,
+    isTypeCompany
+  )
+  const typeCompany = concat(isTypeCompany, {
+    count: typeBoth,
+    typeCompanySelected: '-1'
+  })
+  return map(
+    option => ({
+      ...option,
+      typeCompanySelected: String(Number(option.typeCompanySelected))
+    }),
+    typeCompany
+  )
+}
 const getFilters = async () => {
   const genders = await getGenders()
   const languages = await getLanguages()
   const status = await getStatus()
-  return { genders, languages, status }
+  const locations = await getLocations()
+  const typeCompany = await getType()
+
+  return {
+    genders,
+    languages,
+    status,
+    locations,
+    typeCompany
+  }
 }
 
 const getOneWithDetails = async phone =>
