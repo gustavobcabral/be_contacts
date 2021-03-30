@@ -27,11 +27,14 @@ const getOneRecord = async ({ id, tableName, columnPrimary }) =>
     .where(columnPrimary, '=', id)
     .first()
 
-const getAllWithWhere = async ({ tableName, where }) =>
-  knex
+const getAllWithWhere = async ({ tableName, where, sort }) => {
+  const sql = knex
     .select()
     .from(tableName)
     .where(where)
+  if (sort) sql.orderByRaw(parseOrderBy(sort))
+  return sql
+}
 
 const getOneWithWhere = async ({ tableName, where }) =>
   knex

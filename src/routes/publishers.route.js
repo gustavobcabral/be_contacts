@@ -9,6 +9,8 @@ routes.get(
 )
 routes.get('/filters', publishersController.getAllFiltersOfPublishers)
 
+routes.get('/actives', publishersController.getAllActives)
+
 routes.get('/', publishersController.get)
 
 routes.get('/:id', publishersController.getOne)

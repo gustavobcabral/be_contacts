@@ -1,6 +1,7 @@
 const {
   getAllWithPagination,
   getAll,
+  getAllPublishersActives,
   getFilters,
   getOneRecord,
   createRecord,
@@ -64,6 +65,19 @@ const get = async request => {
     user: getLodash('user', request)
   }
   return asyncPipe(getAll, curry(responseSuccess)(request))(paramsQuery)
+}
+
+const getAllActives = async request => {
+  const paramsQuery = {
+    ...defaultValueForQuery(request, {
+      sort: 'name:asc'
+    }),
+    user: getLodash('user', request)
+  }
+  return asyncPipe(
+    getAllPublishersActives,
+    curry(responseSuccess)(request)
+  )(paramsQuery)
 }
 
 const verifyIfCurrentUserCanEditThisData = obj => {
@@ -246,6 +260,7 @@ const getAllFiltersOfPublishers = async request =>
 export default {
   getAllInformationWithPagination,
   getAllFiltersOfPublishers,
+  getAllActives,
   get,
   getOne,
   create,
