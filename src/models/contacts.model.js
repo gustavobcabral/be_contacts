@@ -2,7 +2,18 @@ import knex from '../config/connection'
 import * as detailsContact from './detailsContacts.model'
 import crud from './crudGeneric.model'
 import { WAITING_FEEDBACK } from '../shared/constants/contacts.constant'
-import { isEmpty, map, contains, first, last, reduce, concat } from 'lodash/fp'
+import {
+  isEmpty,
+  map,
+  contains,
+  first,
+  last,
+  reduce,
+  concat,
+  isNil,
+  some,
+  compact
+} from 'lodash/fp'
 
 const tableName = 'contacts'
 const columnPrimary = 'phone'
@@ -84,8 +95,17 @@ const getAll = async queryParams => {
 
     if (!isEmpty(status)) sql.andWhere(qB => qB.whereIn('idStatus', status))
 
-    if (!isEmpty(locations))
-      sql.andWhere(qB => qB.whereIn('idLocation', locations))
+    if (!isEmpty(locations)) {
+      const someNull = some(isNil, locations)
+      const cleanLocation = compact(locations)
+
+      if (!isEmpty(cleanLocation) && someNull) {
+        sql.andWhere(qB =>
+          qB.whereIn('idLocation', cleanLocation).orWhereNull('idLocation')
+        )
+      } else if (someNull) sql.andWhere(qB => qB.whereNull('idLocation'))
+      else sql.andWhere(qB => qB.whereIn('idLocation', cleanLocation))
+    }
 
     if (typeCompany !== '-1')
       sql.andWhere(qB => qB.where('typeCompany', typeCompany))
