@@ -18,6 +18,14 @@ const get = async (request, response, next) => {
   }
 }
 
+const getAllActives = async (request, response, next) => {
+  try {
+    response.json(await publishersService.getAllActives(request))
+  } catch (error) {
+    next(responseNext(error, request))
+  }
+}
+
 const getAllFiltersOfPublishers = async (request, response, next) => {
   try {
     response.json(await publishersService.getAllFiltersOfPublishers(request))
@@ -61,6 +69,7 @@ const deleteOne = async (request, response, next) => {
 export default {
   getAllInformationWithPagination,
   getAllFiltersOfPublishers,
+  getAllActives,
   get,
   getOne,
   create,

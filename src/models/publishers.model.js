@@ -17,6 +17,7 @@ const getAllWithPagination = async queryParams => {
       'publishers.phone',
       'publishers.email',
       'publishers.idResponsibility',
+      'publishers.active',
       'responsibility.description as responsibilityDescription '
     )
     .from(tableName)
@@ -76,6 +77,15 @@ const getAll = async queryParams =>
     removeColumnNotAllowed
   )(queryParams)
 
+const getAllPublishersActives = async queryParams => {
+  const { sort } = queryParams
+
+  return asyncPipe(
+    crud.getAllWithWhere,
+    removeColumnNotAllowed
+  )({ sort, tableName, where: { active: true } })
+}
+
 const getOneRecord = async id =>
   crud.getOneRecord({ id, tableName, columnPrimary })
 
@@ -100,6 +110,7 @@ const deleteRecord = async id =>
 export {
   getAllWithPagination,
   getAll,
+  getAllPublishersActives,
   getFilters,
   getOneRecord,
   createRecord,
