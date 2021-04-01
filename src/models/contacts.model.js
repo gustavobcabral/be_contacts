@@ -51,13 +51,17 @@ const getAll = async queryParams => {
       'gender',
       'typeCompany',
       'idLocation',
+      'locationName',
+      'departmentName',
       'email',
       'note',
       'languageName',
       'statusDescription',
       'createdAtDetailsContacts',
       'lastConversationInDays',
-      'publisherName'
+      'publisherName',
+      'information',
+      'createdAtDetailsContacts'
     )
     .from('viewListContacts')
   if (!isEmpty(filters)) {
@@ -110,54 +114,7 @@ const getAll = async queryParams => {
     if (typeCompany !== '-1')
       sql.andWhere(qB => qB.where('typeCompany', typeCompany))
   }
-  const data = await sql
-    .orderByRaw(crud.parseOrderBy(sort))
-    .paginate(perPage, currentPage)
-
-  const list = await Promise.all(
-    map(async row => {
-      const detailsDB = await knex
-        .select()
-        .from('detailsContacts')
-        .where('phoneContact', row.phone)
-        .orderBy('createdAt', 'desc')
-        .limit(2)
-
-      const isWaitingFeedback = await knex
-        .count('id')
-        .from('detailsContacts')
-        .where('phoneContact', row.phone)
-        .where('information', WAITING_FEEDBACK)
-        .first()
-
-      if (detailsDB.length > 0) {
-        const lastDetails = first(detailsDB)
-        const beforeLastDetails = last(detailsDB)
-        const waitingFeedback = isWaitingFeedback.count > 0
-        const details = !waitingFeedback
-          ? lastDetails
-          : !contains(WAITING_FEEDBACK, beforeLastDetails.information)
-          ? beforeLastDetails
-          : {}
-        return {
-          ...row,
-          waitingFeedback,
-          details
-        }
-      } else {
-        return {
-          ...row,
-          waitingFeedback: false,
-          details: {}
-        }
-      }
-    }, data.list)
-  )
-
-  return {
-    ...data,
-    list
-  }
+  return sql.orderByRaw(crud.parseOrderBy(sort)).paginate(perPage, currentPage)
 }
 
 const getGenders = async () =>
