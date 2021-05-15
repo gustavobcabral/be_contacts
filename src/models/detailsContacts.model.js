@@ -119,6 +119,7 @@ const getDetailsAllContactWaitingFeedback = async ({ query, user }) => {
       'idLanguage',
       'phone',
       'typeCompany',
+      'createdAtDetailsContacts',
       'waitingFeedback'
     )
     .from('viewListContactsWaitingFeedback')
