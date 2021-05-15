@@ -36,6 +36,14 @@ module.exports = {
       min: 0,
       acquire: 30000,
       idle: 10000
+    },
+    migrations: {
+      tableName: 'knex_migrations',
+      directory: './src/config/migrations'
+    },
+    seeds: {
+      tableName: 'knex_seeds',
+      directory: './src/config/seeds'
     }
   },
   production: {
