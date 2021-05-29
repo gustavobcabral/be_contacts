@@ -2,18 +2,7 @@ import knex from '../config/connection'
 import * as detailsContact from './detailsContacts.model'
 import crud from './crudGeneric.model'
 import { WAITING_FEEDBACK } from '../shared/constants/contacts.constant'
-import {
-  isEmpty,
-  map,
-  contains,
-  first,
-  last,
-  reduce,
-  concat,
-  isNil,
-  some,
-  compact
-} from 'lodash/fp'
+import { isEmpty, map, reduce, concat, isNil, some, compact } from 'lodash/fp'
 
 const tableName = 'contacts'
 const columnPrimary = 'phone'
@@ -35,6 +24,89 @@ const fields = [
 ]
 
 const getAll = async queryParams => {
+  const {
+    sort = 'lastConversationInDays:DESC',
+    perPage,
+    currentPage,
+    filters
+  } = queryParams
+  const sql = knex
+    .select(
+      'name',
+      'owner',
+      'phone',
+      'idStatus',
+      'idLanguage',
+      'gender',
+      'typeCompany',
+      'idLocation',
+      'locationName',
+      'departmentName',
+      'email',
+      'note',
+      'languageName',
+      'statusDescription',
+      'createdAtDetailsContacts',
+      'lastConversationInDays',
+      'publisherName',
+      'information',
+      'createdAtDetailsContacts'
+    )
+    .from('viewListAllContacts')
+  if (!isEmpty(filters)) {
+    const {
+      name,
+      owner,
+      phone,
+      genders,
+      note,
+      languages,
+      status,
+      locations,
+      typeCompany
+    } = JSON.parse(filters)
+
+    if (
+      !isEmpty(name) &&
+      !isEmpty(phone) &&
+      !isEmpty(note) &&
+      !isEmpty(owner)
+    ) {
+      sql.where(builder =>
+        builder
+          .where('name', 'ilike', `%${name}%`)
+          .orWhere('publisherName', 'ilike', `%${name}%`)
+          .orWhere('owner', 'ilike', `%${owner}%`)
+          .orWhere('phone', 'ilike', `%${phone}%`)
+          .orWhere('note', 'ilike', `%${note}%`)
+      )
+    }
+    if (!isEmpty(genders)) sql.andWhere(qB => qB.whereIn('gender', genders))
+
+    if (!isEmpty(languages))
+      sql.andWhere(qB => qB.whereIn('idLanguage', languages))
+
+    if (!isEmpty(status)) sql.andWhere(qB => qB.whereIn('idStatus', status))
+
+    if (!isEmpty(locations)) {
+      const someNull = some(isNil, locations)
+      const cleanLocation = compact(locations)
+
+      if (!isEmpty(cleanLocation) && someNull) {
+        sql.andWhere(qB =>
+          qB.whereIn('idLocation', cleanLocation).orWhereNull('idLocation')
+        )
+      } else if (someNull) sql.andWhere(qB => qB.whereNull('idLocation'))
+      else sql.andWhere(qB => qB.whereIn('idLocation', cleanLocation))
+    }
+
+    if (typeCompany !== '-1')
+      sql.andWhere(qB => qB.where('typeCompany', typeCompany))
+  }
+  return sql.orderByRaw(crud.parseOrderBy(sort)).paginate(perPage, currentPage)
+}
+
+const getAllAvailable = async queryParams => {
   const {
     sort = 'lastConversationInDays:DESC',
     perPage,
@@ -346,6 +418,7 @@ export {
   updateRecord,
   deleteRecord,
   getAll,
+  getAllAvailable,
   getOneWithDetails,
   getSummaryTotals,
   getFilters,

@@ -10,6 +10,14 @@ const get = async (request, response, next) => {
   }
 }
 
+const getAvailable = async (request, response, next) => {
+  try {
+    response.json(await contactsService.getAvailable(request))
+  } catch (error) {
+    next(responseNext(error, request))
+  }
+}
+
 const getAllFiltersOfContacts = async (request, response, next) => {
   try {
     response.json(await contactsService.getAllFiltersOfContacts(request))
@@ -85,6 +93,7 @@ const getSummaryContacts = async (request, response, next) => {
 
 export default {
   get,
+  getAvailable,
   getOne,
   create,
   update,
