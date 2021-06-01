@@ -50,6 +50,7 @@ const getAll = async queryParams => {
       'lastConversationInDays',
       'publisherName',
       'information',
+      'waitingFeedback',
       'createdAtDetailsContacts'
     )
     .from('viewListAllContacts')
