@@ -5,7 +5,6 @@ import {
   updateRecord,
   deleteRecord,
   getAll,
-  getAllAvailable,
   getSummaryTotals,
   columnPrimary,
   fields,
@@ -89,14 +88,8 @@ const mountDetailsDataForOneContact = detailsContact => {
   }
 }
 
-const get = async request =>
-  asyncPipe(getAll, curry(responseSuccess)(request))(getParamsForGet(request))
-
-const getAvailable = async request =>
-  asyncPipe(
-    getAllAvailable,
-    curry(responseSuccess)(request)
-  )(getParamsForGet(request))
+const get = async ({ input, request }) =>
+  asyncPipe(getAll, curry(responseSuccess)(request))(input)
 
 const getOne = async request =>
   asyncPipe(
@@ -352,7 +345,6 @@ const getAllFiltersOfContacts = async request =>
 
 export default {
   get,
-  getAvailable,
   getOne,
   create,
   update,
