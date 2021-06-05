@@ -44,18 +44,18 @@ const responseError = err =>
         error: err.message || err.response || err.error || err
       }
 
-const responseNext = (error, request) =>
-  isObject(error)
+const responseNext = (error, request) => {
+  return isObject(error)
     ? {
         ...error,
-        error: error.error || error,
+        error: error.error || error.message || error,
         httpErrorCode: error.httpErrorCode || HttpStatus.INTERNAL_SERVER_ERROR,
-        cod: findCod(request, 'errorDesc')
+        cod: request ? findCod(request, 'errorDesc') : 'ErrorGraphQL'
       }
     : {
         error: error.error || error,
         httpErrorCode: error.httpErrorCode || HttpStatus.INTERNAL_SERVER_ERROR,
-        cod: findCod(request, 'errorDesc')
+        cod: request ? findCod(request, 'errorDesc') : 'ErrorGraphQL'
       }
-
+}
 export { responseSuccess, responseError, responseNext }

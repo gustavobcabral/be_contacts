@@ -1,22 +1,6 @@
-import contactsService from '../services/contacts.service'
-import { responseNext } from '../shared/helpers/responseGeneric.helper'
+import contactsService from '../../services/contacts.service'
+import { responseNext } from '../../shared/helpers/responseGeneric.helper'
 import { get as getLodash } from 'lodash/fp'
-
-const get = async (request, response, next) => {
-  try {
-    response.json(await contactsService.get(request))
-  } catch (error) {
-    next(responseNext(error, request))
-  }
-}
-
-const getAvailable = async (request, response, next) => {
-  try {
-    response.json(await contactsService.getAvailable(request))
-  } catch (error) {
-    next(responseNext(error, request))
-  }
-}
 
 const getAllFiltersOfContacts = async (request, response, next) => {
   try {
@@ -92,8 +76,6 @@ const getSummaryContacts = async (request, response, next) => {
 }
 
 export default {
-  get,
-  getAvailable,
   getOne,
   create,
   update,

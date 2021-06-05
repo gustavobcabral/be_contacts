@@ -1,10 +1,9 @@
 import { Router } from 'express'
-import contactsController from '../controllers/contacts.controller'
+import contactsGraphQLController from '../controllers/contacts/contacts.graphql.controller'
+import contactsController from '../controllers/contacts/contacts.controller'
 
 const routes = Router()
 
-routes.get('/', contactsController.get)
-routes.get('/available', contactsController.getAvailable)
 routes.get('/summary', contactsController.getSummaryContacts)
 routes.get('/filters', contactsController.getAllFiltersOfContacts)
 routes.get('/:id', contactsController.getOne)
@@ -17,5 +16,7 @@ routes.put('/:id', contactsController.update)
 
 routes.delete('/assign', contactsController.cancelAssign)
 routes.delete('/:id', contactsController.deleteOne)
+
+routes.get('/', contactsGraphQLController)
 
 export default routes
