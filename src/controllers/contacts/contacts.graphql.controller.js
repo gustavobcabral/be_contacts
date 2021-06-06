@@ -3,9 +3,9 @@ import schema from './contacts.schema'
 import rootValueContact from './contacts.resolvers'
 import { responseNext } from '../../shared/helpers/responseGeneric.helper'
 
-import { resolvers as scalarResolvers } from 'graphql-scalars'
+import { TimestampResolver } from 'graphql-scalars'
 
-const rootValue = { ScalarName: scalarResolvers, ...rootValueContact }
+const rootValue = { ScalarName: TimestampResolver, ...rootValueContact }
 
 async function createController(request, response) {
   return {
