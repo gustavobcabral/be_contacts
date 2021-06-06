@@ -1,7 +1,11 @@
 import { graphqlHTTP } from 'express-graphql'
 import schema from './contacts.schema'
-import rootValue from './contacts.resolvers'
+import rootValueContact from './contacts.resolvers'
 import { responseNext } from '../../shared/helpers/responseGeneric.helper'
+
+import { resolvers as scalarResolvers } from 'graphql-scalars'
+
+const rootValue = { ScalarName: scalarResolvers, ...rootValueContact }
 
 async function createController(request, response) {
   return {

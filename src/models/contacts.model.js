@@ -46,7 +46,6 @@ const getAll = async queryParams => {
       'note',
       'languageName',
       'statusDescription',
-      'createdAtDetailsContacts',
       'lastConversationInDays',
       'publisherName',
       'information',

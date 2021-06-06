@@ -19,7 +19,7 @@ type Contact {
   publisherName: String
   information: String
   waitingFeedback: Boolean
-  createdAtDetailsContacts: String
+  createdAtDetailsContacts: Timestamp
 }
 
 
