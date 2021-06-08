@@ -317,6 +317,21 @@ const updateRecord = async ({ id, data }) =>
 const updateRecords = async ({ where, data }) =>
   crud.updateRecords({ data, tableName, where })
 
+const updateIsLastValueOneContact = async (
+  trueOrFalse = true,
+  phoneContact
+) => {
+  const { id } = await getIDLastDetailsContactOneContact(phoneContact)
+
+  if (!id) return phoneContact
+  return crud.updateRecord({
+    id,
+    data: { isLast: trueOrFalse },
+    tableName,
+    columnPrimary
+  })
+}
+
 const deleteRecord = async id =>
   crud.deleteRecord({ id, tableName, columnPrimary })
 
@@ -341,6 +356,7 @@ export {
   deleteRecord,
   deleteRecords,
   deleteRecordByPhone,
+  updateIsLastValueOneContact,
   columnPrimary,
   fields
 }

@@ -7,7 +7,9 @@ import {
   getDetailsOneContact,
   createRecord,
   updateRecord,
-  deleteRecord
+  updateRecords,
+  deleteRecord,
+  updateIsLastValueOneContact
 } from '../models/detailsContacts.model'
 import { updateRecord as updateRecordContacts } from '../models/contacts.model'
 import HttpStatus from 'http-status-codes'
@@ -66,7 +68,13 @@ const create = async request => {
   const data = getParamsForCreate(request)
   const dataDetailsContact = {
     ...getLodash('detailsContact', data),
-    createdBy: getLodash('createdBy', data)
+    createdBy: getLodash('createdBy', data),
+    isLast: true
+  }
+
+  const dataUpdateDetailsContactsIsLast = {
+    where: { phoneContact: dataDetailsContact.phoneContact },
+    data: { isLast: false }
   }
 
   const dataContact = {
@@ -90,12 +98,18 @@ const create = async request => {
   }
 
   const resContacts = await updateRecordContacts(dataContact)
+  const detailsContact = await asyncPipe(
+    data => {
+      updateRecords(dataUpdateDetailsContactsIsLast)
+      return data
+    },
+    createRecord,
+    curry(responseSuccess)(request)
+  )(dataDetailsContact)
+
   return {
     contacts: resContacts,
-    detailsContact: await asyncPipe(
-      createRecord,
-      curry(responseSuccess)(request)
-    )(dataDetailsContact)
+    detailsContact
   }
 }
 
@@ -126,9 +140,16 @@ const update = async request => {
   }
 }
 
+const deleteOneDetailAndReturnPhone = async ({ id, phoneContact }) => {
+  await deleteRecord(id)
+  return phoneContact
+}
+
 const deleteOne = async request =>
   asyncPipe(
-    deleteRecord,
+    getOne,
+    deleteOneDetailAndReturnPhone,
+    curry(updateIsLastValueOneContact)(true),
     curry(responseSuccess)(request)
   )(getParamsForDelete(request))
 
