@@ -16,8 +16,10 @@ import {
   createRecord as createRecordDetailsContact,
   deleteRecords as deleteRecordsDetailsContact,
   updateRecord as updateRecordDetailsContact,
+  updateRecords as updateRecordsDetailsContact,
   getDetailsIsWaitingFeedbackOneContact,
-  getIDLastDetailsContactOneContact
+  getIDLastDetailsContactOneContact,
+  updateIsLastValueOneContact
 } from '../models/detailsContacts.model'
 import asyncPipe from 'pipeawait'
 import {
@@ -164,19 +166,20 @@ const deleteOne = async request =>
 
 const assign = async request =>
   asyncPipe(
-    verifiyIfThisContactsAreAlreadyWaiting,
+    verifyIfThisContactsAreAlreadyWaiting,
+    setIsLastToFalseOnDetailsContacts,
     assignAllContactsToAPublisher,
     curry(responseSuccess)(request)
   )(getParamsForCreate(request))
 
-const verifiyIfThisContactsAreAlreadyWaiting = async data =>
+const verifyIfThisContactsAreAlreadyWaiting = async data =>
   Promise.all(
     map(async phoneContact =>
-      verifiyIfThisContactIsAlreadyWaiting(phoneContact)
+      verifyIfThisContactIsAlreadyWaiting(phoneContact)
     )(getLodash('phones', data))
   ).then(() => data)
 
-const verifiyIfThisContactIsAlreadyWaiting = async phone => {
+const verifyIfThisContactIsAlreadyWaiting = async phone => {
   const data = await getDetailsIsWaitingFeedbackOneContact(phone)
   if (data.length > 0) {
     throw {
@@ -188,6 +191,16 @@ const verifiyIfThisContactIsAlreadyWaiting = async phone => {
   return phone
 }
 
+const setIsLastToFalseOnDetailsContacts = async data =>
+  Promise.all(
+    map(async phoneContact =>
+      updateRecordsDetailsContact({
+        where: { phoneContact },
+        data: { isLast: false }
+      })
+    )(getLodash('phones', data))
+  ).then(() => data)
+
 const assignAllContactsToAPublisher = async data =>
   Promise.all(
     map(async phoneContact =>
@@ -195,6 +208,7 @@ const assignAllContactsToAPublisher = async data =>
         information: WAITING_FEEDBACK,
         idPublisher: getLodash('idPublisher', data),
         createdBy: getLodash('createdBy', data),
+        isLast: true,
         phoneContact
       })
     )(getLodash('phones', data))
@@ -209,11 +223,14 @@ const cancelAssign = async request =>
 const cancelAssignAllContactsToAPublisher = async data =>
   Promise.all(
     map(async phoneContact =>
-      deleteRecordsDetailsContact({
-        phoneContact,
-        idPublisher: getLodash('idPublisher', data),
-        information: WAITING_FEEDBACK
-      })
+      pipe(
+        deleteRecordsDetailsContact({
+          phoneContact,
+          idPublisher: getLodash('idPublisher', data),
+          information: WAITING_FEEDBACK
+        }),
+        updateIsLastValueOneContact
+      )(phoneContact)
     )(getLodash('phones', data))
   )
 
