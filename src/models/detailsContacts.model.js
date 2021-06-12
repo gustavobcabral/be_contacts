@@ -1,6 +1,13 @@
 import knex from '../config/connection'
 import crud from './crudGeneric.model'
-import { isNil, isEmpty, map, reduce, concat } from 'lodash/fp'
+import {
+  isNil,
+  isEmpty,
+  map,
+  reduce,
+  concat,
+  get as getLodash
+} from 'lodash/fp'
 import { WAITING_FEEDBACK } from '../shared/constants/contacts.constant'
 import { MINISTERIAL_SERVANT } from '../shared/constants/permissions.constant'
 
@@ -321,11 +328,11 @@ const updateIsLastValueOneContact = async (
   trueOrFalse = true,
   phoneContact
 ) => {
-  const { id } = await getIDLastDetailsContactOneContact(phoneContact)
+  const data = await getIDLastDetailsContactOneContact(phoneContact)
 
-  if (!id) return phoneContact
+  if (!data) return phoneContact
   return crud.updateRecord({
-    id,
+    id: getLodash('id', data),
     data: { isLast: trueOrFalse },
     tableName,
     columnPrimary
