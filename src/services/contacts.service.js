@@ -133,8 +133,13 @@ const update = async request =>
 
 const updateSomeRecords = request => {
   const updatedBy = getLodash('user.id', request)
+  const updatedAt = new Date()
   const body = getLodash('body', request)
-  const detailsContacts = { ...getLodash('detailsContacts', body), updatedBy }
+  const detailsContacts = {
+    ...getLodash('detailsContacts', body),
+    updatedBy,
+    updatedAt
+  }
   const phones = getLodash('phones', body)
   const data = { ...getLodash('contact', body), updatedBy }
 
