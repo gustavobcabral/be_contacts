@@ -118,7 +118,8 @@ const update = async request => {
   const dataDetailsContact = {
     data: {
       ...getLodash('data.detailsContact', data),
-      updatedBy: getLodash('user.id', request)
+      updatedBy: getLodash('user.id', request),
+      updatedAt: new Date()
     },
     id: getLodash('id', data)
   }
