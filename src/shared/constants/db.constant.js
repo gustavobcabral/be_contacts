@@ -7,7 +7,7 @@ const PUT_ERROR = 'ERROR_WHILE_UPDATE'
 const DEL_OK = 'DELETED_SUCCESSFUL'
 const DEL_ERROR = 'ERROR_WHILE_DELETING'
 
-const fieldsNoTypeText = ['createdAt', 'lastConversationInDays', 'active']
+const fieldsNoTypeText = ['createdAt', 'lastConversationInDays', 'active', 'idStatus']
 
 export {
   GET_OK,
