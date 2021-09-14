@@ -18,14 +18,14 @@ const errorHandler = (err, req, res, next) => {
     : HttpStatus.INTERNAL_SERVER_ERROR
 
   log.error(
-    'error on url: ',
+    new Date().toJSON(),
+    ' error at url: ',
     getWhereCameFrom(req),
     ' IP: ',
     getIP(req),
     ' error: ',
     err,
     ' at ',
-    new Date().toJSON(),
     ' request headers: ',
     req.headers
   )
