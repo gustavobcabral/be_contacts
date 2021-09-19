@@ -9,7 +9,7 @@ import {
   columnPrimary,
   fields,
   getFilters,
-  contactsWithSamePhones
+  contactsWithSamePhones,
 } from '../models/contacts.model'
 import {
   fields as fieldsDetailsContact,
@@ -19,7 +19,7 @@ import {
   updateRecords as updateRecordsDetailsContact,
   getDetailsIsWaitingFeedbackOneContact,
   getIDLastDetailsContactOneContact,
-  updateIsLastValueOneContact
+  updateIsLastValueOneContact,
 } from '../models/detailsContacts.model'
 import asyncPipe from 'pipeawait'
 import {
@@ -33,36 +33,36 @@ import {
   get as getLodash,
   omit,
   orderBy,
-  getOr
+  getOr,
 } from 'lodash/fp'
 import { responseSuccess } from '../shared/helpers/responseGeneric.helper'
 import {
   WAITING_FEEDBACK,
   ERROR_PUBLISHER_ALREADY_WAITING_FEEDBACK,
-  ERROR_CONTACT_PHONE_ALREADY_EXISTS
+  ERROR_CONTACT_PHONE_ALREADY_EXISTS,
 } from '../shared/constants/contacts.constant'
 import {
   getParamsForUpdate,
   getParamsForGet,
   getParamsForCreate,
   getParamsForGetOne,
-  getParamsForDelete
+  getParamsForDelete,
 } from '../shared/helpers/generic.helper'
 
-const getDetailsProps = detailsContact => {
+const getDetailsProps = (detailsContact) => {
   return pipe(
     pick([
       ...fieldsDetailsContact,
       'namePublisher',
       'idDetail',
       'createdByName',
-      'updatedByName'
+      'updatedByName',
     ]),
     omit(['phoneContact'])
   )(detailsContact)
 }
 
-const getContactProps = contact => {
+const getContactProps = (contact) => {
   return pick(fields, contact)
 }
 
@@ -79,28 +79,28 @@ const reduceToGetDetails = (phone, listAllDetails) => {
   )(listAllDetails)
 }
 
-const mountDetailsDataForOneContact = detailsContact => {
+const mountDetailsDataForOneContact = (detailsContact) => {
   const contact = first(detailsContact)
   return {
     ...getContactProps(contact),
     details: reduceToGetDetails(
       getLodash(columnPrimary, contact),
       detailsContact
-    )
+    ),
   }
 }
 
 const get = async ({ input, request }) =>
   asyncPipe(getAll, curry(responseSuccess)(request))(input)
 
-const getOne = async request =>
+const getOne = async (request) =>
   asyncPipe(
     getOneWithDetails,
     mountDetailsDataForOneContact,
     curry(responseSuccess)(request)
   )(getParamsForGetOne(request))
 
-const throwErrorIfExistsSameNumber = async bag => {
+const throwErrorIfExistsSameNumber = async (bag) => {
   const data = getOr(bag, 'data', bag)
   const contact = await contactsWithSamePhones(
     getLodash('phone', data),
@@ -111,40 +111,48 @@ const throwErrorIfExistsSameNumber = async bag => {
     throw {
       httpErrorCode: HttpStatus.INTERNAL_SERVER_ERROR,
       error: ERROR_CONTACT_PHONE_ALREADY_EXISTS,
-      extra: { contact }
+      extra: { contact },
     }
   }
   return bag
 }
 
-const create = async request =>
+const create = async (request) =>
   asyncPipe(
     throwErrorIfExistsSameNumber,
     createRecord,
     curry(responseSuccess)(request)
   )(getParamsForCreate(request))
 
-const update = async request =>
+const addUpdatedAt = (data) => ({
+  ...data,
+  data: {
+    ...data.data,
+    updatedAt: new Date(),
+  },
+})
+
+const update = async (request) =>
   asyncPipe(
     throwErrorIfExistsSameNumber,
+    addUpdatedAt,
     updateRecord,
     curry(responseSuccess)(request)
   )(getParamsForUpdate(request))
 
-const updateSomeRecords = request => {
+const updateSomeRecords = (request) => {
   const updatedBy = getLodash('user.id', request)
   const updatedAt = new Date()
   const body = getLodash('body', request)
   const detailsContacts = {
     ...getLodash('detailsContacts', body),
     updatedBy,
-    updatedAt
+    updatedAt,
   }
   const phones = getLodash('phones', body)
-  const data = { ...getLodash('contact', body), updatedBy }
-
+  const data = { ...getLodash('contact', body), updatedBy, updatedAt }
   return Promise.all(
-    map(async id => {
+    map(async (id) => {
       if (getLodash('idPublisher', detailsContacts)) {
         const lastDetailContactResult = await getIDLastDetailsContactOneContact(
           id
@@ -152,7 +160,7 @@ const updateSomeRecords = request => {
         if (lastDetailContactResult)
           updateRecordDetailsContact({
             id: lastDetailContactResult.id,
-            data: detailsContacts
+            data: detailsContacts,
           })
       }
       updateRecord({ id, data })
@@ -160,16 +168,16 @@ const updateSomeRecords = request => {
   )
 }
 
-const updateSome = async request =>
+const updateSome = async (request) =>
   asyncPipe(updateSomeRecords, curry(responseSuccess)(request))(request)
 
-const deleteOne = async request =>
+const deleteOne = async (request) =>
   asyncPipe(
     deleteRecord,
     curry(responseSuccess)(request)
   )(getParamsForDelete(request))
 
-const assign = async request =>
+const assign = async (request) =>
   asyncPipe(
     verifyIfThisContactsAreAlreadyWaiting,
     setIsLastToFalseOnDetailsContacts,
@@ -177,69 +185,69 @@ const assign = async request =>
     curry(responseSuccess)(request)
   )(getParamsForCreate(request))
 
-const verifyIfThisContactsAreAlreadyWaiting = async data =>
+const verifyIfThisContactsAreAlreadyWaiting = async (data) =>
   Promise.all(
-    map(async phoneContact =>
+    map(async (phoneContact) =>
       verifyIfThisContactIsAlreadyWaiting(phoneContact)
     )(getLodash('phones', data))
   ).then(() => data)
 
-const verifyIfThisContactIsAlreadyWaiting = async phone => {
+const verifyIfThisContactIsAlreadyWaiting = async (phone) => {
   const data = await getDetailsIsWaitingFeedbackOneContact(phone)
   if (data.length > 0) {
     throw {
       httpErrorCode: HttpStatus.BAD_REQUEST,
       error: ERROR_PUBLISHER_ALREADY_WAITING_FEEDBACK,
-      extra: { phone }
+      extra: { phone },
     }
   }
   return phone
 }
 
-const setIsLastToFalseOnDetailsContacts = async data =>
+const setIsLastToFalseOnDetailsContacts = async (data) =>
   Promise.all(
-    map(async phoneContact =>
+    map(async (phoneContact) =>
       updateRecordsDetailsContact({
         where: { phoneContact },
-        data: { isLast: false }
+        data: { isLast: false },
       })
     )(getLodash('phones', data))
   ).then(() => data)
 
-const assignAllContactsToAPublisher = async data =>
+const assignAllContactsToAPublisher = async (data) =>
   Promise.all(
-    map(async phoneContact =>
+    map(async (phoneContact) =>
       createRecordDetailsContact({
         information: WAITING_FEEDBACK,
         idPublisher: getLodash('idPublisher', data),
         createdBy: getLodash('createdBy', data),
         isLast: true,
-        phoneContact
+        phoneContact,
       })
     )(getLodash('phones', data))
   )
 
-const cancelAssign = async request =>
+const cancelAssign = async (request) =>
   asyncPipe(
     cancelAssignAllContactsToAPublisher,
     curry(responseSuccess)(request)
   )(getParamsForCreate(request))
 
-const cancelAssignAllContactsToAPublisher = async data =>
+const cancelAssignAllContactsToAPublisher = async (data) =>
   Promise.all(
-    map(async phoneContact =>
+    map(async (phoneContact) =>
       pipe(
         deleteRecordsDetailsContact({
           phoneContact,
           idPublisher: getLodash('idPublisher', data),
-          information: WAITING_FEEDBACK
+          information: WAITING_FEEDBACK,
         }),
         updateIsLastValueOneContact
       )(phoneContact)
     )(getLodash('phones', data))
   )
 
-const getSummaryContacts = async user => {
+const getSummaryContacts = async (user) => {
   const totals = await getSummaryTotals(getLodash('id', user))
   const totalContacts = Number(totals.totalContacts.count)
 
@@ -276,62 +284,62 @@ const getSummaryContacts = async user => {
       ? 100 - totalPercentContactsAssignByMeWaitingFeedback
       : 0
 
-  const calculatePercentage = count =>
+  const calculatePercentage = (count) =>
     (count / totalContactsWaitingFeedback) * 100
 
   const totalsContactsWaitingFeedbackByPublisher = map(
-    publisher => ({
+    (publisher) => ({
       ...publisher,
-      percent: calculatePercentage(publisher.count)
+      percent: calculatePercentage(publisher.count),
     }),
     totals.totalsContactsWaitingFeedbackByPublisher
   )
 
   const totalContactsByGender = totals.totalContactsByGender
 
-  const calculatePercentageByGender = count =>
+  const calculatePercentageByGender = (count) =>
     (count / totalContactsNotCompanyContacted) * 100
 
   const totalContactsByGenderContacted = map(
-    gender => ({
+    (gender) => ({
       ...gender,
-      percent: calculatePercentageByGender(gender.count)
+      percent: calculatePercentageByGender(gender.count),
     }),
     totals.totalContactsByGenderContacted
   )
 
   const totalContactsByLanguage = totals.totalContactsByLanguage
 
-  const calculatePercentageByLanguage = count =>
+  const calculatePercentageByLanguage = (count) =>
     (count / totalContactsContacted) * 100
 
   const totalContactsByLanguageContacted = map(
-    language => ({
+    (language) => ({
       ...language,
-      percent: calculatePercentageByLanguage(language.count)
+      percent: calculatePercentageByLanguage(language.count),
     }),
     totals.totalContactsByLanguageContacted
   )
 
-  const calculatePercentageByType = count => (count / totalContacts) * 100
+  const calculatePercentageByType = (count) => (count / totalContacts) * 100
 
   const totalContactsByType = map(
-    type => ({
+    (type) => ({
       ...type,
-      percent: calculatePercentageByType(type.count)
+      percent: calculatePercentageByType(type.count),
     }),
     totals.totalContactsByType
   )
 
   const totalContactsByLocation = totals.totalContactsByLocation
 
-  const calculatePercentageByLocation = count =>
+  const calculatePercentageByLocation = (count) =>
     (count / totalContactsContacted) * 100
 
   const totalContactsByLocationContacted = map(
-    location => ({
+    (location) => ({
       ...location,
-      percent: calculatePercentageByLocation(location.count)
+      percent: calculatePercentageByLocation(location.count),
     }),
     totals.totalContactsByLocationContacted
   )
@@ -355,11 +363,11 @@ const getSummaryContacts = async user => {
     totalContactsByLanguageContacted,
     totalContactsByType,
     totalContactsByLocation,
-    totalContactsByLocationContacted
+    totalContactsByLocationContacted,
   }
 }
 
-const getAllFiltersOfContacts = async request =>
+const getAllFiltersOfContacts = async (request) =>
   asyncPipe(
     getFilters,
     curry(responseSuccess)(request)
@@ -375,5 +383,5 @@ export default {
   assign,
   cancelAssign,
   getSummaryContacts,
-  getAllFiltersOfContacts
+  getAllFiltersOfContacts,
 }
