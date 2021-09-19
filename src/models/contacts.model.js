@@ -20,15 +20,17 @@ const fields = [
   'idLocation',
   'email',
   'note',
-  'typeCompany'
+  'contactUpdatedAt',
+  'contactUpdatedBy',
+  'typeCompany',
 ]
 
-const getAll = async queryParams => {
+const getAll = async (queryParams) => {
   const {
     sort = 'lastConversationInDays:DESC',
     perPage,
     currentPage,
-    filters
+    filters,
   } = queryParams
   const sql = knex
     .select(
@@ -50,7 +52,9 @@ const getAll = async queryParams => {
       'publisherName',
       'information',
       'waitingFeedback',
-      'createdAtDetailsContacts'
+      'createdAtDetailsContacts',
+      'updatedAt',
+      'publisherNameUpdatedBy'
     )
     .from('viewListAllContacts')
   if (!isEmpty(filters)) {
@@ -64,7 +68,7 @@ const getAll = async queryParams => {
       status,
       locations,
       typeCompany,
-      modeAllContacts
+      modeAllContacts,
     } = JSON.parse(filters)
 
     if (
@@ -73,7 +77,7 @@ const getAll = async queryParams => {
       !isEmpty(note) &&
       !isEmpty(owner)
     ) {
-      sql.where(builder =>
+      sql.where((builder) =>
         builder
           .where('name', 'ilike', `%${name}%`)
           .orWhere('publisherName', 'ilike', `%${name}%`)
@@ -82,40 +86,36 @@ const getAll = async queryParams => {
           .orWhere('note', 'ilike', `%${note}%`)
       )
     }
-    if (!isEmpty(genders)) sql.andWhere(qB => qB.whereIn('gender', genders))
+    if (!isEmpty(genders)) sql.andWhere((qB) => qB.whereIn('gender', genders))
 
     if (!isEmpty(languages))
-      sql.andWhere(qB => qB.whereIn('idLanguage', languages))
+      sql.andWhere((qB) => qB.whereIn('idLanguage', languages))
 
-    if (!isEmpty(status)) sql.andWhere(qB => qB.whereIn('idStatus', status))
+    if (!isEmpty(status)) sql.andWhere((qB) => qB.whereIn('idStatus', status))
 
     if (!isEmpty(locations)) {
       const someNull = some(isNil, locations)
       const cleanLocation = compact(locations)
 
       if (!isEmpty(cleanLocation) && someNull) {
-        sql.andWhere(qB =>
+        sql.andWhere((qB) =>
           qB.whereIn('idLocation', cleanLocation).orWhereNull('idLocation')
         )
-      } else if (someNull) sql.andWhere(qB => qB.whereNull('idLocation'))
-      else sql.andWhere(qB => qB.whereIn('idLocation', cleanLocation))
+      } else if (someNull) sql.andWhere((qB) => qB.whereNull('idLocation'))
+      else sql.andWhere((qB) => qB.whereIn('idLocation', cleanLocation))
     }
 
     if (typeCompany !== '-1')
-      sql.andWhere(qB => qB.where('typeCompany', typeCompany))
+      sql.andWhere((qB) => qB.where('typeCompany', typeCompany))
 
     if (modeAllContacts !== '-1')
-      sql.andWhere(qB => qB.where('waitingFeedback', modeAllContacts))
+      sql.andWhere((qB) => qB.where('waitingFeedback', modeAllContacts))
   }
   return sql.orderByRaw(crud.parseOrderBy(sort)).paginate(perPage, currentPage)
 }
 
 const getGenders = async () =>
-  knex
-    .count('gender')
-    .select('gender')
-    .from(tableName)
-    .groupBy('gender')
+  knex.count('gender').select('gender').from(tableName).groupBy('gender')
 
 const getLanguages = async () =>
   knex
@@ -159,12 +159,12 @@ const getType = async () => {
   )
   const typeCompany = concat(isTypeCompany, {
     count: typeBoth,
-    typeCompanySelected: '-1'
+    typeCompanySelected: '-1',
   })
   return map(
-    option => ({
+    (option) => ({
       ...option,
-      typeCompanySelected: String(Number(option.typeCompanySelected))
+      typeCompanySelected: String(Number(option.typeCompanySelected)),
     }),
     typeCompany
   )
@@ -181,11 +181,11 @@ const getFilters = async () => {
     languages,
     status,
     locations,
-    typeCompany
+    typeCompany,
   }
 }
 
-const getOneWithDetails = async phone =>
+const getOneWithDetails = async (phone) =>
   knex
     .select(
       'contacts.name',
@@ -199,6 +199,8 @@ const getOneWithDetails = async phone =>
       'contacts.idLocation',
       'contacts.email',
       'contacts.note',
+      'contacts.updatedAt as contactUpdatedAt',
+      'publishers.name as contactUpdatedBy',
       'detailsContacts.*'
     )
     .from(tableName)
@@ -208,9 +210,10 @@ const getOneWithDetails = async phone =>
       '=',
       'contacts.phone'
     )
-    .where(columnPrimary, '=', phone)
+    .leftJoin('publishers', 'publishers.id', '=', 'contacts.updatedBy')
+    .where(`contacts.${columnPrimary}`, '=', phone)
 
-const createRecord = async data => crud.createRecord(data, tableName)
+const createRecord = async (data) => crud.createRecord(data, tableName)
 
 const updateRecord = async ({ id, data }) =>
   crud.updateRecord({ id, data, tableName, columnPrimary })
@@ -220,10 +223,8 @@ async function deleteRecord(id) {
   return crud.deleteRecord({ id, tableName, columnPrimary })
 }
 
-const getSummaryTotals = async userId => {
-  const totalContacts = await knex(tableName)
-    .count('phone')
-    .first()
+const getSummaryTotals = async (userId) => {
+  const totalContacts = await knex(tableName).count('phone').first()
 
   const totalContactsByType = await knex(tableName)
     .count('phone')
@@ -322,7 +323,7 @@ const getSummaryTotals = async userId => {
     totalContactsNotCompanyContacted,
     totalContactsByType,
     totalContactsByLocation,
-    totalContactsByLocationContacted
+    totalContactsByLocationContacted,
   }
 }
 
@@ -344,5 +345,5 @@ export {
   getFilters,
   contactsWithSamePhones,
   columnPrimary,
-  fields
+  fields,
 }

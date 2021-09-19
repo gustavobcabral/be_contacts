@@ -85,6 +85,7 @@ const getOne = async id =>
     .select(
       'detailsContacts.*',
       'publishers.name as publisherName',
+      'publisherUpdatedBy.name as publisherUpdatedBy',
       'contacts.idStatus',
       'contacts.idLanguage',
       'contacts.idLocation',
@@ -95,6 +96,7 @@ const getOne = async id =>
     )
     .from(tableName)
     .leftJoin('publishers', 'detailsContacts.idPublisher', '=', 'publishers.id')
+    .leftJoin('publishers as publisherUpdatedBy', 'detailsContacts.updatedBy', '=', 'publisherUpdatedBy.id')
     .leftJoin('contacts', 'detailsContacts.phoneContact', '=', 'contacts.phone')
     .where('detailsContacts.id', id)
     .first()

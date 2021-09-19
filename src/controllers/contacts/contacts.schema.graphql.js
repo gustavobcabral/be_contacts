@@ -20,6 +20,8 @@ type Contact {
   information: String
   waitingFeedback: Boolean
   createdAtDetailsContacts: Timestamp
+  updatedAt: Timestamp
+  publisherNameUpdatedBy: String
 }
 
 
