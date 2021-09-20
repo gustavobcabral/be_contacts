@@ -20,6 +20,8 @@ const fields = [
   'idLocation',
   'email',
   'note',
+  'contactCreatedAt',
+  'contactCreatedBy',
   'contactUpdatedAt',
   'contactUpdatedBy',
   'typeCompany',
@@ -199,8 +201,10 @@ const getOneWithDetails = async (phone) =>
       'contacts.idLocation',
       'contacts.email',
       'contacts.note',
+      'contacts.createdAt as contactCreatedAt',
       'contacts.updatedAt as contactUpdatedAt',
       'publishers.name as contactUpdatedBy',
+      'publishersCreatedBy.name as contactCreatedBy',
       'detailsContacts.*'
     )
     .from(tableName)
@@ -209,6 +213,12 @@ const getOneWithDetails = async (phone) =>
       'detailsContacts.phoneContact',
       '=',
       'contacts.phone'
+    )
+    .leftJoin(
+      'publishers as publishersCreatedBy',
+      'publishersCreatedBy.id',
+      '=',
+      'contacts.createdBy'
     )
     .leftJoin('publishers', 'publishers.id', '=', 'contacts.updatedBy')
     .where(`contacts.${columnPrimary}`, '=', phone)
