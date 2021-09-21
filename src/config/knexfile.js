@@ -53,7 +53,7 @@ module.exports = {
       rejectUnauthorized: false
     },
     dialectOptions: {
-      ssl: false
+      ssl: true
     },
     migrations: {
       tableName: 'knex_migrations'

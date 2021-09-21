@@ -385,9 +385,8 @@ const backup = async () => {
   const currentDate = `${date.getMonth() + 1}`
   const fileName = `contacts-database-bkp-${currentDate}.tar`
   try {
-    await execute(
-      `pg_dump -U ${username} -d ${database} -f ${fileName} -F t`
-    )
+    await execute(`pg_dump -U ${username} -d ${database} -f ${fileName} -F t`)
+
     const data = fs.readFileSync(fileName, 'utf8')
     const options = {
       method: 'post',
