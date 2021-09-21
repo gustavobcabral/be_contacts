@@ -381,11 +381,14 @@ const getAllFiltersOfContacts = async (request) =>
 const backup = async () => {
   const username = process.env.USERNAME
   const database = process.env.DATABASE
+  const password = process.env.PASSWORD
   const date = new Date()
   const currentDate = `${date.getMonth() + 1}`
   const fileName = `contacts-database-bkp-${currentDate}.tar`
   try {
-    await execute(`pg_dump -U ${username} -d ${database} -f ${fileName} -F t`)
+    await execute(
+      `PGPASSWORD="${password}" pg_dump -U ${username} -d ${database} -f ${fileName} -F t`
+    )
     const data = fs.readFileSync(fileName, 'utf8')
     const options = {
       method: 'post',
@@ -412,8 +415,6 @@ const backup = async () => {
     return { status: false, error }
   }
 }
-
-
 
 export default {
   get,
