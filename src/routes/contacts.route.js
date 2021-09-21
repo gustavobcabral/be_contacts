@@ -10,6 +10,7 @@ routes.get('/:id', contactsController.getOne)
 
 routes.post('/', contactsController.create)
 routes.post('/assign', contactsController.assign)
+routes.post('/backup', contactsController.backup)
 
 routes.put('/some', contactsController.updateSome)
 routes.put('/:id', contactsController.update)

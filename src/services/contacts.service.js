@@ -41,6 +41,8 @@ import {
   ERROR_PUBLISHER_ALREADY_WAITING_FEEDBACK,
   ERROR_CONTACT_PHONE_ALREADY_EXISTS,
 } from '../shared/constants/contacts.constant'
+import { URL_DROPBOX } from '../shared/constants/db.constant'
+
 import {
   getParamsForUpdate,
   getParamsForGet,
@@ -48,6 +50,9 @@ import {
   getParamsForGetOne,
   getParamsForDelete,
 } from '../shared/helpers/generic.helper'
+import fs from 'fs'
+import { execute } from '@getvim/execute'
+import axios from 'axios'
 
 const getDetailsProps = (detailsContact) => {
   return pipe(
@@ -373,6 +378,43 @@ const getAllFiltersOfContacts = async (request) =>
     curry(responseSuccess)(request)
   )(getParamsForGet(request))
 
+const backup = async () => {
+  const username = process.env.USERNAME
+  const database = process.env.DATABASE
+  const date = new Date()
+  const currentDate = `${date.getMonth() + 1}`
+  const fileName = `contacts-database-bkp-${currentDate}.tar`
+  try {
+    await execute(`pg_dump -U ${username} -d ${database} -f ${fileName} -F t`)
+    const data = fs.readFileSync(fileName, 'utf8')
+    const options = {
+      method: 'post',
+      headers: {
+        Authorization: `Bearer ${process.env.DROPBOX_TOKEN}`,
+        'Dropbox-API-Arg': JSON.stringify({
+          path: '/' + fileName,
+          mode: 'overwrite',
+          autorename: true,
+          mute: false,
+          strict_conflict: false,
+        }),
+        'Content-Type': 'application/octet-stream',
+      },
+      timeout: 10000,
+    }
+    await axios.post(URL_DROPBOX, data, options)
+    let bkpDeletedAtServer = true
+    fs.unlink(fileName, (err) => {
+      if (err) bkpDeletedAtServer = false
+    })
+    return { res: true, bkpDeletedAtServer }
+  } catch (error) {
+    return { status: false, error }
+  }
+}
+
+
+
 export default {
   get,
   getOne,
@@ -384,4 +426,5 @@ export default {
   cancelAssign,
   getSummaryContacts,
   getAllFiltersOfContacts,
+  backup,
 }
