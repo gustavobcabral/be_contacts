@@ -66,7 +66,7 @@ module.exports = {
       dialectOptions: { collate: 'utf8_general_ci' }
     },
     dialectOptions: {
-      ssl: true
+      ssl: false
     },
     migrations: {
       tableName: "knex_migrations",
