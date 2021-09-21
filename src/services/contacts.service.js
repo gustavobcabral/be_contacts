@@ -379,8 +379,8 @@ const getAllFiltersOfContacts = async (request) =>
   )(getParamsForGet(request))
 
 const backup = async () => {
-  const username = 'postgres'
-  const database = 'contacts'
+  const username = process.env.USERNAME
+  const database = process.env.DATABASE
   const date = new Date()
   const currentDate = `${date.getMonth() + 1}`
   const fileName = `contacts-database-bkp-${currentDate}.tar`
