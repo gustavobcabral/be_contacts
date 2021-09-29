@@ -31,6 +31,9 @@ const getDetailsOneContact = async ({ id, query }) => {
         `"detailsContacts"."information"='${WAITING_FEEDBACK}' as "waitingFeedback"`
       ),
       'detailsContacts.createdAt',
+      'detailsContacts.createdBy',
+      'detailsContacts.updatedAt',
+      'detailsContacts.updatedBy',
       'detailsContacts.idPublisher',
       'detailsContacts.id',
       'contacts.name',
@@ -39,10 +42,14 @@ const getDetailsOneContact = async ({ id, query }) => {
       'contacts.idLocation',
       'contacts.gender',
       'contacts.typeCompany',
-      'publishers.name as publisherName'
+      'publishers.name as publisherName',
+      'publisherCreatedBy.name as publisherCreatedByName',
+      'publisherUpdatedBy.name as publisherUpdatedByName'
     )
     .from(tableName)
     .leftJoin('publishers', 'detailsContacts.idPublisher', '=', 'publishers.id')
+    .leftJoin('publishers as publisherCreatedBy', 'detailsContacts.createdBy', '=', 'publisherCreatedBy.id')
+    .leftJoin('publishers as publisherUpdatedBy', 'detailsContacts.updatedBy', '=', 'publisherUpdatedBy.id')
     .leftJoin('contacts', 'detailsContacts.phoneContact', '=', 'contacts.phone')
     .where('phoneContact', '=', id)
 
