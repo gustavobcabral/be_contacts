@@ -1,8 +1,8 @@
-exports.up = function(knex) {
+exports.up = function (knex) {
   return knex.schema.raw(`DROP VIEW "viewListContacts"`)
 }
 
-exports.down = function(knex) {
+exports.down = function (knex) {
   return knex.schema.raw(`CREATE OR REPLACE VIEW "viewListContacts" AS ?`, [
     knex
       .select(
@@ -48,6 +48,6 @@ exports.down = function(knex) {
       )
       .whereRaw(`dc.information <> '[WAITING_FEEDBACK]'`)
       .orWhereNull('dc.information')
-      .orderBy('contacts.phone')
+      .orderBy('contacts.phone'),
   ])
 }

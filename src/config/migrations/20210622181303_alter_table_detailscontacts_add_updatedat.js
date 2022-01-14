@@ -1,5 +1,5 @@
-exports.up = async function(knex) {
-  await knex.schema.alterTable('detailsContacts', function(table) {
+exports.up = async function (knex) {
+  await knex.schema.alterTable('detailsContacts', function (table) {
     table.dateTime('updatedAt').nullable()
   })
 
@@ -13,8 +13,8 @@ exports.up = async function(knex) {
   )
 }
 
-exports.down = function(knex) {
-  return knex.schema.alterTable('detailsContacts', function(table) {
+exports.down = function (knex) {
+  return knex.schema.alterTable('detailsContacts', function (table) {
     table.dropColumn('updatedAt')
   })
 }

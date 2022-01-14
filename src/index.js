@@ -22,7 +22,7 @@ app
     // eslint-disable-next-line no-console
     console.info(`Server started on port ${PORT} 🚀`)
   })
-  .on('error', err => {
+  .on('error', (err) => {
     // eslint-disable-next-line no-console
     console.error(err)
   })
