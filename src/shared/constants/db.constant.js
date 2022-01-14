@@ -8,7 +8,12 @@ const DEL_OK = 'DELETED_SUCCESSFUL'
 const DEL_ERROR = 'ERROR_WHILE_DELETING'
 const URL_DROPBOX = 'https://content.dropboxapi.com/2/files/upload'
 
-const fieldsNoTypeText = ['createdAt', 'lastConversationInDays', 'active', 'idStatus']
+const fieldsNoTypeText = [
+  'createdAt',
+  'lastConversationInDays',
+  'active',
+  'idStatus',
+]
 
 export {
   GET_OK,
@@ -20,5 +25,5 @@ export {
   DEL_OK,
   DEL_ERROR,
   fieldsNoTypeText,
-  URL_DROPBOX
+  URL_DROPBOX,
 }

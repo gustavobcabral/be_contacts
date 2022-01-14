@@ -77,9 +77,7 @@ const getSummaryContacts = async (request, response, next) => {
 
 const backup = async (request, response, next) => {
   try {
-    response.json(
-      await contactsService.backup(request)
-    )
+    response.json(await contactsService.backup(request))
   } catch (error) {
     next(responseNext(error, request))
   }
@@ -95,5 +93,5 @@ export default {
   cancelAssign,
   getSummaryContacts,
   getAllFiltersOfContacts,
-  backup
+  backup,
 }

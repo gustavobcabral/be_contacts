@@ -12,7 +12,7 @@ async function createController(request, response) {
     schema,
     context: { request, response },
     rootValue,
-    customFormatErrorFn: responseNext
+    customFormatErrorFn: responseNext,
   }
 }
 

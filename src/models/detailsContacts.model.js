@@ -48,8 +48,18 @@ const getDetailsOneContact = async ({ id, query }) => {
     )
     .from(tableName)
     .leftJoin('publishers', 'detailsContacts.idPublisher', '=', 'publishers.id')
-    .leftJoin('publishers as publisherCreatedBy', 'detailsContacts.createdBy', '=', 'publisherCreatedBy.id')
-    .leftJoin('publishers as publisherUpdatedBy', 'detailsContacts.updatedBy', '=', 'publisherUpdatedBy.id')
+    .leftJoin(
+      'publishers as publisherCreatedBy',
+      'detailsContacts.createdBy',
+      '=',
+      'publisherCreatedBy.id'
+    )
+    .leftJoin(
+      'publishers as publisherUpdatedBy',
+      'detailsContacts.updatedBy',
+      '=',
+      'publisherUpdatedBy.id'
+    )
     .leftJoin('contacts', 'detailsContacts.phoneContact', '=', 'contacts.phone')
     .where('phoneContact', '=', id)
 

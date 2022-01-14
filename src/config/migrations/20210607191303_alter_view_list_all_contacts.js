@@ -1,4 +1,4 @@
-exports.up = async function(knex) {
+exports.up = async function (knex) {
   await knex.schema.raw(`DROP VIEW "viewListAllContacts"`)
   const sql = knex
     .select(
@@ -35,7 +35,7 @@ exports.up = async function(knex) {
     .leftJoin('status', 'status.id', '=', 'contacts.idStatus')
     .leftJoin('cities', 'cities.id', '=', 'contacts.idLocation')
     .leftJoin('departments', 'departments.id', '=', 'cities.idDepartment')
-    .leftJoin('detailsContacts as dc', function() {
+    .leftJoin('detailsContacts as dc', function () {
       this.on('dc.phoneContact', '=', 'contacts.phone').on(
         'dc.isLast',
         '=',
@@ -49,7 +49,7 @@ exports.up = async function(knex) {
   )
 }
 
-exports.down = async function(knex) {
+exports.down = async function (knex) {
   await knex.schema.raw(`DROP VIEW "viewListAllContacts"`)
   return knex.schema.raw(`CREATE OR REPLACE VIEW "viewListAllContacts" AS ?`, [
     knex
@@ -101,6 +101,6 @@ exports.down = async function(knex) {
         ORDER BY "detailsContacts"."createdAt" DESC
         LIMIT 1) as dc ON contacts.phone = dc."phoneContact"`
       )
-      .orderBy('contacts.phone')
+      .orderBy('contacts.phone'),
   ])
 }

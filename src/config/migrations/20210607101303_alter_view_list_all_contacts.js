@@ -1,7 +1,7 @@
-exports.up = async function(knex) {
+exports.up = async function (knex) {
   await knex.schema.raw(`DROP VIEW "viewListAllContacts"`)
   const sql = knex
-    .with('dc', qb => {
+    .with('dc', (qb) => {
       qb.select(
         'detailsContacts.phoneContact',
         'publishers.name as publisherName',
@@ -62,7 +62,7 @@ exports.up = async function(knex) {
   )
 }
 
-exports.down = async function(knex) {
+exports.down = async function (knex) {
   await knex.schema.raw(`DROP VIEW "viewListAllContacts"`)
   return knex.schema.raw(`CREATE OR REPLACE VIEW "viewListAllContacts" AS ?`, [
     knex
@@ -114,6 +114,6 @@ exports.down = async function(knex) {
         ORDER BY "detailsContacts"."createdAt" DESC
         LIMIT 1) as dc ON contacts.phone = dc."phoneContact"`
       )
-      .orderBy('contacts.phone')
+      .orderBy('contacts.phone'),
   ])
 }

@@ -3,20 +3,20 @@ module.exports = {
   env: {
     es6: true,
     node: true,
-    jest: true
+    jest: true,
   },
   parser: '@typescript-eslint/parser',
   settings: {
     'import/resolver': {
       node: {
-        extensions: ['.js', '.ts']
-      }
-    }
+        extensions: ['.js', '.ts'],
+      },
+    },
   },
   parserOptions: {
     ecmaVersion: 2018, // Allows for the parsing of modern ECMAScript features
     sourceType: 'module', // Allows for the use of imports
-    parser: 'babel-eslint'
+    parser: 'babel-eslint',
   },
   plugins: [
     '@typescript-eslint',
@@ -24,7 +24,7 @@ module.exports = {
     'prettier',
     'promise',
     'fp',
-    'security'
+    'security',
   ],
   extends: [
     'eslint:recommended',
@@ -35,7 +35,7 @@ module.exports = {
     'plugin:import/errors',
     'plugin:promise/recommended',
     'plugin:fp/recommended',
-    'plugin:security/recommended'
+    'plugin:security/recommended',
   ],
   // ignorePatterns: ['/src/config/db/**/*.js'],
   rules: {
@@ -50,8 +50,8 @@ module.exports = {
       {
         vars: 'all',
         args: 'after-used',
-        ignoreRestSiblings: true
-      }
+        ignoreRestSiblings: true,
+      },
     ],
     'trailing-comma': [true, { multiline: 'always', singleline: 'never' }],
     'no-use-before-define': 'off',
@@ -61,15 +61,15 @@ module.exports = {
         functions: false,
         classes: false,
         variables: false,
-        typedefs: false
-      }
+        typedefs: false,
+      },
     ],
     'prettier/prettier': [
       'error',
       {
         semi: false,
-        singleQuote: true
-      }
+        singleQuote: true,
+      },
     ],
     'no-console': 'warn',
     'no-var': 'error',
@@ -81,7 +81,7 @@ module.exports = {
     'fp/no-class': 'off',
     'fp/no-loops': 'off',
     'promise/always-return': 'warn',
-    'fp/no-mutation': ['warn', { commonjs: true }]
+    'fp/no-mutation': ['warn', { commonjs: true }],
   },
   overrides: [
     {
@@ -89,16 +89,16 @@ module.exports = {
       files: ['*.ts', '*.tsx'],
       rules: {
         '@typescript-eslint/explicit-function-return-type': ['off'],
-        '@typescript-eslint/no-explicit-any': ['off']
-      }
+        '@typescript-eslint/no-explicit-any': ['off'],
+      },
     },
     {
       // enable the rule specifically for Javascript files
       files: ['*.js', '*.jsx'],
       rules: {
         '@typescript-eslint/explicit-function-return-type': 'off',
-        '@typescript-eslint/no-var-requires': 'off'
-      }
+        '@typescript-eslint/no-var-requires': 'off',
+      },
     },
     {
       // enable the rule specifically for test and stub files
@@ -110,8 +110,8 @@ module.exports = {
         '@typescript-eslint/camelcase': 'off',
         '@typescript-eslint/explicit-function-return-type': 'off',
         '@typescript-eslint/no-var-requires': 'off',
-        '@typescript-eslint/no-empty-function': 'off'
-      }
+        '@typescript-eslint/no-empty-function': 'off',
+      },
     },
     {
       // enable the rule specifically for db migrations files
@@ -119,8 +119,8 @@ module.exports = {
       rules: {
         '@typescript-eslint/no-empty-function': 'off',
         '@typescript-eslint/no-unused-vars': 'off',
-        'no-unused-vars': 'off'
-      }
-    }
-  ]
+        'no-unused-vars': 'off',
+      },
+    },
+  ],
 }
