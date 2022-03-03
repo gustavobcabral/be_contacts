@@ -21,6 +21,10 @@ import {
   getIDLastDetailsContactOneContact,
   updateIsLastValueOneContact,
 } from '../models/detailsContacts.model'
+import {
+  getDetailsCampaignActive,
+  getOne as getOneCampaign,
+} from '../models/campaigns.model'
 import asyncPipe from 'pipeawait'
 import {
   first,
@@ -48,7 +52,9 @@ import {
   getParamsForGet,
   getParamsForCreate,
   getParamsForGetOne,
+  getParamsForGetWithUser,
   getParamsForDelete,
+  getParamsForGetOneWithUser,
 } from '../shared/helpers/generic.helper'
 import fs from 'fs'
 import { execute } from '@getvim/execute'
@@ -225,6 +231,7 @@ const assignAllContactsToAPublisher = async (data) =>
       createRecordDetailsContact({
         information: WAITING_FEEDBACK,
         idPublisher: getLodash('idPublisher', data),
+        idCampaign: getLodash('idCampaign', data),
         createdBy: getLodash('createdBy', data),
         isLast: true,
         phoneContact,
@@ -252,8 +259,8 @@ const cancelAssignAllContactsToAPublisher = async (data) =>
     )(getLodash('phones', data))
   )
 
-const getSummaryContacts = async (user) => {
-  const totals = await getSummaryTotals(getLodash('id', user))
+const getSummary = async ({ user, idCampaign }) => {
+  const totals = await getSummaryTotals(getLodash('id', user), idCampaign)
   const totalContacts = Number(totals.totalContacts.count)
 
   const totalContactsContacted = Number(totals.totalContactsContacted.count)
@@ -372,6 +379,19 @@ const getSummaryContacts = async (user) => {
   }
 }
 
+const getSummaryContacts = async (request) => {
+  const { user } = getParamsForGetWithUser(request)
+  const campaignActive = await getDetailsCampaignActive()
+  const idCampaign = campaignActive ? campaignActive.id : null
+  return getSummary({ user, idCampaign })
+}
+const getSummaryOneCampaign = async (request) => {
+  const { user, id } = getParamsForGetOneWithUser(request)
+  const campaign = await getOneCampaign(id)
+  const idCampaign = campaign ? campaign.id : null
+  return getSummary({ user, idCampaign })
+}
+
 const getAllFiltersOfContacts = async (request) =>
   asyncPipe(
     getFilters,
@@ -426,4 +446,5 @@ export default {
   getSummaryContacts,
   getAllFiltersOfContacts,
   backup,
+  getSummaryOneCampaign,
 }

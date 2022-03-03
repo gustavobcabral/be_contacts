@@ -4,6 +4,7 @@ import contactsController from '../controllers/contacts/contacts.controller'
 
 const routes = Router()
 
+routes.get('/:id/summary', contactsController.getSummaryOneCampaign)
 routes.get('/summary', contactsController.getSummaryContacts)
 routes.get('/filters', contactsController.getAllFiltersOfContacts)
 routes.get('/:id', contactsController.getOne)

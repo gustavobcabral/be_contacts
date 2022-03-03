@@ -22,6 +22,11 @@ type Contact {
   createdAtDetailsContacts: Timestamp
   updatedAt: Timestamp
   publisherNameUpdatedBy: String
+  idCampaign: Int
+  campaignName: String
+  campaignDateStart: Date
+  campaignDateFinal: Date
+
 }
 
 

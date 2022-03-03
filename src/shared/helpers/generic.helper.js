@@ -9,13 +9,16 @@ const getParamsForUpdate = (request) => ({
 })
 
 const getParamsForGet = (request) => get('query', request)
+
 const getParamsForGetWithUser = (request) => ({
   query: get('query', request),
   user: get('user', request),
 })
 const getParamsForCreate = (request) =>
   appendEssentialData(request, 'createdBy')
+
 const getParamsForGetOne = (request) => get('params.id', request)
+
 const getParamsForGetOneWithUser = (request) => ({
   id: get('params.id', request),
   user: get('user', request),
@@ -24,6 +27,7 @@ const getParamsForGetOneWithQuery = (request) => ({
   id: get('params.id', request),
   query: get('query', request),
 })
+
 const getParamsForDelete = (request) => getParamsForGetOne(request)
 
 const defaultValueForQuery = (request, objectDefault) => {

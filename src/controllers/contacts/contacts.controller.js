@@ -67,9 +67,15 @@ const cancelAssign = async (request, response, next) => {
 }
 const getSummaryContacts = async (request, response, next) => {
   try {
-    response.json(
-      await contactsService.getSummaryContacts(getLodash('user', request))
-    )
+    response.json(await contactsService.getSummaryContacts(request))
+  } catch (error) {
+    next(responseNext(error, request))
+  }
+}
+
+const getSummaryOneCampaign = async (request, response, next) => {
+  try {
+    response.json(await contactsService.getSummaryOneCampaign(request))
   } catch (error) {
     next(responseNext(error, request))
   }
@@ -92,6 +98,7 @@ export default {
   assign,
   cancelAssign,
   getSummaryContacts,
+  getSummaryOneCampaign,
   getAllFiltersOfContacts,
   backup,
 }
