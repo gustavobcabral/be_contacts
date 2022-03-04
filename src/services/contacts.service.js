@@ -44,6 +44,8 @@ import {
   WAITING_FEEDBACK,
   ERROR_PUBLISHER_ALREADY_WAITING_FEEDBACK,
   ERROR_CONTACT_PHONE_ALREADY_EXISTS,
+  ERROR_ID_CAMPAIGN_IS_MISSING,
+  ERROR_ID_CAMPAIGN_NOT_EXISTS,
 } from '../shared/constants/contacts.constant'
 import { URL_DROPBOX } from '../shared/constants/db.constant'
 
@@ -381,14 +383,29 @@ const getSummary = async ({ user, idCampaign }) => {
 
 const getSummaryContacts = async (request) => {
   const { user } = getParamsForGetWithUser(request)
-  const campaignActive = await getDetailsCampaignActive()
-  const idCampaign = campaignActive ? campaignActive.id : null
-  return getSummary({ user, idCampaign })
+  return getSummary({ user })
 }
+
 const getSummaryOneCampaign = async (request) => {
   const { user, id } = getParamsForGetOneWithUser(request)
+  if (!id || id === 'undefined') {
+    throw {
+      httpErrorCode: HttpStatus.BAD_REQUEST,
+      error: ERROR_ID_CAMPAIGN_IS_MISSING,
+      extra: { idCampaign: id },
+    }
+  }
+
   const campaign = await getOneCampaign(id)
-  const idCampaign = campaign ? campaign.id : null
+  if (!campaign) {
+    throw {
+      httpErrorCode: HttpStatus.BAD_REQUEST,
+      error: ERROR_ID_CAMPAIGN_NOT_EXISTS,
+      extra: { idCampaign: id },
+    }
+  }
+
+  const idCampaign = campaign.id
   return getSummary({ user, idCampaign })
 }
 
