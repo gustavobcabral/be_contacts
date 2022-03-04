@@ -10,8 +10,7 @@ const fields = ['name', 'dateStart', 'dateFinal']
 
 const getAll = async (queryParams) => crud.getAll(tableName, queryParams)
 
-const getOne = async ( id ) =>
-  crud.getOneRecord({ id, tableName, columnPrimary })
+const getOne = async (id) => crud.getOneRecord({ id, tableName, columnPrimary })
 
 const buildSQLGetAll = (idCampaign, queryParams) => {
   if (!idCampaign) return
@@ -98,7 +97,6 @@ const buildSQLGetAll = (idCampaign, queryParams) => {
 
     if (typeCompany !== '-1')
       sql.andWhere((qB) => qB.where('typeCompany', typeCompany))
-
   }
 
   return sql
@@ -125,6 +123,11 @@ const getCampaignByIntervalDate = async (dateStart, dateFinal) =>
     .from(tableName)
     .whereBetween('dateStart', [dateStart, dateFinal])
     .orWhereBetween('dateFinal', [dateStart, dateFinal])
+    .orWhere((builder) =>
+      builder
+        .where('dateStart', '<=', dateStart)
+        .andWhere('dateFinal', '>=', dateStart)
+    )
     .first()
 
 const createRecord = async (data) => crud.createRecord(data, tableName)
@@ -259,7 +262,7 @@ const getType = async (user, idCampaign) => {
   )
 }
 
-const getLocations = async (user, idCampaign) =>{
+const getLocations = async (user, idCampaign) => {
   const sql = knex
     .select(
       'contacts.idLocation as value',
@@ -270,20 +273,20 @@ const getLocations = async (user, idCampaign) =>{
     .leftJoin('cities', 'cities.id', '=', 'contacts.idLocation')
     .leftJoin('departments', 'departments.id', '=', 'cities.idDepartment')
     .where('detailsContacts.idCampaign', idCampaign)
-    if (user.idResponsibility < MINISTERIAL_SERVANT) {
-      sql.andWhere((builder) =>
-        builder
-          .where('detailsContacts.createdBy', user.id)
-          .orWhere('detailsContacts.idPublisher', user.id)
-      )
-    }
-  
-    return sql.groupBy('contacts.idLocation', 'cities.name', 'departments.name')
-    .orderBy('cities.name')
+  if (user.idResponsibility < MINISTERIAL_SERVANT) {
+    sql.andWhere((builder) =>
+      builder
+        .where('detailsContacts.createdBy', user.id)
+        .orWhere('detailsContacts.idPublisher', user.id)
+    )
   }
 
+  return sql
+    .groupBy('contacts.idLocation', 'cities.name', 'departments.name')
+    .orderBy('cities.name')
+}
+
 const getAllContactsOneCampaignFilters = async ({ user, id }) => {
-  
   const genders = await getGenders(user, id)
   const languages = await getLanguages(user, id)
   const status = await getStatus(user, id)
