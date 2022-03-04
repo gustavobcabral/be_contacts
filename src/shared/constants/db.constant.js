@@ -13,6 +13,10 @@ const fieldsNoTypeText = [
   'lastConversationInDays',
   'active',
   'idStatus',
+  'dateStart',
+  'campaignDateStart',
+  'dateFinal',
+  'campaignDateFinal',
 ]
 
 export {

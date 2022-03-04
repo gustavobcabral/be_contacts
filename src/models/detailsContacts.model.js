@@ -1,5 +1,6 @@
 import knex from '../config/connection'
 import crud from './crudGeneric.model'
+import { getDetailsCampaignActive } from './campaigns.model'
 import {
   isNil,
   isEmpty,
@@ -35,6 +36,7 @@ const getDetailsOneContact = async ({ id, query }) => {
       'detailsContacts.updatedAt',
       'detailsContacts.updatedBy',
       'detailsContacts.idPublisher',
+      'detailsContacts.idCampaign',
       'detailsContacts.id',
       'contacts.name',
       'contacts.owner',
@@ -44,10 +46,14 @@ const getDetailsOneContact = async ({ id, query }) => {
       'contacts.typeCompany',
       'publishers.name as publisherName',
       'publisherCreatedBy.name as publisherCreatedByName',
-      'publisherUpdatedBy.name as publisherUpdatedByName'
+      'publisherUpdatedBy.name as publisherUpdatedByName',
+      'campaigns.name as campaignName',
+      'campaigns.dateStart as campaignDateStart',
+      'campaigns.dateFinal as campaignDateFinal'
     )
     .from(tableName)
     .leftJoin('publishers', 'detailsContacts.idPublisher', '=', 'publishers.id')
+    .leftJoin('campaigns', 'detailsContacts.idCampaign', '=', 'campaigns.id')
     .leftJoin(
       'publishers as publisherCreatedBy',
       'detailsContacts.createdBy',
@@ -139,6 +145,8 @@ const getDetailsAllContact = async () =>
 const getDetailsAllContactWaitingFeedback = async ({ query, user }) => {
   const { sort, perPage, currentPage, filters } = query
   const { idResponsibility } = user
+  const campaign = await getDetailsCampaignActive()
+
   const sql = knex
     .select(
       'id',
@@ -158,12 +166,20 @@ const getDetailsAllContactWaitingFeedback = async ({ query, user }) => {
       'phone',
       'typeCompany',
       'createdAtDetailsContacts',
-      'waitingFeedback'
+      'waitingFeedback',
+      'idCampaign',
+      'campaignName',
+      'campaignDateStart',
+      'campaignDateFinal'
     )
     .from('viewListContactsWaitingFeedback')
 
+  sql.whereNotNull('phone')
+
+  if (campaign) sql.andWhere('idCampaign', campaign.id)
+
   if (idResponsibility < MINISTERIAL_SERVANT) {
-    sql.where((builder) =>
+    sql.andWhere((builder) =>
       builder.where('createdBy', user.id).orWhere('idPublisher', user.id)
     )
   }
@@ -191,7 +207,7 @@ const getDetailsAllContactWaitingFeedback = async ({ query, user }) => {
       !isEmpty(responsible) &&
       !isEmpty(note)
     ) {
-      sql.where((builder) =>
+      sql.andWhere((builder) =>
         builder
           .where('contactName', 'ilike', `%${name}%`)
           .orWhere('owner', 'ilike', `%${owner}%`)
@@ -234,6 +250,28 @@ const getGenders = async (user) => {
   return sql
 }
 
+const getCampaigns = async (user) => {
+  const sql = knex
+    .count('detailsContacts.idCampaign')
+    .select('detailsContacts.idCampaign', 'campaigns.name as campaignName')
+    .from(tableName)
+    .leftJoin('contacts', 'detailsContacts.phoneContact', '=', 'contacts.phone')
+    .leftJoin('campaigns', 'campaigns.id', '=', 'detailsContacts.idCampaign')
+    .where('detailsContacts.information', WAITING_FEEDBACK)
+    .whereNotNull('detailsContacts.idCampaign')
+    .groupBy('detailsContacts.idCampaign', 'campaigns.name')
+
+  if (user.idResponsibility < MINISTERIAL_SERVANT) {
+    sql.where((builder) =>
+      builder
+        .where('detailsContacts.createdBy', user.id)
+        .orWhere('detailsContacts.idPublisher', user.id)
+    )
+  }
+  sql.orderBy('campaigns.name')
+
+  return sql
+}
 const getLanguages = async (user) => {
   const sql = knex
     .count('idLanguage')
@@ -340,11 +378,19 @@ const getType = async (user) => {
 const getFiltersWaitingFeedback = async ({ user }) => {
   const genders = await getGenders(user)
   const languages = await getLanguages(user)
+  const campaigns = await getCampaigns(user)
   const status = await getStatus(user)
   const publishersResponsibles = await getPublishersResponsibles(user)
   const typeCompany = await getType(user)
 
-  return { genders, languages, status, publishersResponsibles, typeCompany }
+  return {
+    genders,
+    languages,
+    campaigns,
+    status,
+    publishersResponsibles,
+    typeCompany,
+  }
 }
 
 const createRecord = async (data) => crud.createRecord(data, tableName)

@@ -21,6 +21,10 @@ import {
   getIDLastDetailsContactOneContact,
   updateIsLastValueOneContact,
 } from '../models/detailsContacts.model'
+import {
+  getDetailsCampaignActive,
+  getOne as getOneCampaign,
+} from '../models/campaigns.model'
 import asyncPipe from 'pipeawait'
 import {
   first,
@@ -40,6 +44,8 @@ import {
   WAITING_FEEDBACK,
   ERROR_PUBLISHER_ALREADY_WAITING_FEEDBACK,
   ERROR_CONTACT_PHONE_ALREADY_EXISTS,
+  ERROR_ID_CAMPAIGN_IS_MISSING,
+  ERROR_ID_CAMPAIGN_NOT_EXISTS,
 } from '../shared/constants/contacts.constant'
 import { URL_DROPBOX } from '../shared/constants/db.constant'
 
@@ -48,7 +54,9 @@ import {
   getParamsForGet,
   getParamsForCreate,
   getParamsForGetOne,
+  getParamsForGetWithUser,
   getParamsForDelete,
+  getParamsForGetOneWithUser,
 } from '../shared/helpers/generic.helper'
 import fs from 'fs'
 import { execute } from '@getvim/execute'
@@ -225,6 +233,7 @@ const assignAllContactsToAPublisher = async (data) =>
       createRecordDetailsContact({
         information: WAITING_FEEDBACK,
         idPublisher: getLodash('idPublisher', data),
+        idCampaign: getLodash('idCampaign', data),
         createdBy: getLodash('createdBy', data),
         isLast: true,
         phoneContact,
@@ -252,8 +261,8 @@ const cancelAssignAllContactsToAPublisher = async (data) =>
     )(getLodash('phones', data))
   )
 
-const getSummaryContacts = async (user) => {
-  const totals = await getSummaryTotals(getLodash('id', user))
+const getSummary = async ({ user, idCampaign }) => {
+  const totals = await getSummaryTotals(getLodash('id', user), idCampaign)
   const totalContacts = Number(totals.totalContacts.count)
 
   const totalContactsContacted = Number(totals.totalContactsContacted.count)
@@ -372,6 +381,34 @@ const getSummaryContacts = async (user) => {
   }
 }
 
+const getSummaryContacts = async (request) => {
+  const { user } = getParamsForGetWithUser(request)
+  return getSummary({ user })
+}
+
+const getSummaryOneCampaign = async (request) => {
+  const { user, id } = getParamsForGetOneWithUser(request)
+  if (!id || id === 'undefined') {
+    throw {
+      httpErrorCode: HttpStatus.BAD_REQUEST,
+      error: ERROR_ID_CAMPAIGN_IS_MISSING,
+      extra: { idCampaign: id },
+    }
+  }
+
+  const campaign = await getOneCampaign(id)
+  if (!campaign) {
+    throw {
+      httpErrorCode: HttpStatus.BAD_REQUEST,
+      error: ERROR_ID_CAMPAIGN_NOT_EXISTS,
+      extra: { idCampaign: id },
+    }
+  }
+
+  const idCampaign = campaign.id
+  return getSummary({ user, idCampaign })
+}
+
 const getAllFiltersOfContacts = async (request) =>
   asyncPipe(
     getFilters,
@@ -426,4 +463,5 @@ export default {
   getSummaryContacts,
   getAllFiltersOfContacts,
   backup,
+  getSummaryOneCampaign,
 }
