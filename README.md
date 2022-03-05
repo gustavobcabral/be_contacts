@@ -2,7 +2,8 @@
 
 ## First Steps
 
-1- Clone the project
+1 - Clone the project
+
 2 - Update the files knexfile.js (both) to use your credentials in development or test environment. In production environment when you attach the database, heroku will creates the env `DATABASE_URL`.
 
 3 - Development environment:
