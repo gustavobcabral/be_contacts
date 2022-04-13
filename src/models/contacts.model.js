@@ -431,6 +431,17 @@ const getSummaryTotals = async (userId, idCampaign) => {
       'departments.name'
     )
 
+  let totalContactsReachedGoal = 0
+  if (idCampaign) {
+    const totalContactsReachedGoalSql = knex('detailsContacts')
+      .countDistinct('phoneContact')
+      .whereNot({ information: WAITING_FEEDBACK })
+      .andWhere('goalReached', true)
+      .andWhere('idCampaign', idCampaign)
+
+    totalContactsReachedGoal = await totalContactsReachedGoalSql.first()
+  }
+
   return {
     totalContacts,
     totalContactsContacted,
@@ -445,6 +456,7 @@ const getSummaryTotals = async (userId, idCampaign) => {
     totalContactsByType,
     totalContactsByLocation,
     totalContactsByLocationContacted,
+    totalContactsReachedGoal,
   }
 }
 
