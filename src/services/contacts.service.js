@@ -359,9 +359,14 @@ const getSummary = async ({ user, idCampaign }) => {
   )
 
   const totalContactsReachedGoal = Number(totals.totalContactsReachedGoal.count)
+  const totalContactsNoReachedGoal =
+    totalContactsContacted - totalContactsReachedGoal
 
   const totalPercentContactsReachedGoal =
-    (totalContactsReachedGoal / totalContacts) * 100
+    (totalContactsReachedGoal / totalContactsContacted) * 100
+
+  const totalPercentContactsNoReachedGoal =
+    100 - totalPercentContactsReachedGoal
 
   return {
     totalContacts,
@@ -383,8 +388,10 @@ const getSummary = async ({ user, idCampaign }) => {
     totalContactsByType,
     totalContactsByLocation,
     totalContactsByLocationContacted,
-    totalContactsReachedGoal,
     totalPercentContactsReachedGoal,
+    totalContactsReachedGoal,
+    totalPercentContactsNoReachedGoal,
+    totalContactsNoReachedGoal,
   }
 }
 
